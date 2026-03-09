@@ -1,9 +1,10 @@
 
-# Technical Specification: `drake.el` (v2)
+# Technical Specification: `drake.el`
 
-`drake` is a high-level statistical visualization library for Emacs. It is designed to be data-agnostic, supporting both columnar and row-based formats seamlessly.
+`drake` is a high-level statistical visualization library for Emacs. It provides a declarative, "Seaborn-style" API to transform data from **DuckDB** and **SQLite** into high-quality images without external runtimes (Python/JS).
 
-## 1. Package Specification: `drake`
+
+## 1. Package Specification
 
 ### Core Philosophy
 
@@ -16,146 +17,127 @@
 All plotting functions follow a consistent signature:
 `(drake-plot-type :data DATA :x X :y Y &rest ARGS)`
 
-#### Common Arguments
+## 2. Plot Object & Return Value
 
-| Argument | Type | Requirement | Description |
-| --- | --- | --- | --- |
-| `:data` | Plist or List | **Required** | The dataset (e.g., your DuckDB `:data` plist). |
-| `:x` | Keyword/Int | **Required** | The column key or index for the x-axis. |
-| `:y` | Keyword/Int | Optional | The column key or index for the y-axis. |
-| `:hue` | Keyword/Int | Optional | Groups data by color/category. |
-| `:palette` | Symbol | Optional | Color scheme (e.g., `'viridis`, `'magma`, `'coolwarm`). |
-| `:title` | String | Optional | Plot title. |
-| `:buffer` | String | Optional | The buffer name to display the plot in. Defaults to `*drake-plot*`. |
-
----
-
-### Plot Types & Specific Arguments
-
-#### 1. `drake-plot-scatter` & `drake-plot-line`
-
-* **Purpose:** Relational plots.
-* **Specific Args:** * `:style`: Map a column to different marker shapes or line dashes.
-* `:size`: Map a column to marker size/line width.
-
-
-
-#### 2. `drake-plot-bar` & `drake-plot-count`
-
-* **Purpose:** Categorical estimates.
-* **Specific Args:**
-* `:estimator`: Function to aggregate (default `'mean`).
-* `:errorbar`: Boolean or method (e.g., `'sd` for standard deviation).
-
-
-
-#### 3. `drake-plot-violin` & `drake-plot-box`
-
-* **Purpose:** Distributional plots.
-* **Specific Args:**
-* `:inner`: For violins: `'box`, `'quartile`, `'point`, or `nil`.
-* `:split`: (Boolean) If using `:hue` with two levels, draws half-violins.
-
-
-
-### Return Value
-
-Every function returns a **`drake-plot` struct**.
-
-* In an interactive call, it automatically renders the image to the target buffer.
-* In a non-interactive call (Lisp-only), it returns the struct containing the calculated scales, coordinates, and raw SVG/Bitmap data for further manipulation.
-
-
-## 4. Supported Input Formats
-
-The `:data` argument now accepts three distinct shapes:
-
-| Format | Source | Example Structure |
-| --- | --- | --- |
-| **Columnar Plist** | DuckDB (Performance) | `(:id [1 2] :val [10.5 20.1])` |
-| **Row List (Named)** | DuckDB / SQLite Alist | `((:id 1 :val 10.5) (:id 2 :val 20.1))` |
-| **Row List (Positional)** | SQLite / DuckDB Basic | `((1 10.5) (2 20.1))` |
-
----
-
-## 5. API Surface & Dispatch Logic
-
-### 5.1 The Coordinate Mapping
-
-Because data can be named or positional, the `:x` and `:y` arguments are interpreted based on the data shape:
-
-* If data is **Columnar** or **Named Rows**: `:x` should be a **keyword** (e.g., `:age`).
-* If data is **Positional Rows**: `:x` should be an **integer** index (e.g., `0`).
-
-### 5.2 Core Functions
-
-`drake-plot-scatter`, `drake-plot-line`, `drake-plot-bar`, `drake-plot-violin`, `drake-plot-box`.
-
-**Required Arguments:**
-
-* `:data`: One of the three formats above.
-* `:x`: Column identifier (Keyword or Integer).
-* `:y`: Column identifier (Keyword or Integer).
-
----
-
-## 6. The Data Normalization Spec (Internal)
-
-To maintain performance, `drake` converts input to **internal columnar vectors** only for the specific columns needed for the current plot.
-
-### Logic Flow:
-
-1. **Identify Format:** Check if `(plistp (car data))` or `(vectorp (cadr data))`.
-2. **Extract Column:** - **Columnar:** Direct `plist-get`.
-* **Named Row:** Map `(lambda (r) (plist-get r key))` over the list.
-* **Positional Row:** Map `(lambda (r) (nth index r))` over the list.
-
-
-3. **Result:** A standard Elisp vector for the plotting math.
-
----
-
-## 7. Staged Development Plan
-
-### Stage 1: The Hybrid Foundation
-
-* **Goal:** Implement the `drake--extract-column` dispatcher.
-* **Function:** `drake-plot-scatter`.
-* **Support:** All 3 data formats but with limited options (no hue/styling).
-* **Validation:** Ensure a 10,000-row SQLite list doesn't trigger a massive GC hit during extraction.
-
-### Stage 2: Categorical Dispatching
-
-* **Goal:** Grouping logic.
-* **Feature:** Add `:hue` support.
-* **Complexity:** The dispatcher must now extract 3 columns (x, y, hue) and align them. If `:hue` points to a column of strings, `drake` must auto-generate a discrete color mapping.
-
-### Stage 3: Statistical Geometry
-
-* **Goal:** Non-linear plots (`drake-plot-violin`, `drake-plot-box`).
-* **Math:** Add `drake-stats.el` to calculate quartiles and KDE.
-* **Visuals:** Implementation of "Inner" violin styles (quartiles vs points).
-
-### Stage 4: Native Performance (The "Drake-Core" Module)
-
-* **Goal:** Offload extraction.
-* **Optimization:** If the data is already in a C-pointer (from DuckDB), pass the pointer directly to the Rust/C `drake` module to avoid Elisp iteration entirely.
-
----
-
-## 8. Usage Example (The Universal API)
+Every plotting function returns a `drake-plot` structure. This allows for programmatic inspection of the plot's state or re-rendering to different sizes.
 
 ```elisp
-;; 1. Using SQLite (Positional Rows)
-(drake-plot-scatter :data (sqlite-select db "SELECT age, bmi FROM users")
-                    :x 0 :y 1 :title "Positional SQLite")
+(cl-defstruct drake-plot
+  spec           ;; The original plist of arguments passed to the function
+  data-internal  ;; The extracted/normalized columnar vectors
+  scales         ;; Mapping functions from data-space to pixel-space
+  image          ;; The actual Emacs image object (SVG or Bitmap)
+  buffer         ;; The buffer where the plot was rendered
+  )
 
-;; 2. Using DuckDB (Columnar Plist)
-(drake-plot-scatter :data (duckdb-select-columns conn "SELECT age, bmi FROM users")
-                    :x :age :y :bmi :title "Columnar DuckDB")
+```
 
-;; 3. Using Row-based Plists
-(drake-plot-scatter :data '((:age 25 :bmi 22.1) (:age 30 :bmi 24.5))
-                    :x :age :y :bmi :title "Named Rows")
+---
+
+## 3. The API Definition
+
+### 3.1 Core Plotting Functions
+
+* `drake-plot-scatter`: Relationship between two numeric variables.
+* `drake-plot-line`: Trends over time or ordered sequences.
+* `drake-plot-bar`: Aggregate estimates (mean/count) across categories.
+* `drake-plot-hist`: Univariate frequency distributions.
+* `drake-plot-violin`: Density and distribution (Stage 3).
+* `drake-plot-box`: Statistical quartiles and outliers (Stage 3).
+
+### 3.2 Arguments
+
+| Argument | Status | Description |
+| --- | --- | --- |
+| `:data` | **Required** | Plist of vectors (Columnar) or List of lists (Row-based). |
+| `:x` | **Required** | Column identifier (Keyword for plists, Integer for rows). |
+| `:y` | **Required*** | Dependent variable (required for all but `hist`/`count`). |
+| `:hue` | Optional | Column identifier for color grouping. |
+| `:palette` | Optional | Symbol naming a color scheme (e.g., `'viridis`). |
+| `:title` | Optional | String title for the chart. |
+| `:buffer` | Optional | Target buffer name (defaults to `*drake-plot*`). |
+| `:width` | Optional | Pixel width (defaults to 600). |
+| `:height` | Optional | Pixel height (defaults to 400). |
+
+---
+
+## 4. Staged Development Plan
+
+### Stage 1: The Duckling (Hybrid Foundation)
+
+**Goal:** Get a scatter plot on screen from DuckDB columnar data or basic SQLite rows.
+
+* **Data Support:** Prioritize Columnar Plists (DuckDB). Implement a basic `drake--ensure-vector` utility.
+* **Math:** Linear scaling for X and Y axes.
+* **Renderer:** Pure Elisp `svg.el`.
+* **Options:** Only `:data`, `:x`, `:y`, and `:title`.
+* **Visuals:** Points only. No legends, no axis labels yet.
+* **Plot Types:** `scatter`.
+* **Options:** `:data`, `:x`, `:y`.
+* **Backend:** Basic `svg.el` (native Elisp).
+* **Milestone:** Query DuckDB, pass two columns of floats, and see dots in an Emacs buffer.
+
+### Stage 2: The Mallard (Aesthetics & Row Formats)
+
+**Goal:** Full support for various data shapes and visual polish.
+
+* **Data Support:** Full normalization for SQLite "Row-Lists" (Positional) and "Alist-Rows" (Named).
+* **Features:** Implementation of `:hue`. Generate a legend automatically.
+* **Plot Types:** Add `drake-plot-bar` and `drake-plot-line`.
+* **Visuals:** Add Axis Ticks, Grid Lines, and dynamic Padding.
+* **Plot Types:** `bar` (simple counts).
+* **Options:** Add `:hue` and `:palette`.
+* **Infrastructure:** Build a "Color Manager" that maps unique values in a `:hue` column to specific HEX codes.
+
+### Stage 3: The Canvas (Statistical Depth)
+
+**Goal:** High-level statistical visualizations.
+
+* **Math:** Implement **KDE (Kernel Density Estimation)** for violins and **Quartile Calculation** for box plots in Elisp.
+* **Plot Types:** `drake-plot-violin`, `drake-plot-box`, and `drake-plot-hist`.
+* **Features:** Faceting (creating a grid of small plots).
+* **Options:** `:inner`, `:bins`.
+* **Logic:** Implement (or wrap in Rust) Kernel Density Estimation (KDE) and Quartile calculations.
+* **Visuals:** Add grid lines and axis labels with proper typography.
+
+### Stage 4: Relational Regression & Smoothing
+
+* **Goal:** Trend lines and uncertainty.
+* **Plot Types:** `lmplot` (Linear Model).
+* **Logic:** Implement a simple Ordinary Least Squares (OLS) regression to draw "lines of best fit" over scatter plots.
+* **UI:** Add interactive tooltips (using Emacs "overlays") that show data values when the mouse hovers over a point.
+
+### Stage 5: High Performance (The Great Drake)
+
+**Goal:** Scale to millions of rows without UI lag.
+
+* **Architecture:** Move geometry and rendering to a **Rust Dynamic Module** (using `plotters` crate).
+* **Features:** Add `:regression t` to scatter plots (Linear Regression).
+* **Interactive UI:** Hover tooltips using Emacs overlays to show exact data values under the cursor.
+
+---
+
+## 6. Minimal Implementation Path (Stage 1)
+
+To get running quickly, we start with a **Columnar-first** approach:
+
+```elisp
+(defun drake-plot-scatter (&rest args)
+  "Basic scatter plot for Columnar data. 
+Usage: (drake-plot-scatter :data duck-res :x :age :y :height)"
+  (let* ((data (plist-get args :data))
+         (x-vec (plist-get data (plist-get args :x)))
+         (y-vec (plist-get data (plist-get args :y)))
+         ;; 1. Calculate Min/Max for scales
+         (x-range (drake--get-range x-vec))
+         (y-range (drake--get-range y-vec))
+         ;; 2. Generate SVG image
+         (svg-img (drake--render-simple-points x-vec y-vec x-range y-range args)))
+
+    ;; 3. Insert into buffer
+    (drake--display-in-buffer svg-img (plist-get args :buffer))
+
+    ;; 4. Return the plot object
+    (make-drake-plot :spec args :image svg-img :data-internal (list x-vec y-vec))))
 
 ```
