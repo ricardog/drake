@@ -1,0 +1,40 @@
+;;; stage3-tests.el --- Tests for Stage 3 features -*- lexical-binding: t; -*-
+
+(require 'test-helper)
+(require 'drake)
+(require 'drake-svg)
+
+(ert-deftest drake-plot-hist-test ()
+  (let* ((data '(:val [1 1 2 2 2 3 4 5 5 5 5]))
+         (plot (drake-plot-hist :data data :x :val :bins 5 :title "Histogram Test")))
+    (should (drake-plot-p plot))
+    (should (eq (plist-get (drake-plot-spec plot) :type) 'hist))
+    (let ((data-int (drake-plot-data-internal plot)))
+      (should (equal (length (plist-get data-int :x)) 5))
+      (should (equal (length (plist-get data-int :y)) 5)))))
+
+(ert-deftest drake-plot-box-test ()
+  (let* ((data '((:cat "A" :val 10) (:cat "A" :val 12) (:cat "A" :val 15)
+                 (:cat "B" :val 20) (:cat "B" :val 22) (:cat "B" :val 25)))
+         (plot (drake-plot-box :data data :x :cat :y :val :title "Box Plot Test")))
+    (should (drake-plot-p plot))
+    (should (eq (plist-get (drake-plot-spec plot) :type) 'box))
+    (let ((extra (plist-get (drake-plot-data-internal plot) :extra)))
+      (should (equal (length extra) 2))
+      (should (plist-get (aref extra 0) :median)))))
+
+(ert-deftest drake-plot-violin-test ()
+  (let* ((data '((:cat "A" :val 10) (:cat "A" :val 12) (:cat "A" :val 15)
+                 (:cat "B" :val 20) (:cat "B" :val 22) (:cat "B" :val 25)))
+         (plot (drake-plot-violin :data data :x :cat :y :val :title "Violin Plot Test")))
+    (should (drake-plot-p plot))
+    (should (eq (plist-get (drake-plot-spec plot) :type) 'violin))))
+
+(ert-deftest drake-plot-hist-hue-test ()
+  (let* ((data '(:val [1 2 3 4 5 1 2 3 4 5] :h ["A" "A" "A" "A" "A" "B" "B" "B" "B" "B"]))
+         (plot (drake-plot-hist :data data :x :val :hue :h :bins 2)))
+    (should (drake-plot-p plot))
+    (let ((data-int (drake-plot-data-internal plot)))
+      (should (equal (length (plist-get data-int :hue)) 4)))))
+
+(provide 'stage3-tests)

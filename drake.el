@@ -36,7 +36,7 @@
 
 (cl-defstruct drake-plot
   spec           ;; The original plist of arguments passed to the function
-  data-internal  ;; Normalized columnar vectors (plist of vectors)
+  data-internal  ;; Normalized columnar vectors (plist of vectors: :x :y :hue :extra)
   scales         ;; Mapping functions/data from data-space to pixel-space
   image          ;; The actual Emacs image object (SVG or Bitmap)
   buffer         ;; The buffer where the plot was rendered
@@ -83,6 +83,85 @@ See `drake-plot-scatter' for ARGS."
 See `drake-plot-scatter' for ARGS."
   (drake--create-plot 'bar args))
 
+(defun drake-plot-hist (&rest args)
+  "Create a histogram.
+ARGS is a plist containing:
+:data    - Columnar data (plist of vectors) or row-based data.
+:x       - Column identifier to bin.
+:bins    - Number of bins (default 10).
+:hue     - Column identifier for color grouping.
+:palette - Palette name.
+:title   - Plot title.
+:buffer  - Target buffer name.
+:width   - Plot width.
+:height  - Plot height."
+  (drake--create-plot 'hist args))
+
+(defun drake-plot-box (&rest args)
+  "Create a box plot.
+See `drake-plot-scatter' for ARGS."
+  (drake--create-plot 'box args))
+
+(defun drake-plot-violin (&rest args)
+  "Create a violin plot.
+See `drake-plot-scatter' for ARGS."
+  (drake--create-plot 'violin args))
+
+(defun drake-facet (&rest args)
+  "Create a faceted plot (grid of plots).
+ARGS is a plist containing:
+:data    - Columnar data.
+:row     - Column identifier to facet by row.
+:col     - Column identifier to facet by column.
+:plot-fn - Plotting function to use for each facet (e.g., #'drake-plot-scatter).
+:args    - Additional arguments to pass to :plot-fn.
+:title   - Overall title."
+  (let* ((data (plist-get args :data))
+         (row-key (plist-get args :row))
+         (col-key (plist-get args :col))
+         (plot-fn (plist-get args :plot-fn))
+         (plot-args (plist-get args :args))
+         (rows (if row-key (drake--get-unique-values (drake--extract-column data row-key)) '(nil)))
+         (cols (if col-key (drake--get-unique-values (drake--extract-column data col-key)) '(nil)))
+         (grid nil))
+    (dolist (r rows)
+      (let ((row-data nil))
+        (dolist (c cols)
+          (let* ((subset (drake--filter-data data (list (cons row-key r) (cons col-key c))))
+                 (p (apply plot-fn :data subset plot-args)))
+            (push p row-data)))
+        (push (nreverse row-data) grid)))
+    (setq grid (nreverse grid))
+    ;; Create a composite plot or handle display differently
+    ;; For now, we'll just return the grid and let the user display it
+    ;; But a better way is to have a drake-facet-plot struct or similar.
+    grid))
+
+(defun drake--filter-data (data filters)
+  "Filter DATA based on FILTERS (alist of key . value)."
+  (let* ((actual-data (if (plist-get data :data) (plist-get data :data) data))
+         (indices nil))
+    ;; 1. Find indices that match all filters
+    (let ((n (length (drake--extract-column actual-data (caar filters)))))
+      (cl-loop for i from 0 below n do
+               (when (cl-every (lambda (f)
+                                 (let* ((k (car f))
+                                        (v (cdr f))
+                                        (col (drake--extract-column actual-data k)))
+                                   (if k (equal (aref col i) v) t)))
+                               filters)
+                 (push i indices))))
+    (setq indices (nreverse indices))
+    ;; 2. Extract subset for all keys in data
+    (cond
+     ((and (listp actual-data) (keywordp (car-safe actual-data)))
+      (let (res)
+        (cl-loop for (k v) on actual-data by #'cddr do
+                 (push k res)
+                 (push (vconcat (mapcar (lambda (i) (aref v i)) indices)) res))
+        (nreverse res)))
+     (t (error "Faceting currently only supports columnar plist data format")))))
+
 (defun drake--create-plot (type args)
   "Internal function to create a plot of TYPE with ARGS."
   (let* ((data (plist-get args :data))
@@ -94,35 +173,140 @@ See `drake-plot-scatter' for ARGS."
          (x-vec (plist-get normalized :x))
          (y-vec (plist-get normalized :y))
          (hue-vec (plist-get normalized :hue))
-         ;; 2. Determine Scale Types
-         (x-type (drake--detect-type x-vec))
-         (y-type (drake--detect-type y-vec))
-         ;; 3. Calculate scales
-         (x-scale (drake--make-scale x-vec x-type))
-         (y-scale (drake--make-scale y-vec y-type))
-         ;; 4. Scale data to 0.0-1.0 (Front-end responsibility)
-         (x-scaled (drake--apply-scale x-vec x-scale))
-         (y-scaled (drake--apply-scale y-vec y-scale))
-         ;; 5. Handle Hue
-         (hue-info (when hue-vec (drake--process-hue hue-vec (plist-get args :palette))))
+         ;; 2. Statistical Transformation (Stage 3)
+         (transformed (drake--transform-data type x-vec y-vec hue-vec args))
+         (x-final (plist-get transformed :x))
+         (y-final (plist-get transformed :y))
+         (hue-final (plist-get transformed :hue))
+         (extra-data (plist-get transformed :extra))
+         ;; 3. Determine Scale Types
+         (x-type (drake--detect-type x-final))
+         (y-type (drake--detect-type y-final))
+         ;; 4. Calculate scales
+         (x-scale (drake--make-scale x-final x-type))
+         (y-scale (drake--make-scale y-final y-type))
+         ;; 5. Scale data to 0.0-1.0
+         (x-scaled (drake--apply-scale x-final x-scale))
+         (y-scaled (drake--apply-scale y-final y-scale))
+         ;; 6. Handle Hue
+         (hue-info (when hue-final (drake--process-hue hue-final (plist-get args :palette))))
          (backend-sym (or (plist-get args :backend) drake-default-backend))
          (backend (gethash backend-sym drake--backends))
          (plot (make-drake-plot
                 :spec (append (list :type type) args)
-                :data-internal (list :x x-scaled :y y-scaled :hue (plist-get hue-info :values))
+                :data-internal (list :x x-scaled :y y-scaled :hue (plist-get hue-info :values) :extra extra-data)
                 :scales (list :x x-scale :y y-scale :hue (plist-get hue-info :map)
                               :x-type x-type :y-type y-type))))
 
     (unless backend
       (error "Backend '%s' not found. Is it loaded?" backend-sym))
 
-    ;; 6. Render
+    ;; 7. Render
     (setf (drake-plot-image plot) (funcall (drake-backend-render-fn backend) plot))
 
-    ;; 7. Display
+    ;; 8. Display
     (drake--display-in-buffer plot (or (plist-get args :buffer) "*drake-plot*"))
 
     plot))
+
+(defun drake--transform-data (type x-vec y-vec hue-vec args)
+  "Perform statistical transformation based on TYPE."
+  (cond
+   ((eq type 'hist)
+    (drake--transform-hist x-vec hue-vec (or (plist-get args :bins) 10)))
+   ((eq type 'box)
+    (drake--transform-stats x-vec y-vec hue-vec))
+   ((eq type 'violin)
+    (drake--transform-stats x-vec y-vec hue-vec))
+   (t
+    (list :x x-vec :y y-vec :hue hue-vec))))
+
+(defun drake--transform-hist (vec hue-vec bins)
+  "Transform VEC into binned counts for histogram."
+  (let* ((range (drake--get-range vec))
+         (min (car range))
+         (max (cdr range))
+         (span (- max min))
+         (bin-width (if (= span 0) 1.0 (/ (float span) bins)))
+         (results nil))
+    ;; For simplicity, we create centers of bins
+    (if hue-vec
+        (let ((groups (make-hash-table :test 'equal))
+              (unique-hues (drake--get-unique-values hue-vec)))
+          (cl-loop for i from 0 below (length vec) do
+                   (let ((h (aref hue-vec i))
+                         (v (aref vec i)))
+                     (push v (gethash h groups))))
+          (let (x-all y-all h-all)
+            (dolist (h unique-hues)
+              (let* ((vals (gethash h groups))
+                     (counts (make-vector bins 0)))
+                (dolist (v vals)
+                  (let ((bin (min (1- bins) (floor (/ (- v min) bin-width)))))
+                    (when (>= bin 0)
+                      (aset counts bin (1+ (aref counts bin))))))
+                (cl-loop for i from 0 below bins do
+                         (push (+ min (* i bin-width) (* 0.5 bin-width)) x-all)
+                         (push (aref counts i) y-all)
+                         (push h h-all))))
+            (list :x (vconcat (nreverse x-all))
+                  :y (vconcat (nreverse y-all))
+                  :hue (vconcat (nreverse h-all)))))
+      ;; No hue
+      (let ((counts (make-vector bins 0)))
+        (cl-loop for v across vec do
+                 (let ((bin (min (1- bins) (floor (/ (- v min) bin-width)))))
+                   (when (>= bin 0)
+                     (aset counts bin (1+ (aref counts bin))))))
+        (let ((x-centers (make-vector bins 0.0))
+              (y-counts (make-vector bins 0.0)))
+          (cl-loop for i from 0 below bins do
+                   (aset x-centers i (+ min (* i bin-width) (* 0.5 bin-width)))
+                   (aset y-counts i (float (aref counts i))))
+          (list :x x-centers :y y-counts))))))
+
+(defun drake--transform-stats (x-vec y-vec hue-vec)
+  "Calculate summary statistics (quartiles, etc.) for each category in X-VEC."
+  (let* ((groups (make-hash-table :test 'equal))
+         (categories (drake--get-unique-values x-vec))
+         (x-res nil) (y-res nil) (hue-res nil) (extra-res nil))
+    (cl-loop for i from 0 below (length x-vec) do
+             (let ((cat (aref x-vec i))
+                   (val (aref y-vec i))
+                   (h (when hue-vec (aref hue-vec i))))
+               (push val (gethash (cons cat h) groups))))
+    
+    (maphash
+     (lambda (key vals)
+       (let* ((sorted (sort (cl-remove-if-not #'numberp vals) #'<))
+              (n (length sorted)))
+         (when (> n 0)
+           (let ((min (car sorted))
+                 (max (car (last sorted)))
+                 (q1 (drake--quantile sorted 0.25))
+                 (median (drake--quantile sorted 0.5))
+                 (q3 (drake--quantile sorted 0.75)))
+             (push (car key) x-res)
+             (push median y-res) ;; representative Y
+             (push (cdr key) hue-res)
+             (push (list :min min :q1 q1 :median median :q3 q3 :max max :vals sorted) extra-res)))))
+     groups)
+    (list :x (vconcat (nreverse x-res))
+          :y (vconcat (nreverse y-res))
+          :hue (if hue-vec (vconcat (nreverse hue-res)) nil)
+          :extra (vconcat (nreverse extra-res)))))
+
+(defun drake--quantile (sorted-vec q)
+  "Get quantile Q from SORTED-VEC."
+  (let* ((n (length sorted-vec))
+         (index (* q (1- n)))
+         (low (floor index))
+         (high (ceiling index))
+         (fraction (- index low)))
+    (if (= low high)
+        (nth low sorted-vec)
+      (+ (* (1- fraction) (nth low sorted-vec))
+         (* fraction (nth high sorted-vec))))))
 
 ;;; Internal Helpers
 
