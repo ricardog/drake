@@ -61,7 +61,51 @@ Every plotting function returns a `drake-plot` structure. This allows for progra
 
 ---
 
-## 4. Staged Development Plan
+## 4. Backend API Definition
+
+The `drake` architecture separates the **Graph Language** (front-end) from the **Rendering Engine** (backend). This allows the same declarative plot definition to be rendered by pure Elisp for convenience or a C/Rust module for performance.
+
+### 4.1 The Graph Language Protocol
+
+The front-end is responsible for:
+1.  **Data Normalization:** Converting various input formats (DuckDB plists, row-lists, alists) into a consistent columnar format.
+2.  **Statistical Transformation:** Performing calculations like Histogram binning, Linear Regression, or KDE. The backend should receive "ready-to-draw" data.
+3.  **Coordinate Scaling:** Defining the mapping from data-space to normalized space (0.0 to 1.0) or pixel-space.
+4.  **Aesthetic Mapping:** Assigning colors (from palettes), shapes, and sizes based on data values (e.g., `:hue`).
+
+### 4.2 Backend Interface (`drake-backend`)
+
+A backend is registered as a `cl-defstruct`:
+
+```elisp
+(cl-defstruct drake-backend
+  name             ;; Symbol identifying the backend (e.g., 'svg, 'c-module)
+  render-fn        ;; Function: (lambda (plot) ...) -> emacs-image
+  supported-types  ;; List of plot types: '(scatter line bar hist)
+  capabilities     ;; Plist of features: '(:interactivity t :high-dpi t)
+  )
+```
+
+### 4.3 The Data Exchange Format
+
+The `drake-plot` object passed to the backend contains:
+
+*   **`:data-internal`**: A plist of Emacs vectors where each key represents a visual dimension (e.g., `:x`, `:y`, `:color`, `:size`).
+*   **`:scales`**: A plist of scale metadata. For numeric scales: `(:x (min . max) :y (min . max))`. For categorical: `(:hue ("Setosa" "Versicolor" "Virginica"))`.
+*   **`:spec`**: The original user arguments, providing context like `:title`, `:width`, and `:height`.
+
+### 4.4 Visual Primitives by Plot Type
+
+The backend must interpret the `plot-type` from the `spec` and apply the corresponding visual primitives:
+
+| Plot Type | Visual Primitive | Mapping |
+| --- | --- | --- |
+| `scatter` | Circles/Points | `x` -> X-coord, `y` -> Y-coord, `hue` -> Fill Color |
+| `line` | Connected Paths | `x` -> X-coord, `y` -> Y-coord (ordered by `x`) |
+| `bar` | Rectangles | `x` -> Category, `y` -> Height |
+| `hist` | Rectangles | `x` -> Bin Edge, `y` -> Frequency |
+
+## 5. Staged Development Plan
 
 ### Stage 1: The Duckling (Hybrid Foundation)
 
@@ -117,7 +161,7 @@ Every plotting function returns a `drake-plot` structure. This allows for progra
 
 ---
 
-## 6. Minimal Implementation Path (Stage 1)
+## 7. Minimal Implementation Path (Stage 1)
 
 To get running quickly, we start with a **Columnar-first** approach:
 
