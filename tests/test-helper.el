@@ -5,6 +5,7 @@
 
 (require 'drake)
 (require 'drake-svg)
+(require 'drake-gnuplot)
 (require 'ert)
 
 ;; Mock image functions for headless environments
