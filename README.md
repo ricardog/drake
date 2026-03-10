@@ -3,10 +3,15 @@ A high performance statistics plotting library for Emacs.
 
 `drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
 
-## Status: Stage 1 (The Duckling)
-- **Plot types:** Scatter plots.
-- **Backends:** Native SVG backend (`svg.el`).
-- **Data formats:** DuckDB columnar plists (plist of vectors).
+## Status: Stage 2 (The Mallard)
+- **Plot types:** Scatter, Line, and Bar plots.
+- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes.
+- **Backends:** Native SVG backend (`svg.el`) with grid lines and ticks.
+- **Data formats:** 
+  - DuckDB columnar plists (plist of vectors).
+  - Row-based list of lists (positional indexing).
+  - List of alists (named columns).
+  - List of plists (named columns).
 
 ## Sample Datasets
 
@@ -20,16 +25,18 @@ A high performance statistics plotting library for Emacs.
 ```elisp
 (require 'drake)
 (require 'drake-svg)
-(require 'duckdb)
 
-;; Plotting from a CSV dataset via DuckDB
-(let* ((db (duckdb-open ":memory:"))
-       (conn (duckdb-connect db)))
-  (duckdb-execute conn "CREATE TABLE iris AS SELECT * FROM read_csv_auto('/app/datasets/iris.csv.gz')")
-  (let ((data (duckdb-select-columns conn "SELECT sepal_length, sepal_width FROM iris")))
-    (drake-plot-scatter :data data :x :sepal_length :y :sepal_width :title "Iris Sepal Comparison"))
-  (duckdb-disconnect conn)
-  (duckdb-close db))
+;; Scatter plot with grouping
+(let ((data '((:x 1 :y 10 :group "A")
+              (:x 2 :y 15 :group "A")
+              (:x 1 :y 12 :group "B")
+              (:x 2 :y 18 :group "B"))))
+  (drake-plot-scatter :data data :x :x :y :y :hue :group :title "Grouped Points"))
+
+;; Bar plot with categorical X
+(let ((data '((:fruit "Apple"  :count 50)
+              (:fruit "Banana" :count 80))))
+  (drake-plot-bar :data data :x :fruit :y :count :title "Fruit Counts"))
 ```
 
 ## Running Examples
@@ -37,6 +44,7 @@ A high performance statistics plotting library for Emacs.
 Check the `examples/` directory for ready-to-run Elisp scripts:
 - `examples/iris-scatter.el`
 - `examples/tips-scatter.el`
+- `examples/stage2-demo.el` (Demonstrates new Stage 2 features)
 
 ## Running Tests
 

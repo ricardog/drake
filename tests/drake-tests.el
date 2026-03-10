@@ -10,21 +10,52 @@
 (ert-deftest drake--normalize-data-row-based-test ()
   ;; Test converting list of lists (rows) to columnar vectors
   (let* ((data '((1 10) (2 20) (3 30)))
-         (normalized (drake--normalize-data data 0 1)))
+         (normalized (drake--normalize-data data '(:x 0 :y 1))))
     (should (equal (plist-get normalized :x) [1 2 3]))
     (should (equal (plist-get normalized :y) [10 20 30]))))
 
-(ert-deftest drake--scale-vector-test ()
-  ;; Test scaling a vector to 0.0-1.0 range
-  (let ((vec [10 20 30]))
-    (should (equal (drake--scale-vector vec '(10 . 30)) [0.0 0.5 1.0]))))
+(ert-deftest drake--normalize-data-alist-test ()
+  ;; Test converting list of alists to columnar vectors
+  (let* ((data '(((:x . 1) (:y . 10) (:h . "a"))
+                 ((:x . 2) (:y . 20) (:h . "b"))))
+         (normalized (drake--normalize-data data '(:x :x :y :y :hue :h))))
+    (should (equal (plist-get normalized :x) [1 2]))
+    (should (equal (plist-get normalized :y) [10 20]))
+    (should (equal (plist-get normalized :hue) ["a" "b"]))))
 
-(ert-deftest drake-plot-scatter-scaling-test ()
-  ;; Test that drake-plot-scatter stores scaled data in data-internal
-  (let* ((data '(:x [10 20 30] :y [100 200 300]))
-         (plot (drake-plot-scatter :data data :x :x :y :y)))
-    ;; According to new spec, data-internal should be scaled 0.0 to 1.0
-    (should (equal (plist-get (drake-plot-data-internal plot) :x) [0.0 0.5 1.0]))
-    (should (equal (plist-get (drake-plot-data-internal plot) :y) [0.0 0.5 1.0]))))
+(ert-deftest drake--normalize-data-plist-rows-test ()
+  ;; Test converting list of plists to columnar vectors
+  (let* ((data '((:x 1 :y 10) (:x 2 :y 20)))
+         (normalized (drake--normalize-data data '(:x :x :y :y))))
+    (should (equal (plist-get normalized :x) [1 2]))
+    (should (equal (plist-get normalized :y) [10 20]))))
+
+(ert-deftest drake--detect-type-test ()
+  (should (eq (drake--detect-type [1 2 3]) 'numeric))
+  (should (eq (drake--detect-type ["a" "b" "c"]) 'categorical))
+  (should (eq (drake--detect-type [1 "a" 3]) 'categorical)))
+
+(ert-deftest drake--process-hue-test ()
+  (let* ((hue-vec ["a" "b" "a"])
+         (processed (drake--process-hue hue-vec nil))
+         (values (plist-get processed :values))
+         (map (plist-get processed :map)))
+    (should (= (length values) 3))
+    (should (equal (aref values 0) (aref values 2)))
+    (should-not (equal (aref values 0) (aref values 1)))
+    (should (assoc "a" map))
+    (should (assoc "b" map))))
+
+(ert-deftest drake-plot-line-smoke-test ()
+  (let* ((data '(:x [1 2 3] :y [10 20 30]))
+         (plot (drake-plot-line :data data :x :x :y :y)))
+    (should (drake-plot-p plot))
+    (should (eq (plist-get (drake-plot-spec plot) :type) 'line))))
+
+(ert-deftest drake-plot-bar-smoke-test ()
+  (let* ((data '(:x ["A" "B"] :y [10 20]))
+         (plot (drake-plot-bar :data data :x :x :y :y)))
+    (should (drake-plot-p plot))
+    (should (eq (plist-get (drake-plot-spec plot) :type) 'bar))))
 
 (provide 'drake-tests)
