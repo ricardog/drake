@@ -97,6 +97,11 @@ ARGS is a plist containing:
 :height  - Plot height."
   (drake--create-plot 'hist args))
 
+(defun drake-plot-lm (&rest args)
+  "Create a scatter plot with a linear regression line.
+See `drake-plot-scatter' for ARGS."
+  (drake--create-plot 'lm args))
+
 (defun drake-plot-box (&rest args)
   "Create a box plot.
 See `drake-plot-scatter' for ARGS."
@@ -204,7 +209,10 @@ ARGS is a plist containing:
     ;; 7. Render
     (setf (drake-plot-image plot) (funcall (drake-backend-render-fn backend) plot))
 
-    ;; 8. Display
+    ;; 8. Add tooltips (Stage 4)
+    (setf (drake-plot-image plot) (drake--attach-tooltips (drake-plot-image plot) plot))
+
+    ;; 9. Display
     (drake--display-in-buffer plot (or (plist-get args :buffer) "*drake-plot*"))
 
     plot))
@@ -218,8 +226,58 @@ ARGS is a plist containing:
     (drake--transform-stats x-vec y-vec hue-vec))
    ((eq type 'violin)
     (drake--transform-stats x-vec y-vec hue-vec))
+   ((eq type 'lm)
+    (drake--transform-lm x-vec y-vec hue-vec))
    (t
     (list :x x-vec :y y-vec :hue hue-vec))))
+
+(defun drake--transform-lm (x-vec y-vec hue-vec)
+  "Calculate OLS regression for each group in HUE-VEC (or overall)."
+  (let ((groups (make-hash-table :test 'equal))
+        (extra nil))
+    (if hue-vec
+        (cl-loop for i from 0 below (length x-vec) do
+                 (let ((h (aref hue-vec i)))
+                   (push (cons (aref x-vec i) (aref y-vec i)) (gethash h groups))))
+      (let (pts)
+        (cl-loop for i from 0 below (length x-vec) do
+                 (push (cons (aref x-vec i) (aref y-vec i)) pts))
+        (puthash 'overall pts groups)))
+    
+    (maphash
+     (lambda (h pts)
+       (let ((res (drake--ols-regression pts)))
+         (push (cons h res) extra)))
+     groups)
+    (list :x x-vec :y y-vec :hue hue-vec :extra (nreverse extra))))
+
+(defun drake--ols-regression (points)
+  "Perform Ordinary Least Squares regression on a list of (X . Y) points.
+Returns a plist (:m slope :b intercept :r2 r-squared)."
+  (let* ((n (length points))
+         (sum-x 0.0) (sum-y 0.0) (sum-xy 0.0) (sum-xx 0.0) (sum-yy 0.0))
+    (dolist (p points)
+      (let ((x (float (car p)))
+            (y (float (cdr p))))
+        (cl-incf sum-x x)
+        (cl-incf sum-y y)
+        (cl-incf sum-xy (* x y))
+        (cl-incf sum-xx (* x x))
+        (cl-incf sum-yy (* y y))))
+    (let* ((denom (- (* n sum-xx) (* sum-x sum-x)))
+           (m (if (= denom 0) 0.0 (/ (- (* n sum-xy) (* sum-x sum-y)) denom)))
+           (b (/ (- sum-y (* m sum-x)) n))
+           ;; R2 calculation
+           (ss-tot (- sum-yy (/ (* sum-y sum-y) n)))
+           (ss-res 0.0))
+      (dolist (p points)
+        (let* ((x (float (car p)))
+               (y (float (cdr p)))
+               (y-pred (+ (* m x) b))
+               (err (- y y-pred)))
+          (cl-incf ss-res (* err err))))
+      (let ((r2 (if (= ss-tot 0) 1.0 (- 1.0 (/ ss-res ss-tot)))))
+        (list :m m :b b :r2 r2)))))
 
 (defun drake--transform-hist (vec hue-vec bins)
   "Transform VEC into binned counts for histogram."
@@ -437,6 +495,23 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
                 (setq i (1+ i))
                 (cons val color)))
             unique-values)))
+
+(defun drake--attach-tooltips (img plot)
+  "Attach a summary tooltip to IMG based on PLOT data."
+  (let* ((spec (drake-plot-spec plot))
+         (type (plist-get spec :type))
+         (x-key (plist-get spec :x))
+         (y-key (plist-get spec :y))
+         (title (plist-get spec :title))
+         (tooltip (concat (when title (format "%s\n" title))
+                         (format "Type: %s\n" type)
+                         (format "X: %s\n" x-key)
+                         (when y-key (format "Y: %s\n" y-key)))))
+    (if (imagep img)
+        (progn
+          (plist-put (cdr img) :help-echo tooltip)
+          img)
+      img)))
 
 (defun drake--display-in-buffer (plot buffer-name)
   "Display PLOT in buffer BUFFER-NAME."
