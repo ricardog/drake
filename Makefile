@@ -7,7 +7,8 @@ TEST_FILES = tests/drake-tests.el \
              tests/drake-svg-tests.el \
              tests/stage3-tests.el \
              tests/stage4-tests.el \
-             tests/drake-gnuplot-tests.el
+             tests/drake-gnuplot-tests.el \
+             tests/uncertainty-tests.el
 
 .PHONY: test demo clean test-all
 

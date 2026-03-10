@@ -81,6 +81,8 @@
       (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec))
      ((eq type 'lm)
       (drake-gnuplot--script-lm lines hue-map x-vec y-vec hue-vec extra))
+     ((eq type 'smooth)
+      (drake-gnuplot--script-smooth lines hue-map x-vec y-vec hue-vec extra))
      ((eq type 'box)
       (drake-gnuplot--script-box lines hue-map x-vec y-vec hue-vec))
      (t (error "Unsupported plot type for gnuplot backend: %s" type)))
@@ -192,6 +194,40 @@
         (push (format "%s %s" (car p) (cdr p)) lines))
       (push "e" lines))))
 
+(defun drake-gnuplot--script-smooth (lines hue-map x-vec y-vec hue-vec extra)
+  (let* ((orig-x (plist-get extra :original-x))
+         (orig-y (plist-get extra :original-y))
+         (orig-hue (plist-get extra :original-hue))
+         (groups-orig (drake-gnuplot--group-data orig-x orig-y orig-hue))
+         (groups-smooth (drake-gnuplot--group-data x-vec y-vec hue-vec))
+         (plot-parts nil))
+    ;; 1. Define plot parts for original points
+    (dolist (g groups-orig)
+      (let ((color (cdr (assoc (car g) hue-map))))
+        (push (format "'-' title '%s' with points pt 7 ps 0.5 %s" 
+                      (car g) (if color (format "lc rgb '%s'" color) "")) 
+              plot-parts)))
+    ;; 2. Define plot parts for smooth lines
+    (dolist (g groups-smooth)
+      (let ((color (cdr (assoc (car g) hue-map))))
+        (push (format "'-' title '' with lines lw 2 %s" 
+                      (if color (format "lc rgb '%s'" color) "")) 
+              plot-parts)))
+    
+    (push (format "plot %s" (mapconcat #'identity (nreverse plot-parts) ", ")) lines)
+    
+    ;; 3. Provide data for original points
+    (dolist (g groups-orig)
+      (dolist (p (cdr g))
+        (push (format "%s %s" (car p) (cdr p)) lines))
+      (push "e" lines))
+    ;; 4. Provide data for smooth lines
+    (dolist (g groups-smooth)
+      (let ((sorted (sort (cdr g) (lambda (a b) (< (car a) (car b))))))
+        (dolist (p sorted)
+          (push (format "%s %s" (car p) (cdr p)) lines))
+        (push "e" lines)))))
+
 (defun drake-gnuplot--group-data (x-vec y-vec hue-vec)
   (let ((groups (make-hash-table :test 'equal)))
     (cl-loop for i from 0 below (length x-vec) do
@@ -205,7 +241,7 @@
   (make-drake-backend
    :name 'gnuplot
    :render-fn #'drake-gnuplot-render
-   :supported-types '(scatter line bar hist lm box)))
+   :supported-types '(scatter line bar hist lm smooth box)))
 
 (drake-register-backend drake-gnuplot-backend)
 

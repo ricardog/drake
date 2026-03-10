@@ -38,6 +38,8 @@
       (drake-svg--draw-bar svg margin margin inner-width inner-height x-scaled y-scaled hue-colors))
      ((eq type 'hist)
       (drake-svg--draw-hist svg margin margin inner-width inner-height x-scaled y-scaled hue-colors plot))
+     ((eq type 'smooth)
+      (drake-svg--draw-smooth svg margin margin inner-width inner-height plot))
      ((eq type 'box)
       (drake-svg--draw-box svg margin margin inner-width inner-height x-scaled y-scaled hue-colors plot))
      ((eq type 'violin)
@@ -135,16 +137,72 @@
              (stats (cdr item))
              (m (plist-get stats :m))
              (b (plist-get stats :b))
+             (se (plist-get stats :se))
+             (sxx (plist-get stats :sxx))
+             (mean-x (plist-get stats :mean-x))
+             (n (plist-get stats :n))
              (color (if (eq h 'overall) "blue" (cdr (assoc h hue-map))))
-             ;; Calculate two points for the line at edges of x-range
-             (y-at-min (+ (* m x-min) b))
-             (y-at-max (+ (* m x-max) b))
-             ;; Scale to pixels
-             (px1 x)
-             (py1 (+ y (- height (* (/ (- y-at-min y-min) y-span) height))))
-             (px2 (+ x width))
-             (py2 (+ y (- height (* (/ (- y-at-max y-min) y-span) height)))))
-        (svg-line svg px1 py1 px2 py2 :stroke color :stroke-width 3 :stroke-opacity 0.8)))))
+             ;; Confidence Interval points
+             (steps 20)
+             (ci-upper nil)
+             (ci-lower nil))
+        
+        ;; 1. Draw Confidence Interval shaded area
+        (when (and se (> sxx 0) (> n 2))
+          (cl-loop for i from 0 to steps do
+                   (let* ((ratio (/ (float i) steps))
+                          (xv (+ x-min (* ratio (- x-max x-min))))
+                          (yv (+ (* m xv) b))
+                          ;; SE of mean response: se * sqrt(1/n + (xv - mean_x)^2 / sxx)
+                          (se-r (* se (sqrt (+ (/ 1.0 n) (/ (expt (- xv mean-x) 2) sxx)))))
+                          (ci-width (* 2.0 se-r)) ;; t approx 2 for 95%
+                          (px (+ x (* ratio width)))
+                          (py-up (+ y (- height (* (/ (- (+ yv ci-width) y-min) y-span) height))))
+                          (py-down (+ y (- height (* (/ (- (- yv ci-width) y-min) y-span) height)))))
+                     (push (list px py-up) ci-upper)
+                     (push (list px py-down) ci-lower)))
+          (let ((points (append (nreverse ci-upper) ci-lower)))
+            (svg-polyline svg points :fill color :fill-opacity 0.15 :stroke "none")))
+
+        ;; 2. Draw Regression Line
+        (let* ((y-at-min (+ (* m x-min) b))
+               (y-at-max (+ (* m x-max) b))
+               (px1 x)
+               (py1 (+ y (- height (* (/ (- y-at-min y-min) y-span) height))))
+               (px2 (+ x width))
+               (py2 (+ y (- height (* (/ (- y-at-max y-min) y-span) height)))))
+          (svg-line svg px1 py1 px2 py2 :stroke color :stroke-width 3 :stroke-opacity 0.8))))))
+
+(defun drake-svg--draw-smooth (svg x y width height plot)
+  "Draw original scatter points and a smoothed line."
+  (let* ((data (drake-plot-data-internal plot))
+         (extra (plist-get data :extra))
+         (scales (drake-plot-scales plot))
+         (x-range (plist-get scales :x))
+         (y-range (plist-get scales :y))
+         ;; 1. Draw original points
+         (orig-x (plist-get extra :original-x))
+         (orig-y (plist-get extra :original-y))
+         (orig-hue (plist-get extra :original-hue))
+         (hue-map (plist-get scales :hue))
+         (y-min (car y-range))
+         (y-max (cdr y-range))
+         (y-span (max 1.0 (- y-max y-min)))
+         (x-min (car x-range))
+         (x-max (cdr x-range))
+         (x-span (max 1.0 (- x-max x-min))))
+    
+    (cl-loop for i from 0 below (length orig-x) do
+             (let* ((px (+ x (* (/ (- (aref orig-x i) x-min) x-span) width)))
+                    (py (+ y (- height (* (/ (- (aref orig-y i) y-min) y-span) height))))
+                    (color (if orig-hue (cdr (assoc (aref orig-hue i) hue-map)) "blue")))
+               (svg-circle svg px py 3 :fill color :fill-opacity 0.4 :stroke "none")))
+    
+    ;; 2. Draw smoothed line
+    (let ((x-scaled (plist-get data :x))
+          (y-scaled (plist-get data :y))
+          (hue-values (plist-get data :hue)))
+      (drake-svg--draw-line svg x y width height x-scaled y-scaled hue-values))))
 
 (defun drake-svg--draw-line (svg x y width height x-scaled y-scaled hue-colors)
   ;; Group by hue if exists
@@ -265,7 +323,7 @@
   (make-drake-backend
    :name 'svg
    :render-fn #'drake-svg-render
-   :supported-types '(scatter line bar hist box violin)))
+   :supported-types '(scatter line bar hist box violin lm smooth)))
 
 (drake-register-backend drake-svg-backend)
 

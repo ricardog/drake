@@ -217,6 +217,11 @@ ARGS is a plist containing:
 
     plot))
 
+(defun drake-plot-smooth (&rest args)
+  "Create a plot with a smoothed trend line.
+See `drake-plot-scatter' for ARGS."
+  (drake--create-plot 'smooth args))
+
 (defun drake--transform-data (type x-vec y-vec hue-vec args)
   "Perform statistical transformation based on TYPE."
   (cond
@@ -228,8 +233,43 @@ ARGS is a plist containing:
     (drake--transform-stats x-vec y-vec hue-vec))
    ((eq type 'lm)
     (drake--transform-lm x-vec y-vec hue-vec))
+   ((eq type 'smooth)
+    (drake--transform-smooth x-vec y-vec hue-vec args))
    (t
     (list :x x-vec :y y-vec :hue hue-vec))))
+
+(defun drake--transform-smooth (x-vec y-vec hue-vec args)
+  "Apply Gaussian kernel smoothing to X-VEC and Y-VEC."
+  (let* ((range (drake--get-range x-vec))
+         (x-min (car range))
+         (x-max (cdr range))
+         (steps 50)
+         (bandwidth (* 0.1 (- x-max x-min)))
+         (res-x nil) (res-y nil) (res-hue nil))
+    (let ((groups (make-hash-table :test 'equal)))
+      (cl-loop for i from 0 below (length x-vec) do
+               (let ((h (if hue-vec (aref hue-vec i) 'overall)))
+                 (push (cons (aref x-vec i) (aref y-vec i)) (gethash h groups))))
+      (maphash
+       (lambda (h pts)
+         (cl-loop for i from 0 to steps do
+                  (let* ((target-x (+ x-min (* (/ (float i) steps) (- x-max x-min))))
+                         (weighted-sum 0.0)
+                         (total-weight 0.0))
+                    (dolist (p pts)
+                      (let* ((dist (- target-x (car p)))
+                             (weight (exp (/ (- (expt dist 2)) (* 2.0 (expt bandwidth 2))))))
+                        (cl-incf weighted-sum (* (cdr p) weight))
+                        (cl-incf total-weight weight)))
+                    (when (> total-weight 0)
+                      (push target-x res-x)
+                      (push (/ weighted-sum total-weight) res-y)
+                      (push (if (eq h 'overall) nil h) res-hue)))))
+       groups))
+    (list :x (vconcat (nreverse res-x))
+          :y (vconcat (nreverse res-y))
+          :hue (if hue-vec (vconcat (nreverse res-hue)) nil)
+          :extra (list :original-x x-vec :original-y y-vec :original-hue hue-vec))))
 
 (defun drake--transform-lm (x-vec y-vec hue-vec)
   "Calculate OLS regression for each group in HUE-VEC (or overall)."
@@ -253,7 +293,7 @@ ARGS is a plist containing:
 
 (defun drake--ols-regression (points)
   "Perform Ordinary Least Squares regression on a list of (X . Y) points.
-Returns a plist (:m slope :b intercept :r2 r-squared)."
+Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx :mean-x mean-x :n n)."
   (let* ((n (length points))
          (sum-x 0.0) (sum-y 0.0) (sum-xy 0.0) (sum-xx 0.0) (sum-yy 0.0))
     (dolist (p points)
@@ -276,8 +316,11 @@ Returns a plist (:m slope :b intercept :r2 r-squared)."
                (y-pred (+ (* m x) b))
                (err (- y y-pred)))
           (cl-incf ss-res (* err err))))
-      (let ((r2 (if (= ss-tot 0) 1.0 (- 1.0 (/ ss-res ss-tot)))))
-        (list :m m :b b :r2 r2)))))
+      (let* ((r2 (if (= ss-tot 0) 1.0 (- 1.0 (/ ss-res ss-tot))))
+             (se (if (> n 2) (sqrt (/ ss-res (- n 2))) 0.0))
+             (mean-x (/ sum-x n))
+             (sxx (- sum-xx (/ (* sum-x sum-x) n))))
+        (list :m m :b b :r2 r2 :se se :sxx sxx :mean-x mean-x :n n)))))
 
 (defun drake--transform-hist (vec hue-vec bins)
   "Transform VEC into binned counts for histogram."
