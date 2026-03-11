@@ -1,5 +1,11 @@
 # Makefile for drake
 
+ifeq ($(OS),Darwin)
+LIB_SUFFIX := dylib
+else
+LIB_SUFFIX := so
+endif
+
 EMACS ?= emacs
 LOAD_PATH = -L . -L tests
 
@@ -25,7 +31,7 @@ build: module
 
 module:
 	cd rust && cargo build --release
-	cp rust/target/release/libdrake_rust_module.so drake-rust-module.so
+	cp rust/target/release/libdrake_rust_module.$(LIB_SUFFIX) drake-rust-module.so
 
 clean:
 	rm -f *.elc tests/*.elc examples/*.elc
