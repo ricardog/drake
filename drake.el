@@ -108,12 +108,12 @@
 (defun drake--get-palette (name)
   "Return color list for palette NAME."
   (cond
-   ((listp name) name) ;; Direct list of colors
+   ((and name (listp name)) name) ;; Direct list of colors
    ((symbolp name)
     (drake--load-cache-if-needed)
-    (or (cdr (assoc name drake--user-palettes))
-        (cdr (assoc name drake--bundled-palettes))
-        (cdr (assoc name drake--palette-cache))
+    (or (and name (cdr (assoc name drake--user-palettes)))
+        (and name (cdr (assoc name drake--bundled-palettes)))
+        (and name (cdr (assoc name drake--palette-cache)))
         (cdr (assoc 'default drake--bundled-palettes))))
    (t (cdr (assoc 'default drake--bundled-palettes)))))
 
