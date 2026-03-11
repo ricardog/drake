@@ -24,6 +24,9 @@ test:
 test-all:
 	$(EMACS) -batch $(LOAD_PATH) $(foreach file,$(TEST_FILES) tests/duckdb-drake-tests.el,-l $(file)) -f ert-run-tests-batch-and-exit
 
+test-rust:
+	$(EMACS) -batch $(LOAD_PATH) $(foreach file,$(TEST_FILES) tests/drake-rust-tests.el,-l $(file)) -f ert-run-tests-batch-and-exit
+
 demo:
 	$(EMACS) -batch $(LOAD_PATH) -l tests/test-helper.el -l examples/stage2-demo.el
 
