@@ -58,4 +58,19 @@
     (should (drake-plot-p plot))
     (should (eq (plist-get (drake-plot-spec plot) :type) 'bar))))
 
+(ert-deftest drake-save-plot-test ()
+  (let* ((data '(:x [1 2 3] :y [10 20 30]))
+         (plot (drake-plot-scatter :data data :x :x :y :y))
+         (temp-file (make-temp-file "drake-save-test-" nil ".svg")))
+    (unwind-protect
+        (progn
+          (drake-save-plot plot temp-file)
+          (should (file-exists-p temp-file))
+          (with-temp-buffer
+            (insert-file-contents temp-file)
+            (goto-char (point-min))
+            (should (re-search-forward "<svg" nil t))))
+      (when (file-exists-p temp-file)
+        (delete-file temp-file)))))
+
 (provide 'drake-tests)

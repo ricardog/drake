@@ -68,6 +68,13 @@ Create a grid of plots based on categorical variables using `drake-facet`:
 ### Interactivity
 Plots rendered with the `svg` or `gnuplot` backends include interactive tooltips. Hover your mouse over any data point to see its underlying values.
 
+### Saving Plots
+You can save any generated plot to an SVG file using `drake-save-plot`:
+```elisp
+(let ((plot (drake-plot-scatter :data iris :x :sepal_length :y :sepal_width)))
+  (drake-save-plot plot "my-plot.svg"))
+```
+
 ## Data Formats
 
 `drake` is optimized for **DuckDB** but supports any common Emacs data shape:

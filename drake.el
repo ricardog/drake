@@ -734,6 +734,14 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
           img)
       img)))
 
+(defun drake-save-plot (plot filename)
+  "Save the SVG representation of PLOT to FILENAME."
+  (let ((xml (drake-plot-svg-xml plot)))
+    (if xml
+        (with-temp-file filename
+          (insert xml))
+      (error "Plot does not contain SVG XML data"))))
+
 (defun drake--display-in-buffer (plot buffer-name)
   "Display PLOT (drake-plot or drake-facet-plot) in buffer BUFFER-NAME."
   (let ((buf (get-buffer-create buffer-name))
