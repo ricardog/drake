@@ -73,4 +73,13 @@
       (when (file-exists-p temp-file)
         (delete-file temp-file)))))
 
+(ert-deftest drake-current-plot-buffer-local-test ()
+  (let* ((data '(:x [1 2 3] :y [10 20 30]))
+         (buffer-name "*drake-test-buffer*")
+         (plot (drake-plot-scatter :data data :x :x :y :y :buffer buffer-name)))
+    (with-current-buffer buffer-name
+      (should (eq drake-current-plot plot)))
+    (when (get-buffer buffer-name)
+      (kill-buffer buffer-name))))
+
 (provide 'drake-tests)

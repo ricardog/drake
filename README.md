@@ -75,6 +75,8 @@ You can save any generated plot to an SVG file using `drake-save-plot`:
   (drake-save-plot plot "my-plot.svg"))
 ```
 
+For plots displayed in a buffer, you can also use the interactive command **`M-x drake-save`** from that buffer to save it to a file. This works because `drake` stores the plot object in a buffer-local variable `drake-current-plot`.
+
 ## Data Formats
 
 `drake` is optimized for **DuckDB** but supports any common Emacs data shape:

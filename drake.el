@@ -734,6 +734,9 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
           img)
       img)))
 
+(defvar-local drake-current-plot nil
+  "The plot currently displayed in this buffer.")
+
 (defun drake-save-plot (plot filename)
   "Save the SVG representation of PLOT to FILENAME."
   (let ((xml (drake-plot-svg-xml plot)))
@@ -741,6 +744,13 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
         (with-temp-file filename
           (insert xml))
       (error "Plot does not contain SVG XML data"))))
+
+(defun drake-save (filename)
+  "Interactively save the current plot in the buffer to FILENAME."
+  (interactive "FSave plot to: ")
+  (if drake-current-plot
+      (drake-save-plot drake-current-plot filename)
+    (error "No plot found in this buffer")))
 
 (defun drake--display-in-buffer (plot buffer-name)
   "Display PLOT (drake-plot or drake-facet-plot) in buffer BUFFER-NAME."
@@ -752,6 +762,7 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
       (let ((inhibit-read-only t))
         (erase-buffer)
         (insert-image img)
+        (setq drake-current-plot plot)
         (cond
          ((drake-plot-p plot) (setf (drake-plot-buffer plot) buf))
          ((drake-facet-plot-p plot) nil))
