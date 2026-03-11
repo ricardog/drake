@@ -10,7 +10,7 @@ TEST_FILES = tests/drake-tests.el \
              tests/drake-gnuplot-tests.el \
              tests/uncertainty-tests.el
 
-.PHONY: test demo clean test-all
+.PHONY: test demo clean test-all build module
 
 test:
 	$(EMACS) -batch $(LOAD_PATH) $(foreach file,$(TEST_FILES),-l $(file)) -f ert-run-tests-batch-and-exit
@@ -21,5 +21,13 @@ test-all:
 demo:
 	$(EMACS) -batch $(LOAD_PATH) -l tests/test-helper.el -l examples/stage2-demo.el
 
+build: module
+
+module:
+	cd rust && cargo build --release
+	cp rust/target/release/libdrake_rust_module.so drake-rust-module.so
+
 clean:
 	rm -f *.elc tests/*.elc examples/*.elc
+	rm -f drake-rust-module.so
+	cd rust && cargo clean

@@ -1,5 +1,8 @@
 # Compiled
 *.elc
+*.so
+rust/target/
+drake-rust-module.so
 
 # Packaging
 .cask/
