@@ -9,26 +9,30 @@
          (type (plist-get spec :type))
          (width (or (plist-get spec :width) drake-default-width))
          (height (or (plist-get spec :height) drake-default-height))
-         (script (drake-gnuplot--generate-script plot width height))
-         (temp-svg (make-temp-file "drake-gnuplot-" nil ".svg")))
+         (temp-svg (make-temp-file "drake-gnuplot-" nil ".svg"))
+         (script (drake-gnuplot--generate-script plot width height temp-svg)))
     
     (with-temp-buffer
       (insert script)
       ;; We use call-process-region to send the script to gnuplot
-      (let ((exit-code (call-process-region (point-min) (point-max) "gnuplot" nil t nil
-                                           "-e" (format "set output '%s'" temp-svg))))
+      (let ((exit-code (call-process-region (point-min) (point-max) "gnuplot" nil t nil)))
         (unless (zerop exit-code)
-          (error "Gnuplot failed with exit code %d: %s" exit-code (buffer-string)))))
+          (let ((err-msg (buffer-string)))
+            (message "Gnuplot Script:\n%s" script)
+            (error "Gnuplot failed with exit code %d: %s" exit-code err-msg)))))
     
-    (let ((img (create-image temp-svg 'svg t :width width :height height)))
-      ;; Clean up temp file? Actually, Emacs image objects might need the file
-      ;; if not loaded as data. But create-image with DATA-P=t loads from data.
-      ;; Wait, create-image with file-name and DATA-P=nil is better for large files,
-      ;; but here we want it to be self-contained.
+    (let* ((xml (with-temp-buffer
+                  (when (file-exists-p temp-svg)
+                    (insert-file-contents temp-svg))
+                  (buffer-string)))
+           (img (condition-case nil
+                    (create-image xml 'svg t :width width :height height)
+                  (error (list 'image :type 'svg :data xml)))))
+      (setf (drake-plot-svg-xml plot) xml)
       (delete-file temp-svg)
       img)))
 
-(defun drake-gnuplot--generate-script (plot width height)
+(defun drake-gnuplot--generate-script (plot width height output-file)
   "Generate a gnuplot script for PLOT."
   (let* ((spec (drake-plot-spec plot))
          (type (plist-get spec :type))
@@ -46,6 +50,7 @@
     
     ;; Common settings
     (push (format "set terminal svg size %d,%d dynamic font 'sans,10'" width height) lines)
+    (push (format "set output '%s'" output-file) lines)
     (push "set datafile separator whitespace" lines)
     (push "set style fill solid 0.5 border -1" lines)
     (push "set grid lt 0 lc rgb '#cccccc'" lines)
@@ -70,24 +75,63 @@
           (setq i (1+ i)))
         (push (format "set xtics (%s)" (mapconcat #'identity (nreverse tics) ", ")) lines)))
     
-    (cond
-     ((eq type 'scatter)
-      (drake-gnuplot--script-scatter lines hue-map x-vec y-vec hue-vec))
-     ((eq type 'line)
-      (drake-gnuplot--script-line lines hue-map x-vec y-vec hue-vec))
-     ((eq type 'bar)
-      (drake-gnuplot--script-bar lines hue-map x-vec y-vec hue-vec))
-     ((eq type 'hist)
-      (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec))
-     ((eq type 'lm)
-      (drake-gnuplot--script-lm lines hue-map x-vec y-vec hue-vec extra))
-     ((eq type 'smooth)
-      (drake-gnuplot--script-smooth lines hue-map x-vec y-vec hue-vec extra))
-     ((eq type 'box)
-      (drake-gnuplot--script-box lines hue-map x-vec y-vec hue-vec))
-     (t (error "Unsupported plot type for gnuplot backend: %s" type)))
+    (setq lines
+          (cond
+           ((eq type 'scatter)
+            (drake-gnuplot--script-scatter lines hue-map x-vec y-vec hue-vec))
+           ((eq type 'line)
+            (drake-gnuplot--script-line lines hue-map x-vec y-vec hue-vec))
+           ((eq type 'bar)
+            (drake-gnuplot--script-bar lines hue-map x-vec y-vec hue-vec))
+           ((eq type 'hist)
+            (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec))
+           ((eq type 'lm)
+            (drake-gnuplot--script-lm lines hue-map x-vec y-vec hue-vec extra))
+           ((eq type 'smooth)
+            (drake-gnuplot--script-smooth lines hue-map x-vec y-vec hue-vec extra))
+           ((eq type 'box)
+            (drake-gnuplot--script-box lines hue-map x-vec y-vec hue-vec))
+           ((eq type 'violin)
+            (drake-gnuplot--script-violin lines hue-map x-vec y-vec hue-vec extra))
+           (t (error "Unsupported plot type for gnuplot backend: %s" type))))
     
     (mapconcat #'identity (nreverse lines) "\n")))
+
+(defun drake-gnuplot--script-violin (lines hue-map x-vec y-vec hue-vec extra)
+  (let ((plot-parts nil)
+        (data-sections nil)
+        (violin-width 0.4))
+    (cl-loop for i from 0 below (length x-vec) do
+             (let* ((stats (aref extra i))
+                    (h (if hue-vec (aref hue-vec i) 'overall))
+                    (color (or (cdr (assoc h hue-map)) "blue"))
+                    (kde (plist-get stats :kde))
+                    (x-pos (aref x-vec i))
+                    (max-density (cl-loop for p in kde maximize (cdr p)))
+                    (section-data nil))
+               
+               ;; Left side of violin
+               (dolist (p (reverse kde))
+                 (let* ((val (car p))
+                        (density (cdr p))
+                        (w (if (> max-density 0) (* (/ violin-width 2.0) (/ density max-density)) 0)))
+                   (push (format "%f %f" (- x-pos w) val) section-data)))
+               ;; Right side of violin
+               (dolist (p kde)
+                 (let* ((val (car p))
+                        (density (cdr p))
+                        (w (if (> max-density 0) (* (/ violin-width 2.0) (/ density max-density)) 0)))
+                   (push (format "%f %f" (+ x-pos w) val) section-data)))
+               
+               (push (format "'-' title '%s' with filledcurves lc rgb '%s' fs transparent solid 0.4 border" (if (eq h 'overall) "" h) color) plot-parts)
+               (push (nreverse section-data) data-sections)))
+    
+    (push (format "plot %s" (mapconcat #'identity (nreverse plot-parts) ", ")) lines)
+    (dolist (section (nreverse data-sections))
+      (dolist (line section)
+        (push line lines))
+      (push "e" lines))
+    lines))
 
 (defun drake-gnuplot--script-box (lines hue-map x-vec y-vec hue-vec)
   (push "set style boxplot outliers pointtype 7" lines)
@@ -106,7 +150,8 @@
     (dolist (g groups)
       (dolist (p (cdr g))
         (push (format "%s %s" (car p) (cdr p)) lines))
-      (push "e" lines))))
+      (push "e" lines))
+    lines))
 
 (defun drake-gnuplot--script-scatter (lines hue-map x-vec y-vec hue-vec)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
@@ -121,7 +166,8 @@
     (dolist (g groups)
       (dolist (p (cdr g))
         (push (format "%s %s" (car p) (cdr p)) lines))
-      (push "e" lines))))
+      (push "e" lines))
+    lines))
 
 (defun drake-gnuplot--script-line (lines hue-map x-vec y-vec hue-vec)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
@@ -137,7 +183,8 @@
       (let ((sorted (sort (cdr g) (lambda (a b) (< (car a) (car b))))))
         (dolist (p sorted)
           (push (format "%s %s" (car p) (cdr p)) lines))
-        (push "e" lines)))))
+        (push "e" lines)))
+    lines))
 
 (defun drake-gnuplot--script-bar (lines hue-map x-vec y-vec hue-vec)
   (push "set boxwidth 0.8" lines)
@@ -153,7 +200,8 @@
     (dolist (g groups)
       (dolist (p (cdr g))
         (push (format "%s %s" (car p) (cdr p)) lines))
-      (push "e" lines))))
+      (push "e" lines))
+    lines))
 
 (defun drake-gnuplot--script-hist (lines hue-map x-vec y-vec hue-vec)
   ;; Histogram in drake is already binned (center, count)
@@ -170,29 +218,72 @@
     (dolist (g groups)
       (dolist (p (cdr g))
         (push (format "%s %s" (car p) (cdr p)) lines))
-      (push "e" lines))))
+      (push "e" lines))
+    lines))
 
 (defun drake-gnuplot--script-lm (lines hue-map x-vec y-vec hue-vec extra)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
     ;; We need to define functions for each group
     (let ((i 0)
-          (plot-parts nil))
+          (plot-parts nil)
+          (ci-data nil))
       (dolist (g groups)
         (let* ((h (car g))
+               (pts (cdr g))
                (stats (cdr (assoc h extra)))
                (m (plist-get stats :m))
                (b (plist-get stats :b))
-               (color (or (cdr (assoc h hue-map)) "blue")))
+               (se (plist-get stats :se))
+               (sxx (plist-get stats :sxx))
+               (mean-x (plist-get stats :mean-x))
+               (n (plist-get stats :n))
+               (color (or (cdr (assoc h hue-map)) "blue"))
+               (x-min (apply #'min (mapcar #'car pts)))
+               (x-max (apply #'max (mapcar #'car pts)))
+               (steps 20)
+               (group-ci nil))
+          
           (push (format "f%d(x) = %f * x + %f" i m b) lines)
+          
+          ;; 1. Confidence Interval (filledcurves)
+          (when (and se (> sxx 0) (> n 2))
+            (cl-loop for j from 0 to steps do
+                     (let* ((ratio (/ (float j) steps))
+                            (xv (+ x-min (* ratio (- x-max x-min))))
+                            (yv (+ (* m xv) b))
+                            (se-r (* se (sqrt (+ (/ 1.0 n) (/ (expt (- xv mean-x) 2) sxx)))))
+                            (ci-width (* 2.0 se-r))) ;; t approx 2
+                       (push (format "%f %f %f" xv (- yv ci-width) (+ yv ci-width)) group-ci)))
+            (push (format "'-' using 1:2:3 title '' with filledcurves lc rgb '%s' fs transparent solid 0.15 noborder" color) plot-parts)
+            (push (nreverse group-ci) ci-data))
+          
+          ;; 2. Points and regression line
           (push (format "'-' title '%s' with points pt 7 lc rgb '%s'" h color) plot-parts)
           (push (format "f%d(x) title '' with lines lw 2 lc rgb '%s'" i color) plot-parts)
           (setq i (1+ i))))
-      (push (format "plot %s" (mapconcat #'identity (nreverse plot-parts) ", ")) lines))
-    
-    (dolist (g groups)
-      (dolist (p (cdr g))
-        (push (format "%s %s" (car p) (cdr p)) lines))
-      (push "e" lines))))
+      
+      (push (format "plot %s" (mapconcat #'identity (nreverse plot-parts) ", ")) lines)
+      
+      ;; Data sections
+      (setq ci-data (nreverse ci-data))
+      (let ((group-idx 0))
+        (dolist (g groups)
+          (let* ((h (car g))
+                 (stats (cdr (assoc h extra)))
+                 (se (plist-get stats :se))
+                 (sxx (plist-get stats :sxx))
+                 (n (plist-get stats :n)))
+            ;; Provide CI data if it exists for this group
+            (when (and se (> sxx 0) (> n 2))
+              (dolist (line (pop ci-data))
+                (push line lines))
+              (push "e" lines))
+            
+            ;; Provide point data
+            (dolist (p (cdr g))
+              (push (format "%s %s" (car p) (cdr p)) lines))
+            (push "e" lines))))
+      lines)))
 
 (defun drake-gnuplot--script-smooth (lines hue-map x-vec y-vec hue-vec extra)
   (let* ((orig-x (plist-get extra :original-x))
@@ -226,7 +317,8 @@
       (let ((sorted (sort (cdr g) (lambda (a b) (< (car a) (car b))))))
         (dolist (p sorted)
           (push (format "%s %s" (car p) (cdr p)) lines))
-        (push "e" lines)))))
+        (push "e" lines)))
+    lines))
 
 (defun drake-gnuplot--group-data (x-vec y-vec hue-vec)
   (let ((groups (make-hash-table :test 'equal)))
@@ -241,7 +333,7 @@
   (make-drake-backend
    :name 'gnuplot
    :render-fn #'drake-gnuplot-render
-   :supported-types '(scatter line bar hist lm smooth box)))
+   :supported-types '(scatter line bar hist lm smooth box violin)))
 
 (drake-register-backend drake-gnuplot-backend)
 

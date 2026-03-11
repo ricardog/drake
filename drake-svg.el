@@ -53,7 +53,13 @@
     (when-let ((title (plist-get spec :title)))
       (svg-text svg title :x (/ width 2) :y (/ margin 2) :text-anchor "middle" :font-size "16px" :fill "black" :font-weight "bold"))
 
-    (svg-image svg)))
+    (let ((xml (with-temp-buffer
+                 (svg-print svg)
+                 (buffer-string))))
+      (setf (drake-plot-svg-xml plot) xml)
+      (condition-case nil
+          (svg-image svg)
+        (error (list 'image :type 'svg :data xml))))))
 
 (defun drake-svg--draw-axes (svg x y width height plot)
   "Draw axes, ticks, and grid lines."
@@ -278,34 +284,31 @@
 (defun drake-svg--draw-violin (svg x y width height x-scaled y-scaled hue-colors plot)
   (let* ((data (drake-plot-data-internal plot))
          (extra (plist-get data :extra))
-         (violin-width 40)
-         (y-scale (plist-get (drake-plot-scales plot) :y)))
+         (violin-width 60)
+         (y-scale (plist-get (drake-plot-scales plot) :y))
+         (y-min (car y-scale))
+         (y-max (cdr y-scale))
+         (y-span (max 1.0 (- y-max y-min))))
     (cl-loop for i from 0 below (length x-scaled) do
              (let* ((stats (aref extra i))
                     (px (+ x (* (aref x-scaled i) width)))
                     (color (if hue-colors (aref hue-colors i) "steelblue"))
-                    (vals (plist-get stats :vals))
-                    (scale-y (lambda (val) (+ y (- height (* (/ (float (- val (car y-scale))) (max 1.0 (- (cdr y-scale) (car y-scale)))) height)))))
-                    ;; Simple KDE approximation: histogram-like shape
-                    (points nil)
-                    (steps 20)
-                    (min (plist-get stats :min))
-                    (max (plist-get stats :max))
-                    (step-size (/ (float (- max min)) steps)))
-               ;; Draw KDE shape as a path or multiple rectangles
-               (cl-loop for s from 0 to steps do
-                        (let* ((v (+ min (* s step-size)))
-                               (py (funcall scale-y v))
-                               ;; Count values near v for "density"
-                               (density (cl-count-if (lambda (x) (and (>= x (- v step-size)) (< x (+ v step-size)))) vals))
-                               (w (* violin-width (/ (float density) (length vals)) 5))) ;; scale factor
-                          (push (cons (- px w) py) points)))
-               (let ((rev-points nil))
-                 (cl-loop for p in points do
-                          (push (cons (+ px (- px (car p))) (cdr p)) rev-points))
-                 (let ((all-points (append (reverse points) rev-points)))
-                   (svg-polyline svg (mapcar (lambda (p) (list (car p) (cdr p))) all-points)
-                                 :fill color :fill-opacity 0.4 :stroke color)))))))
+                    (kde (plist-get stats :kde))
+                    (scale-y (lambda (val) (+ y (- height (* (/ (float (- val y-min)) y-span) height)))))
+                    ;; Maximum density for scaling the width
+                    (max-density (cl-loop for p in kde maximize (cdr p)))
+                    (points-left nil)
+                    (points-right nil))
+               (dolist (p kde)
+                 (let* ((val (car p))
+                        (density (cdr p))
+                        (py (funcall scale-y val))
+                        (w (if (> max-density 0) (* (/ violin-width 2.0) (/ density max-density)) 0)))
+                   (push (list (- px w) py) points-left)
+                   (push (list (+ px w) py) points-right)))
+               (let ((all-points (append (nreverse points-left) points-right)))
+                 (svg-polyline svg all-points
+                               :fill color :fill-opacity 0.4 :stroke color :stroke-width 1))))))
 
 (defun drake-svg--draw-legend (svg width height margin hue-map)
   (let ((lx (- width margin 10))

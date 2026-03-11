@@ -119,7 +119,7 @@
 
 (defun drake--color-manager (unique-values palette-name)
   "Return an alist mapping values to colors based on PALETTE-NAME."
-  (let* ((colors (drake--get-palette palette-name))
+  (let* ((colors (or (drake--get-palette palette-name) '("blue")))
          (n (length colors))
          (i 0))
     (mapcar (lambda (val)
@@ -135,6 +135,7 @@
   data-internal  ;; Normalized columnar vectors (plist of vectors: :x :y :hue :extra)
   scales         ;; Mapping functions/data from data-space to pixel-space
   image          ;; The actual Emacs image object (SVG or Bitmap)
+  svg-xml        ;; Raw SVG XML data (Stage 3 facet support)
   buffer         ;; The buffer where the plot was rendered
   )
 
@@ -208,6 +209,14 @@ See `drake-plot-scatter' for ARGS."
 See `drake-plot-scatter' for ARGS."
   (drake--create-plot 'violin args))
 
+(cl-defstruct drake-facet-plot
+  grid           ;; 2D list of drake-plot objects
+  title          ;; Overall title
+  rows           ;; Number of rows
+  cols           ;; Number of columns
+  image          ;; Composite image
+  )
+
 (defun drake-facet (&rest args)
   "Create a faceted plot (grid of plots).
 ARGS is a plist containing:
@@ -228,15 +237,57 @@ ARGS is a plist containing:
     (dolist (r rows)
       (let ((row-data nil))
         (dolist (c cols)
-          (let* ((subset (drake--filter-data data (list (cons row-key r) (cons col-key c))))
-                 (p (apply plot-fn :data subset plot-args)))
+          (let* ((filters (cl-remove-if (lambda (f) (null (car f)))
+                                       (list (cons row-key r) (cons col-key c))))
+                 (subset (drake--filter-data data filters))
+                 (p (apply plot-fn :data subset :buffer nil plot-args)))
             (push p row-data)))
         (push (nreverse row-data) grid)))
     (setq grid (nreverse grid))
-    ;; Create a composite plot or handle display differently
-    ;; For now, we'll just return the grid and let the user display it
-    ;; But a better way is to have a drake-facet-plot struct or similar.
-    grid))
+    (let* ((fplot (make-drake-facet-plot
+                   :grid grid
+                   :title (plist-get args :title)
+                   :rows (length rows)
+                   :cols (length cols))))
+      (setf (drake-facet-plot-image fplot) (drake--render-facet fplot))
+      (drake--display-in-buffer fplot (or (plist-get args :buffer) "*drake-facet*"))
+      fplot)))
+
+(defun drake--render-facet (fplot)
+  "Render a drake-facet-plot FPLOT into a single composite SVG image."
+  (let* ((grid (drake-facet-plot-grid fplot))
+         (n-rows (drake-facet-plot-rows fplot))
+         (n-cols (drake-facet-plot-cols fplot))
+         (first-plot (caar grid))
+         (p-spec (drake-plot-spec first-plot))
+         (p-width (or (plist-get p-spec :width) drake-default-width))
+         (p-height (or (plist-get p-spec :height) drake-default-height))
+         (padding 10)
+         (title-height (if (drake-facet-plot-title fplot) 40 0))
+         (total-width (+ (* n-cols p-width) (* (1+ n-cols) padding)))
+         (total-height (+ title-height (* n-rows p-height) (* (1+ n-rows) padding)))
+         (svg (svg-create total-width total-height)))
+    
+    (svg-rectangle svg 0 0 total-width total-height :fill "white")
+    
+    (when (drake-facet-plot-title fplot)
+      (svg-text svg (drake-facet-plot-title fplot) 
+                :x (/ total-width 2) :y 25 :text-anchor "middle" 
+                :font-size "20px" :fill "black" :font-weight "bold"))
+    
+    (cl-loop for r from 0 below n-rows do
+             (cl-loop for c from 0 below n-cols do
+                      (let* ((p (nth c (nth r grid)))
+                             (xml (drake-plot-svg-xml p))
+                             (px (+ padding (* c (+ p-width padding))))
+                             (py (+ title-height padding (* r (+ p-height padding)))))
+                        (if xml
+                            (svg-embed svg xml "image/svg+xml" t 
+                                       :x px :y py :width p-width :height p-height)
+                          (svg-rectangle svg px py p-width p-height :fill "none" :stroke "#ccc")
+                          (svg-text svg (format "Plot (%d,%d)" r c) :x (+ px (/ p-width 2)) :y (+ py (/ p-height 2))
+                                    :text-anchor "middle" :font-size "12px" :fill "#999")))))
+    (svg-image svg)))
 
 (defun drake--filter-data (data filters)
   "Filter DATA based on FILTERS (alist of key . value)."
@@ -447,7 +498,6 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
                          (push (aref counts i) y-all)
                          (push h h-all))))
             (list :x (vconcat (nreverse x-all))
-                  :y (vconcat (nreverse x-all))
                   :y (vconcat (nreverse y-all))
                   :hue (vconcat (nreverse h-all)))))
       ;; No hue
@@ -463,8 +513,31 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
                    (aset y-counts i (float (aref counts i))))
           (list :x x-centers :y y-counts))))))
 
+(defun drake--kde-gaussian-kernel (u)
+  "Calculate the Gaussian kernel value for U."
+  (/ (exp (* -0.5 u u))
+     (sqrt (* 2.0 float-pi))))
+
+(defun drake--kde-estimate-density (x data bandwidth)
+  "Estimate the density at X for DATA using BANDWIDTH."
+  (let ((n (length data))
+        (sum 0.0))
+    (dolist (xi data)
+      (let ((u (/ (- x xi) (float bandwidth))))
+        (cl-incf sum (drake--kde-gaussian-kernel u))))
+    (/ sum (* n bandwidth))))
+
+(defun drake--kde-silverman-bandwidth (data)
+  "Calculate the optimal bandwidth for DATA using Silverman's rule of thumb."
+  (let* ((n (length data))
+         (avg (/ (cl-reduce #'+ data) (float n)))
+         (variance (/ (cl-reduce #'+ (mapcar (lambda (x) (expt (- x avg) 2)) data))
+                      (float (max 1 (1- n)))))
+         (sd (sqrt variance)))
+    (if (= sd 0) 0.1 (* 1.06 sd (expt n -0.2)))))
+
 (defun drake--transform-stats (x-vec y-vec hue-vec)
-  "Calculate summary statistics (quartiles, etc.) for each category in X-VEC."
+  "Calculate summary statistics (quartiles, etc.) and KDE for each category."
   (let* ((groups (make-hash-table :test 'equal))
          (categories (drake--get-unique-values x-vec))
          (x-res nil) (y-res nil) (hue-res nil) (extra-res nil))
@@ -479,15 +552,29 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
        (let* ((sorted (sort (cl-remove-if-not #'numberp vals) #'<))
               (n (length sorted)))
          (when (> n 0)
-           (let ((min (car sorted))
-                 (max (car (last sorted)))
-                 (q1 (drake--quantile sorted 0.25))
-                 (median (drake--quantile sorted 0.5))
-                 (q3 (drake--quantile sorted 0.75)))
+           (let* ((min (car sorted))
+                  (max (car (last sorted)))
+                  (q1 (drake--quantile sorted 0.25))
+                  (median (drake--quantile sorted 0.5))
+                  (q3 (drake--quantile sorted 0.75))
+                  ;; KDE calculation
+                  (h (drake--kde-silverman-bandwidth sorted))
+                  (kde-points nil)
+                  (steps 50)
+                  (span (- max min))
+                  ;; Extend range slightly for KDE
+                  (kde-min (- min (* 0.2 span)))
+                  (kde-max (+ max (* 0.2 span)))
+                  (kde-step (/ (- kde-max kde-min) (float steps))))
+             (cl-loop for i from 0 to steps do
+                      (let* ((target-x (+ kde-min (* i kde-step)))
+                             (density (drake--kde-estimate-density target-x sorted h)))
+                        (push (cons target-x density) kde-points)))
              (push (car key) x-res)
-             (push median y-res) ;; representative Y
+             (push median y-res)
              (push (cdr key) hue-res)
-             (push (list :min min :q1 q1 :median median :q3 q3 :max max :vals sorted) extra-res)))))
+             (push (list :min min :q1 q1 :median median :q3 q3 :max max 
+                         :vals sorted :kde (nreverse kde-points)) extra-res)))))
      groups)
     (list :x (vconcat (nreverse x-res))
           :y (vconcat (nreverse y-res))
@@ -638,14 +725,18 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
       img)))
 
 (defun drake--display-in-buffer (plot buffer-name)
-  "Display PLOT in buffer BUFFER-NAME."
+  "Display PLOT (drake-plot or drake-facet-plot) in buffer BUFFER-NAME."
   (let ((buf (get-buffer-create buffer-name))
-        (img (drake-plot-image plot)))
+        (img (cond
+              ((drake-plot-p plot) (drake-plot-image plot))
+              ((drake-facet-plot-p plot) (drake-facet-plot-image plot)))))
     (with-current-buffer buf
       (let ((inhibit-read-only t))
         (erase-buffer)
         (insert-image img)
-        (setf (drake-plot-buffer plot) buf)
+        (cond
+         ((drake-plot-p plot) (setf (drake-plot-buffer plot) buf))
+         ((drake-facet-plot-p plot) nil))
         (display-buffer buf)))))
 
 (provide 'drake)
