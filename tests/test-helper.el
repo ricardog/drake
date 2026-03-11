@@ -23,4 +23,11 @@
   (defun insert-image (img &optional string area slice) t)
   (defun display-buffer (buf &optional action frame) t))
 
+(require 'cl-lib)
+
+(defmacro drake-skip-unless-gnuplot ()
+  "Skip the current ERT test unless gnuplot backend is available."
+  `(unless (gethash 'gnuplot drake--backends)
+     (ert-skip "Gnuplot backend not available")))
+
 (provide 'test-helper)

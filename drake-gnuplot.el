@@ -346,6 +346,8 @@
    :render-fn #'drake-gnuplot-render
    :supported-types '(scatter line bar hist lm smooth box violin)))
 
-(drake-register-backend drake-gnuplot-backend)
+(if (executable-find "gnuplot")
+    (drake-register-backend drake-gnuplot-backend)
+  (message "Gnuplot executable not found. skipping gnuplot backend registration."))
 
 (provide 'drake-gnuplot)

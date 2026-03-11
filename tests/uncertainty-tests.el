@@ -26,6 +26,7 @@
         (should (equal (plist-get extra :original-x) [1 2 3 4 5]))))))
 
 (ert-deftest drake-plot-smooth-gnuplot-test ()
+  (drake-skip-unless-gnuplot)
   (let* ((data '(:x [1 2 3 4 5] :y [2 4 3 5 4]))
          (plot (drake-plot-smooth :data data :x :x :y :y :backend 'gnuplot)))
     (should (drake-plot-p plot))
