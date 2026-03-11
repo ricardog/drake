@@ -215,6 +215,7 @@ See `drake-plot-scatter' for ARGS."
   rows           ;; Number of rows
   cols           ;; Number of columns
   image          ;; Composite image
+  svg-xml        ;; Raw SVG XML data
   )
 
 (defun drake-facet (&rest args)
@@ -287,7 +288,11 @@ ARGS is a plist containing:
                           (svg-rectangle svg px py p-width p-height :fill "none" :stroke "#ccc")
                           (svg-text svg (format "Plot (%d,%d)" r c) :x (+ px (/ p-width 2)) :y (+ py (/ p-height 2))
                                     :text-anchor "middle" :font-size "12px" :fill "#999")))))
-    (svg-image svg)))
+    (let ((xml (with-temp-buffer
+                 (svg-print svg)
+                 (buffer-string))))
+      (setf (drake-facet-plot-svg-xml fplot) xml)
+      (svg-image svg))))
 
 (defun drake--filter-data (data filters)
   "Filter DATA based on FILTERS (alist of key . value)."
@@ -739,7 +744,9 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
 
 (defun drake-save-plot (plot filename)
   "Save the SVG representation of PLOT to FILENAME."
-  (let ((xml (drake-plot-svg-xml plot)))
+  (let ((xml (cond
+              ((drake-plot-p plot) (drake-plot-svg-xml plot))
+              ((drake-facet-plot-p plot) (drake-facet-plot-svg-xml plot)))))
     (if xml
         (with-temp-file filename
           (insert xml))
