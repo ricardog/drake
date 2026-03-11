@@ -7,7 +7,7 @@
          (plot (drake-plot-scatter :data data :x :x :y :y :backend 'svg)))
     (should (drake-plot-image plot))
     (should (imagep (drake-plot-image plot)))
-    (should (eq (image-type (drake-plot-image plot)) 'svg))))
+    (should (eq (drake-test-get-image-type (drake-plot-image plot)) 'svg))))
 
 (ert-deftest drake-svg-tooltip-test ()
   (let* ((data '(:x [1] :y [10] :note ["Special Point"]))

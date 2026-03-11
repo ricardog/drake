@@ -23,6 +23,15 @@
   (defun insert-image (img &optional string area slice) t)
   (defun display-buffer (buf &optional action frame) t))
 
+(defun drake-test-get-image-type (img)
+  "Extract image type from IMG (image descriptor or mock)."
+  (if (and (listp img) (eq (car img) 'image))
+      (plist-get (cdr img) :type)
+    ;; Fallback for cases where it's a real image object but built-in image-type fails
+    (if (fboundp 'image-property)
+        (image-property img :type)
+      (ert-fail (format "Cannot determine image type of %S" img)))))
+
 (require 'cl-lib)
 
 (defmacro drake-skip-unless-gnuplot ()
