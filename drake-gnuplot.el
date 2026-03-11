@@ -45,6 +45,7 @@
          (x-vec (plist-get data :x))
          (y-vec (plist-get data :y))
          (hue-vec (plist-get data :hue))
+         (tooltip-vec (plist-get data :tooltip))
          (extra (plist-get data :extra))
          (lines nil))
     
@@ -78,19 +79,19 @@
     (setq lines
           (cond
            ((eq type 'scatter)
-            (drake-gnuplot--script-scatter lines hue-map x-vec y-vec hue-vec))
+            (drake-gnuplot--script-scatter lines hue-map x-vec y-vec hue-vec tooltip-vec))
            ((eq type 'line)
-            (drake-gnuplot--script-line lines hue-map x-vec y-vec hue-vec))
+            (drake-gnuplot--script-line lines hue-map x-vec y-vec hue-vec tooltip-vec))
            ((eq type 'bar)
-            (drake-gnuplot--script-bar lines hue-map x-vec y-vec hue-vec))
+            (drake-gnuplot--script-bar lines hue-map x-vec y-vec hue-vec tooltip-vec))
            ((eq type 'hist)
-            (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec))
+            (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec tooltip-vec))
            ((eq type 'lm)
             (drake-gnuplot--script-lm lines hue-map x-vec y-vec hue-vec extra))
            ((eq type 'smooth)
             (drake-gnuplot--script-smooth lines hue-map x-vec y-vec hue-vec extra))
            ((eq type 'box)
-            (drake-gnuplot--script-box lines hue-map x-vec y-vec hue-vec))
+            (drake-gnuplot--script-box lines hue-map x-vec y-vec hue-vec extra))
            ((eq type 'violin)
             (drake-gnuplot--script-violin lines hue-map x-vec y-vec hue-vec extra))
            (t (error "Unsupported plot type for gnuplot backend: %s" type))))
@@ -133,27 +134,37 @@
       (push "e" lines))
     lines))
 
-(defun drake-gnuplot--script-box (lines hue-map x-vec y-vec hue-vec)
+(defun drake-gnuplot--script-box (lines hue-map x-vec y-vec hue-vec extra)
   (push "set style boxplot outliers pointtype 7" lines)
   (push "set style fill solid 0.5 border -1" lines)
-  (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
-    (push (format "plot %s"
-                  (mapconcat (lambda (g)
-                               (let* ((h (car g))
-                                      (color (cdr (assoc h hue-map)))
-                                      ;; We need a unique x coordinate for each group if not already numeric
-                                      (x-coord (if (numberp (caar (cdr g))) (caar (cdr g)) 0)))
-                                 (format "'-' using (%s):2 title '%s' with boxplot %s"
-                                         x-coord h (if color (format "lc rgb '%s'" color) ""))))
-                             groups ", "))
-          lines)
-    (dolist (g groups)
-      (dolist (p (cdr g))
-        (push (format "%s %s" (car p) (cdr p)) lines))
+  ;; Ensure x range is valid for boxplot
+  (let* ((x-min (cl-loop for x across x-vec minimize x))
+         (x-max (cl-loop for x across x-vec maximize x)))
+    (push (format "set xrange [%f:%f]" (- x-min 0.5) (+ x-max 0.5)) lines))
+  (let ((plot-parts nil)
+        (data-sections nil))
+    (cl-loop for i from 0 below (length x-vec) do
+             (let* ((stats (aref extra i))
+                    (h (if hue-vec (aref hue-vec i) 'overall))
+                    (color (or (cdr (assoc h hue-map)) "blue"))
+                    (vals (plist-get stats :vals))
+                    (x-pos (aref x-vec i))
+                    (section-data nil))
+               
+               (push (format "'-' using (column(0)*0 + %f):1 title '%s' with boxplot lc rgb '%s'" 
+                             x-pos (if (eq h 'overall) "" h) color) plot-parts)
+               (dolist (v vals)
+                 (push (format "%f" (float v)) section-data))
+               (push (nreverse section-data) data-sections)))
+    
+    (push (format "plot %s" (mapconcat #'identity (nreverse plot-parts) ", ")) lines)
+    (dolist (section (nreverse data-sections))
+      (dolist (line section)
+        (push line lines))
       (push "e" lines))
     lines))
 
-(defun drake-gnuplot--script-scatter (lines hue-map x-vec y-vec hue-vec)
+(defun drake-gnuplot--script-scatter (lines hue-map x-vec y-vec hue-vec _tooltip-vec)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
     (push (format "plot %s"
                   (mapconcat (lambda (g)
@@ -169,7 +180,7 @@
       (push "e" lines))
     lines))
 
-(defun drake-gnuplot--script-line (lines hue-map x-vec y-vec hue-vec)
+(defun drake-gnuplot--script-line (lines hue-map x-vec y-vec hue-vec _tooltip-vec)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
     (push (format "plot %s"
                   (mapconcat (lambda (g)
@@ -186,7 +197,7 @@
         (push "e" lines)))
     lines))
 
-(defun drake-gnuplot--script-bar (lines hue-map x-vec y-vec hue-vec)
+(defun drake-gnuplot--script-bar (lines hue-map x-vec y-vec hue-vec _tooltip-vec)
   (push "set boxwidth 0.8" lines)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
     (push (format "plot %s"
@@ -203,7 +214,7 @@
       (push "e" lines))
     lines))
 
-(defun drake-gnuplot--script-hist (lines hue-map x-vec y-vec hue-vec)
+(defun drake-gnuplot--script-hist (lines hue-map x-vec y-vec hue-vec _tooltip-vec)
   ;; Histogram in drake is already binned (center, count)
   (push "set boxwidth 1.0 relative" lines)
   (let ((groups (drake-gnuplot--group-data x-vec y-vec hue-vec)))
