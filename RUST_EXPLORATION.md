@@ -15,7 +15,7 @@ drake/
 │   ├── Cargo.toml
 │   └── src/
 │       └── lib.rs      # Entry point (emacs-module-rs)
-└── Makefile            # Updated to build the module
+└── CMakeLists.txt      # Build system
 ```
 
 ## 2. The Rust Module API
