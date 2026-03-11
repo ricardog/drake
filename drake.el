@@ -11,6 +11,8 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'json)
+(require 'url)
 
 (defgroup drake nil
   "High-level statistical visualization."
@@ -31,6 +33,100 @@
   "Default height for plots in pixels."
   :type 'number
   :group 'drake)
+
+(defcustom drake-palette-url "https://raw.githubusercontent.com/axismaps/colorbrewer/master/export/colorbrewer.json"
+  "URL to fetch additional palettes from (ColorBrewer format)."
+  :type 'string
+  :group 'drake)
+
+;;; Color & Palettes
+
+(defvar drake--bundled-palettes
+  '((viridis . ("#440154" "#414487" "#2a788e" "#22a884" "#7ad151" "#fde725"))
+    (magma . ("#000004" "#3b0f70" "#8c2981" "#de4968" "#fe9f6d" "#fcfdbf"))
+    (inferno . ("#000004" "#420a68" "#932667" "#dd513a" "#fca50a" "#fcffa4"))
+    (plasma . ("#0d0887" "#6a00a8" "#b12a90" "#e16462" "#fca636" "#f0f921"))
+    (set1 . ("#e41a1c" "#377eb8" "#4daf4a" "#984ea3" "#ff7f00" "#ffff33" "#a65628" "#f781bf" "#999999"))
+    (set2 . ("#66c2a5" "#fc8d62" "#8da0cb" "#e78ac3" "#a6d854" "#ffd92f" "#e5c494" "#b3b3b3"))
+    (dark2 . ("#1b9e77" "#d95f02" "#7570b3" "#e7298a" "#66a61e" "#e6ab02" "#a6761d" "#666666"))
+    (paired . ("#a6cee3" "#1f78b4" "#b2df8a" "#33a02c" "#fb9a99" "#e31a1c" "#fdbf6f" "#ff7f00" "#cab2d6" "#6a3d9a" "#ffff99" "#b15928"))
+    (rdbu . ("#ca0020" "#f4a582" "#f7f7f7" "#92c5de" "#0571b0"))
+    (spectral . ("#d53e4f" "#f46d43" "#fdae61" "#fee08b" "#ffffbf" "#e6f598" "#abdda4" "#66c2a5" "#3288bd"))
+    (blues . ("#eff3ff" "#bdd7e7" "#6baed6" "#3182bd" "#08519c"))
+    (default . ("#4c72b0" "#55a868" "#c44e52" "#8172b2" "#ccb974" "#64b5cd")))
+  "Core bundled palettes.")
+
+(defvar drake--palette-cache nil
+  "Cached palettes from external sources.")
+
+(defvar drake--user-palettes nil
+  "User-registered palettes.")
+
+(defun drake-register-palette (name colors)
+  "Register a new palette NAME with COLORS (list of hex strings)."
+  (push (cons name colors) drake--user-palettes))
+
+(defun drake-fetch-palettes ()
+  "Fetch and cache additional palettes from `drake-palette-url`."
+  (interactive)
+  (message "Fetching additional palettes from %s..." drake-palette-url)
+  (let ((url-request-method "GET"))
+    (with-current-buffer (url-retrieve-synchronously drake-palette-url)
+      (goto-char (point-min))
+      (re-search-forward "^$" nil t)
+      (let* ((json-object-type 'alist)
+             (raw-data (json-read))
+             (processed nil))
+        (dolist (entry raw-data)
+          (let* ((name (symbol-name (car entry)))
+                 (data (cdr entry))
+                 ;; Get the largest available class count (k)
+                 (max-k (apply #'max (mapcar (lambda (k-entry)
+                                               (if (string-match "^[0-9]+$" (symbol-name (car k-entry)))
+                                                   (string-to-number (symbol-name (car k-entry)))
+                                                 0))
+                                             data)))
+                 (colors (cdr (assoc (intern (number-to-string max-k)) data))))
+            (when (vectorp colors)
+              (push (cons (intern (downcase name)) (append colors nil)) processed))))
+        (setq drake--palette-cache processed)
+        ;; Simple persistence in ~/.emacs.d/drake/
+        (let ((cache-dir (expand-file-name "drake" user-emacs-directory)))
+          (unless (file-exists-p cache-dir) (make-directory cache-dir t))
+          (with-temp-file (expand-file-name "palettes-cache.el" cache-dir)
+            (insert ";;; Generated drake palettes cache\n")
+            (insert (format "(setq drake--palette-cache '%S)" processed))))
+        (message "Successfully loaded %d additional palettes." (length processed))))))
+
+(defun drake--load-cache-if-needed ()
+  "Load palettes from disk cache if not already loaded."
+  (unless drake--palette-cache
+    (let ((cache-file (expand-file-name "drake/palettes-cache.el" user-emacs-directory)))
+      (when (file-exists-p cache-file)
+        (load cache-file t t)))))
+
+(defun drake--get-palette (name)
+  "Return color list for palette NAME."
+  (cond
+   ((listp name) name) ;; Direct list of colors
+   ((symbolp name)
+    (drake--load-cache-if-needed)
+    (or (cdr (assoc name drake--user-palettes))
+        (cdr (assoc name drake--bundled-palettes))
+        (cdr (assoc name drake--palette-cache))
+        (cdr (assoc 'default drake--bundled-palettes))))
+   (t (cdr (assoc 'default drake--bundled-palettes)))))
+
+(defun drake--color-manager (unique-values palette-name)
+  "Return an alist mapping values to colors based on PALETTE-NAME."
+  (let* ((colors (drake--get-palette palette-name))
+         (n (length colors))
+         (i 0))
+    (mapcar (lambda (val)
+              (let ((color (nth (% i n) colors)))
+                (setq i (1+ i))
+                (cons val color)))
+            unique-values)))
 
 ;;; Structs
 
@@ -351,6 +447,7 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
                          (push (aref counts i) y-all)
                          (push h h-all))))
             (list :x (vconcat (nreverse x-all))
+                  :y (vconcat (nreverse x-all))
                   :y (vconcat (nreverse y-all))
                   :hue (vconcat (nreverse h-all)))))
       ;; No hue
@@ -522,22 +619,6 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
                (puthash val t seen)
                (push val result)))
     (nreverse result)))
-
-(defvar drake--palettes
-  '((viridis . ("#440154" "#414487" "#2a788e" "#22a884" "#7ad151" "#fde725"))
-    (default . ("#4c72b0" "#55a868" "#c44e52" "#8172b2" "#ccb974" "#64b5cd"))))
-
-(defun drake--color-manager (unique-values palette-name)
-  "Return an alist mapping values to colors based on PALETTE-NAME."
-  (let* ((colors (or (cdr (assoc palette-name drake--palettes))
-                    (cdr (assoc 'default drake--palettes))))
-         (n (length colors))
-         (i 0))
-    (mapcar (lambda (val)
-              (let ((color (nth (% i n) colors)))
-                (setq i (1+ i))
-                (cons val color)))
-            unique-values)))
 
 (defun drake--attach-tooltips (img plot)
   "Attach a summary tooltip to IMG based on PLOT data."

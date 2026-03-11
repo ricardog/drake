@@ -56,12 +56,50 @@ Every plotting function returns a `drake-plot` structure. This allows for progra
 | `:palette` | Optional | Symbol naming a color scheme (e.g., `'viridis`). |
 | `:title` | Optional | String title for the chart. |
 | `:buffer` | Optional | Target buffer name (defaults to `*drake-plot*`). |
-| `:width` | Optional | Pixel width (defaults to 600). |
-| `:height` | Optional | Pixel height (defaults to 400). |
+| :width | Optional | Pixel width (defaults to 600). |
+| :height | Optional | Pixel height (defaults to 400). |
 
 ---
 
-## 4. Backend API Definition
+## 5. Color & Palettes
+
+`drake` uses a structured palette system to ensure data is represented accurately and accessibly. Palettes are categorized by the type of data they are intended to visualize.
+
+### 5.1 Palette Categories
+
+1.  **Qualitative (Categorical):** For discrete, unordered categories (e.g., Species, Department). Colors are designed to be visually distinct with no implied ranking.
+    *   *Standard:* `Set1`, `Set2`, `Dark2`, `Paired`.
+2.  **Sequential:** For ordered numeric or ordinal data (e.g., Age, Count). A gradient typically moving from light/low-saturation to dark/high-saturation.
+    *   *Standard:* `Blues`, `Greens`, `YlOrRd`.
+3.  **Diverging:** For data with a critical midpoint (e.g., Correlation, Profit/Loss, Temperature Anomaly). Two sequential scales diverging from a neutral center.
+    *   *Standard:* `RdBu`, `PiYG`, `Spectral`.
+4.  **Perceptually Uniform:** High-performance palettes where equal data intervals correspond to equal perceived color changes. Essential for scientific accuracy and accessibility (CVD-friendly).
+    *   *Standard:* `Viridis` (default), `Magma`, `Inferno`, `Plasma`, `Cividis`.
+
+### 5.2 Palette Specification
+
+Users specify palettes via the `:palette` argument using a symbol or a custom list of HEX strings.
+
+```elisp
+;; Use a built-in named palette
+(drake-plot-scatter :data iris :x :sepal_length :y :sepal_width :hue :species :palette 'Set1)
+
+;; Use a custom palette
+(drake-plot-scatter :data data :x :time :y :value :palette '("#ff0000" "#00ff00" "#0000ff"))
+```
+
+### 5.3 Palette Management Strategy
+
+To balance performance with variety, `drake` employs a hybrid storage strategy:
+
+*   **Core Bundling:** A minimal set of essential palettes (`Viridis`, `Set1`, `RdBu`) is hardcoded in `drake.el` for immediate, zero-dependency use.
+*   **Dynamic Fetching:** `drake` can fetch additional palettes (e.g., the full ColorBrewer set) from a standardized JSON source (e.g., GitHub or a CDN) upon first request.
+*   **Local Caching:** Once fetched, palettes are cached in `~/.emacs.d/drake/palettes.json` to avoid redundant network calls.
+*   **Extensibility:** Users can register custom palettes globally via `(drake-register-palette 'my-theme '("#color1" ...))`.
+
+---
+
+## 6. Backend API Definition
 
 The `drake` architecture separates the **Graph Language** (front-end) from the **Rendering Engine** (backend). This allows the same declarative plot definition to be rendered by pure Elisp for convenience or a C/Rust module for performance.
 
