@@ -5,34 +5,80 @@ A high performance statistics plotting library for Emacs.
 
 ## Status: Stage 4 (Relational Regression)
 - **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
-- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats).
+- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats), and interactive tooltips.
 - **Backends:** 
-  - **Native SVG backend (`svg.el`)**: Pure Elisp, no external dependencies.
-  - **Gnuplot backend**: High-quality SVG rendering via external `gnuplot`.
-- **Data formats:** 
-  - DuckDB columnar plists (plist of vectors).
-  - Row-based list of lists (positional indexing).
-  - List of alists (named columns).
-  - List of plists (named columns).
+  - **Native SVG (`svg`)**: Pure Elisp, zero dependencies.
+  - **Gnuplot (`gnuplot`)**: High-quality SVG rendering via external `gnuplot`.
+  - **Rust (`rust`)**: High-performance rendering for large datasets (Stage 5 preview).
 
 ## Backends
 
-`drake` is backend-agnostic. You can switch backends using the `:backend` argument:
-
-- **`:backend 'svg`** (Default): Uses `svg.el`.
-- **`:backend 'gnuplot`**: Requires `gnuplot` installed on your system.
+`drake` is backend-agnostic. You can switch backends using the `:backend` argument or by changing the default:
 
 ```elisp
-(require 'drake-gnuplot)
-(drake-plot-scatter :data iris :x :sepal_length :y :sepal_width :backend 'gnuplot)
+;; Change the default backend globally
+(setq drake-default-backend 'gnuplot)
+
+;; Specify a backend for a single plot
+(drake-plot-scatter :data iris :x :sepal_length :y :sepal_width :backend 'rust)
 ```
+
+### Backend Priority
+
+When multiple backends are loaded, `drake` respects the `drake-default-backend` variable (defaults to `'svg`). While there is no automatic switching between backends based on availability, the recommended order for performance and quality is:
+
+1.  **`rust`**: Fastest rendering, ideal for datasets with >100,000 points. Requires compilation (see below).
+2.  **`gnuplot`**: Excellent for high-quality static charts and complex types like Violins or Boxplots. Requires external `gnuplot` executable.
+3.  **`svg`**: Best for portability and small-to-medium datasets. Works out-of-the-box in any Emacs with SVG support.
+
+### The Rust Module
+
+The `rust` backend provides a high-performance rendering engine built with the `plotters` crate. Use it when `svg` or `gnuplot` become slow with large datasets.
+
+**Installation:**
+To use the Rust backend, you must compile the dynamic module:
+```elisp
+(require 'drake-rust)
+(drake-module-compile) ;; Requires CMake and Cargo/Rust
+```
+
+## Color Palettes
+
+`drake` includes a variety of built-in palettes and supports fetching hundreds more.
+
+- **Built-in Palettes:** `viridis` (default), `magma`, `inferno`, `plasma`, `set1`, `set2`, `dark2`, `paired`, `rdbu`, `spectral`, and `blues`.
+- **Fetch More:** Run `M-x drake-fetch-palettes` to download the full set of ColorBrewer palettes and cache them locally.
+- **Custom Palettes:** You can provide a list of HEX strings directly to the `:palette` argument:
+  ```elisp
+  (drake-plot-scatter ... :palette '("#ff0000" "#00ff00" "#0000ff"))
+  ```
+  Or register a custom palette globally:
+  ```elisp
+  (drake-register-palette 'my-theme '("#1a1a1a" "#bada55" "#abcdef"))
+  ```
+
+## Advanced Features
+
+### Faceting (Small Multiples)
+Create a grid of plots based on categorical variables using `drake-facet`:
+```elisp
+(drake-facet :data tips :row :sex :col :time :plot-fn #'drake-plot-scatter :args '(:x :total_bill :y :tip))
+```
+
+### Interactivity
+Plots rendered with the `svg` or `gnuplot` backends include interactive tooltips. Hover your mouse over any data point to see its underlying values.
+
+## Data Formats
+
+`drake` is optimized for **DuckDB** but supports any common Emacs data shape:
+- **Columnar Plists:** `(:x [1 2 3] :y [10 20 30])` (Highest performance).
+- **List of Lists (Row-based):** `((1 10) (2 20) (3 30))` (Use positional indices for `:x` and `:y`).
+- **List of Alists/Plists:** `((:x 1 :y 10) (:x 2 :y 20))` (Keyword-based access).
 
 ## Sample Datasets
 
 `drake` includes several well-known sample datasets in the `datasets/` directory (compressed as `.gz`):
-- `iris.csv.gz`: The classic Iris flower dataset.
-- `tips.csv.gz`: Restaurant tipping data (total bill, tip, etc.).
-- `gapminder.csv.gz`: Global development indicators.
+- `iris.csv.gz`, `tips.csv.gz`, `gapminder.csv.gz`, `stocks.csv.gz`, etc.
 
 ## Usage
 
@@ -40,17 +86,8 @@ A high performance statistics plotting library for Emacs.
 (require 'drake)
 (require 'drake-svg)
 
-;; Scatter plot with grouping
-(let ((data '((:x 1 :y 10 :group "A")
-              (:x 2 :y 15 :group "A")
-              (:x 1 :y 12 :group "B")
-              (:x 2 :y 18 :group "B"))))
-  (drake-plot-scatter :data data :x :x :y :y :hue :group :title "Grouped Points"))
-
-;; Bar plot with categorical X
-(let ((data '((:fruit "Apple"  :count 50)
-              (:fruit "Banana" :count 80))))
-  (drake-plot-bar :data data :x :fruit :y :count :title "Fruit Counts"))
+;; Scatter plot with grouping and linear regression
+(drake-plot-lm :data iris :x :sepal_length :y :sepal_width :hue :species :title "Iris Regression")
 ```
 
 ## Running Examples
@@ -58,11 +95,9 @@ A high performance statistics plotting library for Emacs.
 Check the `examples/` directory for ready-to-run Elisp scripts:
 - `examples/iris-scatter.el`
 - `examples/tips-scatter.el`
-- `examples/stage2-demo.el` (Demonstrates new Stage 2 features)
+- `examples/stage2-demo.el`
 
 ## Running Tests
-
-`drake` uses ERT for testing. You can run tests from the command line:
 
 ```sh
 emacs -batch -L . -L tests -l tests/drake-tests.el -f ert-run-tests-batch-and-exit
