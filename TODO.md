@@ -6,7 +6,7 @@
 - [x] **Gnuplot Violin Support:** Implement violin plots in the `drake-gnuplot.el` backend.
 
 ## Stage 4: Relational Regression & UI
-- [ ] **Point-level Interactivity:** Implement Emacs overlays to show specific data values when hovering over individual points in a plot.
+- [x] **Point-level Interactivity:** Implement Emacs overlays to show specific data values when hovering over individual points in a plot. (Implemented via SVG <title> elements and post-processing)
 - [ ] **Smoothing & Uncertainty:**
     - [x] Basic OLS Regression (Implemented)
     - [x] **Confidence Intervals:** Calculate and visualize the 95% confidence interval (shaded area) for the regression line. (Implemented for SVG and Gnuplot backends)

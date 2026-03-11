@@ -321,10 +321,11 @@ ARGS is a plist containing:
          (y-key (plist-get args :y))
          (hue-key (plist-get args :hue))
          ;; 1. Normalize data to columnar format
-         (normalized (drake--normalize-data data (list :x x-key :y y-key :hue hue-key)))
+         (normalized (drake--normalize-data data (list :x x-key :y y-key :hue hue-key :tooltip (plist-get args :tooltip))))
          (x-vec (plist-get normalized :x))
          (y-vec (plist-get normalized :y))
          (hue-vec (plist-get normalized :hue))
+         (tooltip-vec (plist-get normalized :tooltip))
          ;; 2. Statistical Transformation (Stage 3)
          (transformed (drake--transform-data type x-vec y-vec hue-vec args))
          (x-final (plist-get transformed :x))
@@ -342,14 +343,23 @@ ARGS is a plist containing:
          (y-scaled (drake--apply-scale y-final y-scale))
          ;; 6. Handle Hue
          (hue-info (when hue-final (drake--process-hue hue-final (plist-get args :palette))))
+
+         ;; 7. Prepare Tooltips
+         (final-tooltips (or tooltip-vec
+                            (vconcat (cl-loop for i from 0 below (length x-final) collect
+                                              (format "%s: %s\n%s: %s%s" 
+                                                      (or x-key "X") (aref x-final i)
+                                                      (or y-key "Y") (aref y-final i)
+                                                      (if hue-final (format "\n%s: %s" (or hue-key "Hue") (aref hue-final i)) ""))))))
+
          (backend-sym (or (plist-get args :backend) drake-default-backend))
          (backend (gethash backend-sym drake--backends))
          (plot (make-drake-plot
                 :spec (append (list :type type) args)
-                :data-internal (list :x x-scaled :y y-scaled :hue (plist-get hue-info :values) :extra extra-data)
+                :data-internal (list :x x-scaled :y y-scaled :hue (plist-get hue-info :values) 
+                                     :extra extra-data :tooltip final-tooltips)
                 :scales (list :x x-scale :y y-scale :hue (plist-get hue-info :map)
                               :x-type x-type :y-type y-type))))
-
     (unless backend
       (error "Backend '%s' not found. Is it loaded?" backend-sym))
 
