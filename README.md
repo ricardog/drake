@@ -65,6 +65,13 @@ Create a grid of plots based on categorical variables using `drake-facet`:
 (drake-facet :data tips :row :sex :col :time :plot-fn #'drake-plot-scatter :args '(:x :total_bill :y :tip))
 ```
 
+### Legend Placement
+By default, `drake` intelligently places the legend in the emptiest corner of the plot. You can manually override this using the `:legend` argument:
+```elisp
+(drake-plot-scatter :data tips :x :total_bill :y :tip :hue :sex :legend 'bottom-left)
+```
+Supported values: `'top-right`, `'top-left`, `'bottom-right`, `'bottom-left`.
+
 ### Interactivity
 Plots rendered with the `svg` or `gnuplot` backends include interactive tooltips. Hover your mouse over any data point to see its underlying values.
 
