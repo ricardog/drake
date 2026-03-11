@@ -658,21 +658,30 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
     (nreverse result)))
 
 (defun drake--extract-column (data key)
-  "Extract column KEY from DATA."
+  "Extract column KEY from DATA. Raise error if KEY is missing."
   (cond
    ;; Columnar plist
    ((and (listp data) (keywordp (car-safe data)))
+    (unless (plist-member data key)
+      (error "Column %S not found in data. Available: %S" key (cl-loop for (k v) on data by #'cddr collect k)))
     (drake--ensure-vector (plist-get data key)))
    ;; List of Alists
    ((and (listp data) (consp (car-safe data)) (consp (caar data)))
+    (unless (assoc key (car data))
+      (error "Column %S not found in alist row. Available: %S" key (mapcar #'car (car data))))
     (vconcat (mapcar (lambda (row) (cdr (assoc key row))) data)))
    ;; List of Plists
    ((and (listp data) (listp (car-safe data)) (keywordp (caar data)))
+    (unless (plist-member (car data) key)
+      (error "Column %S not found in plist row. Available: %S" key (cl-loop for (k v) on (car data) by #'cddr collect k)))
     (vconcat (mapcar (lambda (row) (plist-get row key)) data)))
    ;; List of lists (Row-based)
    ((and (listp data) (listp (car-safe data)))
     (if (numberp key)
-        (vconcat (mapcar (lambda (row) (nth key row)) data))
+        (let ((row (car data)))
+          (when (>= key (length row))
+            (error "Column index %d out of range (length %d)" key (length row)))
+          (vconcat (mapcar (lambda (row) (nth key row)) data)))
       (error "Positional column index required for row-based data: %S" key)))
    (t (error "Unsupported data format: %S" data))))
 

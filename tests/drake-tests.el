@@ -82,4 +82,18 @@
     (when (get-buffer buffer-name)
       (kill-buffer buffer-name))))
 
+(ert-deftest drake--extract-column-missing-key-test ()
+  (let ((data '(:x [1 2 3])))
+    (should-error (drake--extract-column data :nonexistent)
+                  :type 'error))
+  (let ((data '(((:x . 1)))))
+    (should-error (drake--extract-column data :nonexistent)
+                  :type 'error))
+  (let ((data '((:x 1))))
+    (should-error (drake--extract-column data :nonexistent)
+                  :type 'error))
+  (let ((data '((1))))
+    (should-error (drake--extract-column data 1)
+                  :type 'error)))
+
 (provide 'drake-tests)
