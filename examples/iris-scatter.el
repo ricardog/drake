@@ -17,8 +17,8 @@
        (sql (format "CREATE TABLE iris AS SELECT * FROM read_csv_auto('%s')"
 		    data-file)))
   (duckdb-execute conn sql)
-  (let ((data (duckdb-select-columns conn "SELECT sepal_length, sepal_width FROM iris")))
-    (drake-plot-scatter :data data :x :sepal_length :y :sepal_width :title "Iris: Sepal Length vs Width"))
+  (let ((data (duckdb-select-columns conn "SELECT sepal_length, sepal_width, species FROM iris")))
+    (drake-plot-scatter :data data :x :sepal_length :y :sepal_width :hue :species :title "Iris: Sepal Length vs Width"))
   (duckdb-disconnect conn)
   (duckdb-close db))
 

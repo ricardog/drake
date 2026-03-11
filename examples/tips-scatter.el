@@ -17,8 +17,8 @@
        (sql (format "CREATE TABLE tips AS SELECT * FROM read_csv_auto('%s')"
 		    data-file)))
   (duckdb-execute conn sql)
-  (let ((data (duckdb-select-columns conn "SELECT total_bill, tip FROM tips")))
-    (drake-plot-scatter :data data :x :total_bill :y :tip :title "Tips: Total Bill vs Tip"))
+  (let ((data (duckdb-select-columns conn "SELECT total_bill, tip, sex FROM tips")))
+    (drake-plot-scatter :data data :x :total_bill :y :tip :hue :sex :title "Tips: Total Bill vs Tip"))
   (duckdb-disconnect conn)
   (duckdb-close db))
 
