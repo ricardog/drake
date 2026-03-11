@@ -49,7 +49,7 @@
 
     ;; Legend
     (when-let ((hue-map (plist-get (drake-plot-scales plot) :hue)))
-      (drake-svg--draw-legend svg width height margin hue-map))
+      (drake-svg--draw-legend svg width height margin hue-map plot))
 
     ;; Title
     (when-let ((title (plist-get spec :title)))
@@ -360,11 +360,42 @@ Handles self-closing tags by converting them to open/close tags with the title i
                  (svg-polyline svg all-points
                                :fill color :fill-opacity 0.4 :stroke color :stroke-width 1 :drake-tooltip tooltip))))))
 
-(defun drake-svg--draw-legend (svg width height margin hue-map)
-  (let ((lx (- width margin 10))
-        (ly margin)
-        (i 0))
-    (svg-rectangle svg lx ly 100 (* (length hue-map) 20) :fill "white" :fill-opacity 0.8 :stroke "#ccc")
+(defun drake-svg--draw-legend (svg width height margin hue-map plot)
+  "Draw legend for HUE-MAP on SVG. PLOT is used for smart placement."
+  (let* ((spec (drake-plot-spec plot))
+         (legend-pos (plist-get spec :legend))
+         (data (drake-plot-data-internal plot))
+         (x-scaled (plist-get data :x))
+         (y-scaled (plist-get data :y))
+         (n-items (length hue-map))
+         (l-width 100)
+         (l-height (* n-items 20))
+         (padding 10)
+         ;; 1. Calculate best position if not specified
+         (best-pos (or legend-pos
+                       (let ((tr 0) (tl 0) (br 0) (bl 0))
+                         (cl-loop for i from 0 below (length x-scaled) do
+                                  (let ((xv (aref x-scaled i))
+                                        (yv (aref y-scaled i)))
+                                    (cond
+                                     ((and (> xv 0.5) (> yv 0.5)) (cl-incf tr))
+                                     ((and (<= xv 0.5) (> yv 0.5)) (cl-incf tl))
+                                     ((and (> xv 0.5) (<= yv 0.5)) (cl-incf br))
+                                     (t (cl-incf bl)))))
+                         (let ((counts (list (cons 'top-right tr) (cons 'top-left tl)
+                                             (cons 'bottom-right br) (cons 'bottom-left bl))))
+                           (car (car (sort counts (lambda (a b) (< (cdr a) (cdr b))))))))))
+         ;; 2. Determine coordinates based on position
+         (coords (cl-case best-pos
+                   (top-left (cons (+ margin padding) (+ margin padding)))
+                   (bottom-right (cons (- width margin l-width padding) (- height margin l-height padding)))
+                   (bottom-left (cons (+ margin padding) (- height margin l-height padding)))
+                   (t (cons (- width margin l-width padding) (+ margin padding)))))
+         (lx (car coords))
+         (ly (cdr coords))
+         (i 0))
+
+    (svg-rectangle svg lx ly l-width l-height :fill "white" :fill-opacity 0.8 :stroke "#ccc")
     (dolist (entry hue-map)
       (let ((val (car entry))
             (color (cdr entry)))

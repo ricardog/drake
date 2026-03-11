@@ -167,6 +167,7 @@ ARGS is a plist containing:
 :buffer  - Target buffer name.
 :width   - Plot width (pixels).
 :height  - Plot height (pixels).
+:legend  - Legend position ('top-right, 'top-left, 'bottom-right, 'bottom-left).
 :backend - Backend to use (symbol)."
   (drake--create-plot 'scatter args))
 
