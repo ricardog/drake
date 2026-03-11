@@ -10,8 +10,13 @@
 (require 'duckdb)
 
 (let* ((db (duckdb-open ":memory:"))
-       (conn (duckdb-connect db)))
-  (duckdb-execute conn "CREATE TABLE tips AS SELECT * FROM read_csv_auto('/app/datasets/tips.csv.gz')")
+       (conn (duckdb-connect db))
+       (drake-dir (file-name-directory (locate-library "drake.el" t)))
+       (dataset-dir (expand-file-name "datasets" drake-dir))
+       (data-file (expand-file-name "tips.csv.gz" dataset-dir))
+       (sql (format "CREATE TABLE tips AS SELECT * FROM read_csv_auto('%s')"
+		    data-file)))
+  (duckdb-execute conn sql)
   (let ((data (duckdb-select-columns conn "SELECT total_bill, tip FROM tips")))
     (drake-plot-scatter :data data :x :total_bill :y :tip :title "Tips: Total Bill vs Tip"))
   (duckdb-disconnect conn)
