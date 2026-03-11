@@ -1,0 +1,20 @@
+(require 'drake)
+(require 'drake-svg)
+(require 'drake-rust)
+
+(unless (fboundp 'imagep)
+  (defun imagep (_) t))
+
+(let* ((n 10000)
+       (x (vconcat (cl-loop for i from 0 below n collect (random 1000))))
+       (y (vconcat (cl-loop for i from 0 below n collect (random 1000))))
+       (data (list :x x :y y))
+       (start-time (float-time)))
+  (message "Rendering %d points with SVG backend..." n)
+  (drake-plot-scatter :data data :x :x :y :y :backend 'svg)
+  (message "SVG time: %.3fs" (- (float-time) start-time))
+  
+  (setq start-time (float-time))
+  (message "Rendering %d points with Rust backend..." n)
+  (drake-plot-scatter :data data :x :x :y :y :backend 'rust)
+  (message "Rust time: %.3fs" (- (float-time) start-time)))

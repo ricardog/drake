@@ -75,6 +75,7 @@ dependencies = [
 name = "drake-rust-module"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "emacs",
  "plotters",
  "serde",

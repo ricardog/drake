@@ -17,9 +17,14 @@
 (defun drake-rust-render (plot)
   "Render PLOT using the Rust backend."
   (drake-rust-load-module)
-  (if (fboundp 'drake-rust-module/render)
-      (drake-rust-module/render plot)
-    (error "Rust module render function (drake-rust-module/render) not found")))
+  (let* ((spec (drake-plot-spec plot))
+         (width (or (plist-get spec :width) drake-default-width))
+         (height (or (plist-get spec :height) drake-default-height))
+         (xml (drake-rust-module/render plot)))
+    (setf (drake-plot-svg-xml plot) xml)
+    (condition-case nil
+        (create-image xml 'svg t :width width :height height)
+      (error (list 'image :type 'svg :data xml)))))
 
 ;; Register the backend
 (drake-register-backend
