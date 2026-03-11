@@ -3,15 +3,29 @@ A high performance statistics plotting library for Emacs.
 
 `drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
 
-## Status: Stage 2 (The Mallard)
-- **Plot types:** Scatter, Line, and Bar plots.
-- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes.
-- **Backends:** Native SVG backend (`svg.el`) with grid lines and ticks.
+## Status: Stage 4 (Relational Regression)
+- **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
+- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats).
+- **Backends:** 
+  - **Native SVG backend (`svg.el`)**: Pure Elisp, no external dependencies.
+  - **Gnuplot backend**: High-quality SVG rendering via external `gnuplot`.
 - **Data formats:** 
   - DuckDB columnar plists (plist of vectors).
   - Row-based list of lists (positional indexing).
   - List of alists (named columns).
   - List of plists (named columns).
+
+## Backends
+
+`drake` is backend-agnostic. You can switch backends using the `:backend` argument:
+
+- **`:backend 'svg`** (Default): Uses `svg.el`.
+- **`:backend 'gnuplot`**: Requires `gnuplot` installed on your system.
+
+```elisp
+(require 'drake-gnuplot)
+(drake-plot-scatter :data iris :x :sepal_length :y :sepal_width :backend 'gnuplot)
+```
 
 ## Sample Datasets
 

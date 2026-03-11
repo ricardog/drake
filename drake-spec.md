@@ -79,11 +79,23 @@ A backend is registered as a `cl-defstruct`:
 
 ```elisp
 (cl-defstruct drake-backend
-  name             ;; Symbol identifying the backend (e.g., 'svg, 'c-module)
+  name             ;; Symbol identifying the backend (e.g., 'svg, 'gnuplot)
   render-fn        ;; Function: (lambda (plot) ...) -> emacs-image
-  supported-types  ;; List of plot types: '(scatter line bar hist)
+  supported-types  ;; List of plot types: '(scatter line bar hist box lm)
   capabilities     ;; Plist of features: '(:interactivity t :high-dpi t)
   )
+```
+
+#### The `svg` Backend (Native)
+Pure Elisp implementation using `svg.el`. Best for general use when no external tools are available.
+
+#### The `gnuplot` Backend (External)
+Generates gnuplot scripts and executes `gnuplot` as a subprocess to render SVGs. Provides high-quality aesthetics and handles complex chart types with more precision.
+
+```elisp
+(require 'drake-gnuplot)
+;; Render using gnuplot
+(drake-plot-scatter :data iris :x :sepal_length :y :sepal_width :backend 'gnuplot)
 ```
 
 ### 4.3 The Data Exchange Format
@@ -107,7 +119,7 @@ The backend must interpret the `plot-type` from the `spec` and apply the corresp
 
 ## 5. Staged Development Plan
 
-### Stage 1: The Duckling (Hybrid Foundation)
+### Stage 1: The Duckling (Hybrid Foundation) [DONE]
 
 **Goal:** Get a scatter plot on screen from DuckDB columnar data or basic SQLite rows.
 
@@ -121,7 +133,7 @@ The backend must interpret the `plot-type` from the `spec` and apply the corresp
 * **Backend:** Basic `svg.el` (native Elisp).
 * **Milestone:** Query DuckDB, pass two columns of floats, and see dots in an Emacs buffer.
 
-### Stage 2: The Mallard (Aesthetics & Row Formats)
+### Stage 2: The Mallard (Aesthetics & Row Formats) [DONE]
 
 **Goal:** Full support for various data shapes and visual polish.
 
@@ -133,7 +145,7 @@ The backend must interpret the `plot-type` from the `spec` and apply the corresp
 * **Options:** Add `:hue` and `:palette`.
 * **Infrastructure:** Build a "Color Manager" that maps unique values in a `:hue` column to specific HEX codes.
 
-### Stage 3: The Canvas (Statistical Depth)
+### Stage 3: The Canvas (Statistical Depth) [DONE]
 
 **Goal:** High-level statistical visualizations.
 
@@ -144,7 +156,7 @@ The backend must interpret the `plot-type` from the `spec` and apply the corresp
 * **Logic:** Implement (or wrap in Rust) Kernel Density Estimation (KDE) and Quartile calculations.
 * **Visuals:** Add grid lines and axis labels with proper typography.
 
-### Stage 4: Relational Regression & Smoothing
+### Stage 4: Relational Regression & Smoothing [DONE]
 
 * **Goal:** Trend lines and uncertainty.
 * **Plot Types:** `lmplot` (Linear Model).
