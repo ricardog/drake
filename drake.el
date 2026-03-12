@@ -5,8 +5,10 @@
 ;; Package-Requires: ((emacs "28.1") (cl-lib "0.5") (duckdb "0.1"))
 
 ;;; Commentary:
-;; `drake` is a declarative plotting library for Emacs, inspired by Seaborn.
-;; It supports multiple backends, including a native SVG backend.
+;; `drake` is a declarative plotting library for Emacs, inspired by
+;; Seaborn.  It supports multiple backends, including a native SVG
+;; backend (using svg.el), gnuplot, and a rust dynamic module library
+;; (based on plotters).
 
 ;;; Code:
 
