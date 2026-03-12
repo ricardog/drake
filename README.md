@@ -111,6 +111,7 @@ For plots displayed in a buffer, you can also use the interactive command **`M-x
 Check the `examples/` directory for ready-to-run Elisp scripts:
 - `examples/iris-scatter.el`
 - `examples/tips-scatter.el`
+- `examples/tips-regression.el`
 - `examples/stage2-demo.el`
 
 ## Running Tests
