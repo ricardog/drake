@@ -69,6 +69,14 @@
     (should (drake-plot-p plot))
     (should (string-match "polyline" (drake-plot-svg-xml plot)))))
 
+(ert-deftest drake-rust-unsupported-type-test ()
+  "Test that an unsupported plot type signals a Lisp error."
+  (let* ((data '(:x [1.0] :y [10.0]))
+         (plot (drake-plot-scatter :data data :x :x :y :y :backend 'rust)))
+    ;; Force an unsupported type in the spec
+    (setf (plist-get (drake-plot-spec plot) :type) 'unsupported)
+    (should-error (drake-rust-render plot) :type 'error)))
+
 (defun string-match-all (regexp string count)
   "Verify that REGEXP matches STRING at least COUNT times."
   (let ((start 0)

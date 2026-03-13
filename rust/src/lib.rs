@@ -3,10 +3,22 @@ use plotters::prelude::*;
 
 emacs::plugin_is_GPL_compatible!();
 
-fn to_emacs_error<'e, E: std::fmt::Display>(env: &'e Env, e: E) -> emacs::Error {
-    let msg = format!("Plotters error: {}", e).into_lisp(env).unwrap();
-    let data = env.call("list", [msg]).unwrap();
-    env.call("signal", [env.intern("error").unwrap(), data]).unwrap_err()
+trait PlottersResultExt<T> {
+    fn map_plot_err(self, env: &Env) -> Result<T>;
+}
+
+impl<T, E: std::fmt::Display> PlottersResultExt<T> for std::result::Result<T, E> {
+    fn map_plot_err(self, env: &Env) -> Result<T> {
+        match self {
+            Ok(v) => Ok(v),
+            Err(e) => {
+                let msg = format!("Plotters error: {}", e);
+                let data = env.list(&[msg.into_lisp(env)?])?;
+                env.signal(env.intern("error")?, (data,))?;
+                unreachable!()
+            }
+        }
+    }
 }
 
 fn value_to_f64<'e>(value: Value<'e>) -> Result<f64> {
@@ -128,7 +140,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
     {
         let root = SVGBackend::with_string(&mut buffer, (width as u32, height as u32))
             .into_drawing_area();
-        root.fill(&WHITE).map_err(|e| to_emacs_error(env, e))?;
+        root.fill(&WHITE).map_plot_err(env)?;
 
         let margin = 60;
         let chart_area = root.margin(margin, margin, margin, margin);
@@ -139,14 +151,14 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                 &t,
                 &style,
                 (width / 2 - (t.len() as i32 * 5), 20),
-            ).map_err(|e| to_emacs_error(env, e))?;
+            ).map_plot_err(env)?;
         }
 
         let mut chart = ChartBuilder::on(&chart_area)
             .build_cartesian_2d(0.0..1.0, 0.0..1.0)
-            .map_err(|e| to_emacs_error(env, e))?;
+            .map_plot_err(env)?;
 
-        chart.configure_mesh().draw().map_err(|e| to_emacs_error(env, e))?;
+        chart.configure_mesh().draw().map_plot_err(env)?;
 
         match plot_type.as_str() {
             "scatter" => {
@@ -159,7 +171,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                         };
                         Circle::new((x, y), 4, color.filled())
                     })
-                ).map_err(|e| to_emacs_error(env, e))?;
+                ).map_plot_err(env)?;
             },
             "line" => {
                 let color = if hue_vec.is_empty() {
@@ -170,7 +182,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                 chart.draw_series(std::iter::once(PathElement::new(
                     x_vec.iter().zip(y_vec.iter()).map(|(&x, &y)| (x, y)).collect::<Vec<_>>(),
                     color,
-                ))).map_err(|e| to_emacs_error(env, e))?;
+                ))).map_plot_err(env)?;
             },
             "bar" | "hist" => {
                 let n = x_vec.len();
@@ -187,7 +199,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                             color.filled(),
                         )
                     })
-                ).map_err(|e| to_emacs_error(env, e))?;
+                ).map_plot_err(env)?;
             },
             "box" => {
                 let extra_vec = value_to_iter(env, extra_val)?;
@@ -215,23 +227,23 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                     chart.draw_series(std::iter::once(Rectangle::new(
                         [(x - box_width, s_q1), (x + box_width, s_q3)],
                         color.mix(0.5).filled(),
-                    ))).map_err(|e| to_emacs_error(env, e))?;
+                    ))).map_plot_err(env)?;
                     chart.draw_series(std::iter::once(Rectangle::new(
                         [(x - box_width, s_q1), (x + box_width, s_q3)],
                         color.stroke_width(1),
-                    ))).map_err(|e| to_emacs_error(env, e))?;
+                    ))).map_plot_err(env)?;
                     chart.draw_series(std::iter::once(PathElement::new(
                         vec![(x - box_width, s_med), (x + box_width, s_med)],
                         color.stroke_width(2),
-                    ))).map_err(|e| to_emacs_error(env, e))?;
+                    ))).map_plot_err(env)?;
                     chart.draw_series(std::iter::once(PathElement::new(
                         vec![(x, s_min), (x, s_q1)],
                         color.stroke_width(1),
-                    ))).map_err(|e| to_emacs_error(env, e))?;
+                    ))).map_plot_err(env)?;
                     chart.draw_series(std::iter::once(PathElement::new(
                         vec![(x, s_q3), (x, s_max)],
                         color.stroke_width(1),
-                    ))).map_err(|e| to_emacs_error(env, e))?;
+                    ))).map_plot_err(env)?;
                 }
             },
             "violin" => {
@@ -272,7 +284,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                             points.push((x_center + offset, sy));
                         }
                         chart.draw_series(std::iter::once(Polygon::new(points, color.mix(0.5).filled())))
-                            .map_err(|e| to_emacs_error(env, e))?;
+                            .map_plot_err(env)?;
                     }
                 }
             },
@@ -286,7 +298,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                         };
                         Circle::new((x, y), 4, color.mix(0.7).filled())
                     })
-                ).map_err(|e| to_emacs_error(env, e))?;
+                ).map_plot_err(env)?;
 
                 let extra_vec = value_to_iter(env, extra_val)?;
                 let hue_map = get_plist_value(env, scales, ":hue")?;
@@ -338,7 +350,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                             ci_points.push((ratio, sy));
                         }
                         chart.draw_series(std::iter::once(Polygon::new(ci_points, color.mix(0.15).filled())))
-                            .map_err(|e| to_emacs_error(env, e))?;
+                            .map_plot_err(env)?;
                     }
 
                     let y_at_min = m * x_min + b;
@@ -349,7 +361,7 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                     chart.draw_series(std::iter::once(PathElement::new(
                         vec![(0.0, sy1), (1.0, sy2)],
                         color.stroke_width(2),
-                    ))).map_err(|e| to_emacs_error(env, e))?;
+                    ))).map_plot_err(env)?;
                 }
             },
             "smooth" => {
@@ -368,17 +380,18 @@ pub fn render(env: &Env, plot: Value) -> Result<String> {
                         };
                         Circle::new((sx, sy), 3, color.mix(0.4).filled())
                     })
-                ).map_err(|e| to_emacs_error(env, e))?;
+                ).map_plot_err(env)?;
 
                 chart.draw_series(std::iter::once(PathElement::new(
                     x_vec.iter().zip(y_vec.iter()).map(|(&x, &y)| (x, y)).collect::<Vec<_>>(),
                     RGBColor(76, 114, 176).stroke_width(2),
-                ))).map_err(|e| to_emacs_error(env, e))?;
+                ))).map_plot_err(env)?;
             },
             _ => {
                 let msg = format!("Unsupported plot type in Rust: {}", plot_type);
-                let data = env.call("list", [msg.into_lisp(env)?])?;
-                return Err(env.call("signal", [env.intern("error")?, data]).unwrap_err());
+                let data = env.list(&[msg.into_lisp(env)?])?;
+                env.signal(env.intern("error")?, (data,))?;
+                unreachable!()
             }
         }
     }
