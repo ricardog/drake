@@ -62,53 +62,27 @@ if(EMACS_EXECUTABLE)
     enable_testing()
 
     set(LOAD_PATH -L . -L tests)
-    set(TEST_FILES 
-        tests/drake-tests.el
-        tests/drake-svg-tests.el
-        tests/stage3-tests.el
-        tests/stage4-tests.el
-        tests/drake-gnuplot-tests.el
-        tests/uncertainty-tests.el
-    )
-
-    # Convert TEST_FILES to include -l before each file
-    set(EMACS_TEST_ARGS "")
+    
+    # Discover all test files
+    file(GLOB_RECURSE TEST_FILES "tests/*-tests.el" "tests/*-test.el")
+    
     foreach(test_file ${TEST_FILES})
-        list(APPEND EMACS_TEST_ARGS -l "${test_file}")
+        get_filename_component(test_name ${test_file} NAME_WE)
+        
+        # Exclude helper files if they match the pattern (though they shouldn't with -tests.el/-test.el)
+        if(NOT test_name STREQUAL "test-helper")
+            add_test(NAME ${test_name}
+                COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} -l tests/test-helper.el -l "${test_file}" -f ert-run-tests-batch-and-exit
+                WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
+            )
+        endif()
     endforeach()
 
-    add_test(NAME basic_tests
-        COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} ${EMACS_TEST_ARGS} -f ert-run-tests-batch-and-exit
-        WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
-    )
-
-    add_test(NAME all_tests
-        COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} ${EMACS_TEST_ARGS} -l tests/duckdb-drake-tests.el -f ert-run-tests-batch-and-exit
-        WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
-    )
-
-    add_test(NAME rust_tests
-        COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} ${EMACS_TEST_ARGS} -l tests/drake-rust-tests.el -f ert-run-tests-batch-and-exit
-        WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
-    )
-
-    # Custom targets for convenience (similar to Makefile)
-    add_custom_target(drake-test
-        COMMAND ${CMAKE_CTEST_COMMAND} -R basic_tests --output-on-failure
-        DEPENDS module
-        COMMENT "Running basic tests..."
-    )
-
-    add_custom_target(test-all
-        COMMAND ${CMAKE_CTEST_COMMAND} -R all_tests --output-on-failure
+    # Custom target to run all tests
+    add_custom_target(check
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         DEPENDS module
         COMMENT "Running all tests..."
-    )
-
-    add_custom_target(test-rust
-        COMMAND ${CMAKE_CTEST_COMMAND} -R rust_tests --output-on-failure
-        DEPENDS module
-        COMMENT "Running Rust-specific tests..."
     )
 
     add_custom_target(demo
