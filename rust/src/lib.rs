@@ -1,4 +1,4 @@
-use emacs::{defun, Env, Result, Value, IntoLisp};
+use emacs::{defun, Env, Result, Value, IntoLisp, Vector};
 use plotters::prelude::*;
 
 emacs::plugin_is_GPL_compatible!();
@@ -40,32 +40,52 @@ fn value_to_f64_vec<'e>(env: &'e Env, value: Value<'e>) -> Result<Vec<f64>> {
     if !value.is_not_nil() {
         return Ok(Vec::new());
     }
-    let size: usize = env.call("length", [value])?.into_rust()?;
-    let mut res = Vec::with_capacity(size);
-    for i in 0..size {
-        let idx = (i as i64).into_lisp(env)?;
-        let val: Value = env.call("aref", [value, idx])?;
-        res.push(value_to_f64(val)?);
+    if let Ok(vector) = value.into_rust::<Vector>() {
+        let mut res = Vec::with_capacity(vector.len());
+        for val in vector {
+            res.push(value_to_f64(val)?);
+        }
+        Ok(res)
+    } else {
+        let size: usize = env.call("length", [value])?.into_rust()?;
+        let mut res = Vec::with_capacity(size);
+        for i in 0..size {
+            let idx = (i as i64).into_lisp(env)?;
+            let val: Value = env.call("aref", [value, idx])?;
+            res.push(value_to_f64(val)?);
+        }
+        Ok(res)
     }
-    Ok(res)
 }
 
 fn value_to_string_vec<'e>(env: &'e Env, value: Value<'e>) -> Result<Vec<String>> {
     if !value.is_not_nil() {
         return Ok(Vec::new());
     }
-    let size: usize = env.call("length", [value])?.into_rust()?;
-    let mut res = Vec::with_capacity(size);
-    for i in 0..size {
-        let idx = (i as i64).into_lisp(env)?;
-        let val: Value = env.call("aref", [value, idx])?;
-        if val.is_not_nil() {
-            res.push(val.into_rust::<String>()?);
-        } else {
-            res.push("".to_string());
+    if let Ok(vector) = value.into_rust::<Vector>() {
+        let mut res = Vec::with_capacity(vector.len());
+        for val in vector {
+            if val.is_not_nil() {
+                res.push(val.into_rust::<String>()?);
+            } else {
+                res.push("".to_string());
+            }
         }
+        Ok(res)
+    } else {
+        let size: usize = env.call("length", [value])?.into_rust()?;
+        let mut res = Vec::with_capacity(size);
+        for i in 0..size {
+            let idx = (i as i64).into_lisp(env)?;
+            let val: Value = env.call("aref", [value, idx])?;
+            if val.is_not_nil() {
+                res.push(val.into_rust::<String>()?);
+            } else {
+                res.push("".to_string());
+            }
+        }
+        Ok(res)
     }
-    Ok(res)
 }
 
 fn get_plist_value<'e>(env: &'e Env, plist: Value<'e>, key: &str) -> Result<Value<'e>> {
@@ -88,11 +108,10 @@ fn value_to_iter<'e>(env: &'e Env, value: Value<'e>) -> Result<Vec<Value<'e>>> {
     if !value.is_not_nil() {
         return Ok(Vec::new());
     }
-    if env.call("vectorp", [value])?.is_not_nil() {
-        let size: usize = env.call("length", [value])?.into_rust()?;
-        let mut res = Vec::with_capacity(size);
-        for i in 0..size {
-            res.push(env.call("aref", [value, (i as i64).into_lisp(env)?])?);
+    if let Ok(vector) = value.into_rust::<Vector>() {
+        let mut res = Vec::with_capacity(vector.len());
+        for val in vector {
+            res.push(val);
         }
         Ok(res)
     } else {

@@ -25,7 +25,7 @@
 ## Current & Future Tasks
 
 ### Stage 5: High Performance & Optimization
-- [ ] **Optimize Rust Data Transfer:** Replace `env.call("aref", ...)` loops with direct memory access or more efficient vector transfer methods to handle large datasets (>100k rows) without lag.
+- [x] **Optimize Rust Data Transfer:** Replace `env.call("aref", ...)` loops with direct memory access or more efficient vector transfer methods to handle large datasets (>100k rows) without lag.
 - [ ] **Offload Math to Rust:** Move KDE, OLS regression, and summary statistics calculations from Elisp to the Rust dynamic module.
 - [ ] **Direct DuckDB-to-Rust Pipeline:** Investigate passing DuckDB result pointers directly to the Rust backend to minimize Elisp-side data manipulation.
 
@@ -38,7 +38,7 @@
     - [ ] Customizable number formatting (SI prefixes, decimal precision).
 
 ### Code Quality & Robustness
-- [ ] **Hardened Rust Module:** Replace `unwrap()` calls in `rust/src/lib.rs` with proper `Result` handling to prevent Emacs crashes on malformed data.
+- [X] **Hardened Rust Module:** Replace `unwrap()` calls in `rust/src/lib.rs` with proper `Result` handling to prevent Emacs crashes on malformed data.
 - [ ] **Refactor Data Normalization:** Streamline `drake--normalize-data` and `drake--extract-column` for better maintainability and performance.
 - [ ] **Enhanced KDE:** Implement automatic bandwidth selection methods beyond Silverman's rule (e.g., Scott's Rule, Cross-validation).
 
