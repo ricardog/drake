@@ -37,4 +37,19 @@
     (let ((data-int (drake-plot-data-internal plot)))
       (should (equal (length (plist-get data-int :hue)) 4)))))
 
+(ert-deftest drake-kde-bandwidth-method-test ()
+  (let* ((data '(:cat ["A" "A" "A" "A" "A"] :val [10.0 12.0 15.0 14.0 13.0]))
+         (stats-scott (let ((drake-kde-bandwidth-method 'scott))
+                        (drake--transform-stats (plist-get data :cat) 
+                                                (plist-get data :val) nil)))
+         (stats-silverman (let ((drake-kde-bandwidth-method 'silverman))
+                            (drake--transform-stats (plist-get data :cat) 
+                                                    (plist-get data :val) nil)))
+         (extra-scott (aref (plist-get stats-scott :extra) 0))
+         (extra-silverman (aref (plist-get stats-silverman :extra) 0))
+         (kde-scott (plist-get extra-scott :kde))
+         (kde-silverman (plist-get extra-silverman :kde)))
+    ;; Density estimates should differ because the bandwidths are different
+    (should-not (equal kde-scott kde-silverman))))
+
 (provide 'stage3-tests)

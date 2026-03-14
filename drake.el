@@ -32,8 +32,15 @@
   :group 'drake)
 
 (defcustom drake-default-height 400
-  "Default height for plots in pixels."
-  :type 'number
+  "Default pixel height of plots."
+  :type 'integer
+  :group 'drake)
+
+(defcustom drake-kde-bandwidth-method 'scott
+  "Automatic bandwidth selection method for Kernel Density Estimation.
+Valid options are 'scott and 'silverman."
+  :type '(choice (const :tag "Scott's Rule" scott)
+                 (const :tag "Silverman's Rule" silverman))
   :group 'drake)
 
 (defcustom drake-palette-url "https://raw.githubusercontent.com/axismaps/colorbrewer/master/export/colorbrewer.json"
@@ -543,14 +550,25 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
         (cl-incf sum (drake--kde-gaussian-kernel u))))
     (/ sum (* n bandwidth))))
 
-(defun drake--kde-silverman-bandwidth (data)
-  "Calculate the optimal bandwidth for DATA using Silverman's rule of thumb."
+(defun drake--standard-deviation (data)
+  "Calculate the sample standard deviation of DATA."
   (let* ((n (length data))
          (avg (/ (cl-reduce #'+ data) (float n)))
          (variance (/ (cl-reduce #'+ (mapcar (lambda (x) (expt (- x avg) 2)) data))
-                      (float (max 1 (1- n)))))
-         (sd (sqrt variance)))
-    (if (= sd 0) 0.1 (* 1.06 sd (expt n -0.2)))))
+                      (float (max 1 (1- n))))))
+    (sqrt (max 0.0001 variance))))
+
+(defun drake--kde-silverman-bandwidth (data)
+  "Calculate the optimal bandwidth for DATA using Silverman's rule of thumb."
+  (let* ((n (length data))
+         (sd (drake--standard-deviation data)))
+    (* 1.06 sd (expt n -0.2))))
+
+(defun drake--kde-scott-bandwidth (data)
+  "Calculate the optimal bandwidth for DATA using Scott's rule."
+  (let* ((n (length data))
+         (sd (drake--standard-deviation data)))
+    (* sd (expt n -0.2))))
 
 (defun drake--transform-stats (x-vec y-vec hue-vec)
   "Calculate summary statistics (quartiles, etc.) and KDE for each category."
@@ -574,7 +592,9 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
                   (median (drake--quantile sorted 0.5))
                   (q3 (drake--quantile sorted 0.75))
                   ;; KDE calculation
-                  (h (drake--kde-silverman-bandwidth sorted))
+                  (h (if (eq drake-kde-bandwidth-method 'scott)
+                         (drake--kde-scott-bandwidth sorted)
+                       (drake--kde-silverman-bandwidth sorted)))
                   (kde-points nil)
                   (steps 50)
                   (span (- max min))

@@ -27,12 +27,23 @@
     (let ((end (float-time)))
       (message "Filtering %d rows took %.4f seconds" n-rows (- end start)))))
 
+(defun benchmark-kde (n-points)
+  (let ((data (cl-loop for i from 0 below n-points collect (random 1000.0))))
+    (let ((start (float-time)))
+      (drake--kde-scott-bandwidth data)
+      (message "KDE Scott bandwidth (%d points) took %.4f seconds" n-points (- (float-time) start)))
+    (let ((start (float-time)))
+      (drake--kde-silverman-bandwidth data)
+      (message "KDE Silverman bandwidth (%d points) took %.4f seconds" n-points (- (float-time) start)))))
+
 (defun run-all-benchmarks ()
   (message "Starting benchmarks...")
   (benchmark-normalization 10000)
   (benchmark-normalization 50000)
   (benchmark-filtering 10000)
   (benchmark-filtering 20000)
+  (benchmark-kde 5000)
+  (benchmark-kde 10000)
   (message "Benchmarks complete."))
 
 (run-all-benchmarks)
