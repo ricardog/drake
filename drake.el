@@ -230,13 +230,13 @@ ARGS is a plist containing:
 :plot-fn - Plotting function to use for each facet (e.g., #'drake-plot-scatter).
 :args    - Additional arguments to pass to :plot-fn.
 :title   - Overall title."
-  (let* ((data (plist-get args :data))
+  (let* ((data (drake--normalize-data-all (plist-get args :data)))
          (row-key (plist-get args :row))
          (col-key (plist-get args :col))
          (plot-fn (plist-get args :plot-fn))
          (plot-args (plist-get args :args))
-         (rows (if row-key (drake--get-unique-values (drake--extract-column data row-key)) '(nil)))
-         (cols (if col-key (drake--get-unique-values (drake--extract-column data col-key)) '(nil)))
+         (rows (if row-key (drake--get-unique-values (plist-get data row-key)) '(nil)))
+         (cols (if col-key (drake--get-unique-values (plist-get data col-key)) '(nil)))
          (grid nil))
     (dolist (r rows)
       (let ((row-data nil))
@@ -299,28 +299,26 @@ ARGS is a plist containing:
 
 (defun drake--filter-data (data filters)
   "Filter DATA based on FILTERS (alist of key . value)."
-  (let* ((actual-data (if (plist-get data :data) (plist-get data :data) data))
+  (let* ((normalized (drake--normalize-data-all data))
          (indices nil))
-    ;; 1. Find indices that match all filters
-    (let ((n (length (drake--extract-column actual-data (caar filters)))))
-      (cl-loop for i from 0 below n do
-               (when (cl-every (lambda (f)
-                                 (let* ((k (car f))
-                                        (v (cdr f))
-                                        (col (drake--extract-column actual-data k)))
-                                   (if k (equal (aref col i) v) t)))
-                               filters)
-                 (push i indices))))
-    (setq indices (nreverse indices))
-    ;; 2. Extract subset for all keys in data
-    (cond
-     ((and (listp actual-data) (keywordp (car-safe actual-data)))
-      (let (res)
-        (cl-loop for (k v) on actual-data by #'cddr do
-                 (push k res)
-                 (push (vconcat (mapcar (lambda (i) (aref v i)) indices)) res))
-        (nreverse res)))
-     (t (error "Faceting currently only supports columnar plist data format")))))
+    (if (null filters)
+        normalized
+      (let* ((first-col-key (caar filters))
+             (n (length (plist-get normalized first-col-key)))
+             (filter-cols (mapcar (lambda (f) (cons (cdr f) (plist-get normalized (car f)))) filters)))
+        ;; 1. Find indices that match all filters
+        (cl-loop for i from 0 below n do
+                 (when (cl-every (lambda (f-col)
+                                   (equal (aref (cdr f-col) i) (car f-col)))
+                                 filter-cols)
+                   (push i indices)))
+        (setq indices (nreverse indices))
+        ;; 2. Subset all columns
+        (let (res)
+          (cl-loop for (k v) on normalized by #'cddr do
+                   (push k res)
+                   (push (vconcat (mapcar (lambda (i) (aref v i)) indices)) res))
+          (nreverse res))))))
 
 (defun drake--create-plot (type args)
   "Internal function to create a plot of TYPE with ARGS."
@@ -647,46 +645,94 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
    ((listp seq) (vconcat seq))
    (t (error "Cannot convert to vector: %S" seq))))
 
+(defun drake--identify-format (data)
+  "Identify the format of DATA.
+Returns one of: 'columnar-plist, 'alist-rows, 'plist-rows, 'list-rows, or nil."
+  (cond
+   ((null data) nil)
+   ;; Columnar plist: (:key1 [v1 v2] :key2 [v3 v4])
+   ((and (listp data) (keywordp (car-safe data)) (vectorp (car-safe (cdr-safe data))))
+    'columnar-plist)
+   ;; List of rows
+   ((listp data)
+    (let ((first-row (car data)))
+      (cond
+       ((null first-row) nil)
+       ;; Alist: ((:x . 1) (:y . 2))
+       ((and (consp first-row) (consp (car first-row))) 'alist-rows)
+       ;; Plist: (:x 1 :y 2)
+       ((and (listp first-row) (keywordp (car-safe first-row))) 'plist-rows)
+       ;; List: (1 2)
+       ((listp first-row) 'list-rows)
+       (t nil))))
+   (t nil)))
+
 (defun drake--normalize-data (data column-map)
   "Normalize DATA into a plist of vectors based on COLUMN-MAP.
 COLUMN-MAP is a plist mapping internal keys (like :x) to data keys.
 Handles columnar plists, row-based lists, and lists of alists/plists."
   (let* ((actual-data (if (plist-get data :data) (plist-get data :data) data))
+         (format (drake--identify-format actual-data))
          (result nil))
-    (cl-loop for (internal-key data-key) on column-map by #'cddr do
-             (when data-key
-               (let ((col (drake--extract-column actual-data data-key)))
-                 (push internal-key result)
-                 (push col result))))
+    (unless format
+      (error "Unsupported or empty data format: %S" actual-data))
+
+    (if (eq format 'columnar-plist)
+        ;; For columnar, just pick requested columns
+        (cl-loop for (internal-key data-key) on column-map by #'cddr do
+                 (when data-key
+                   (unless (plist-member actual-data data-key)
+                     (error "Column %S not found in data" data-key))
+                   (push internal-key result)
+                   (push (drake--ensure-vector (plist-get actual-data data-key)) result)))
+      
+      ;; Validation for row-based data
+      (let ((first-row (car actual-data)))
+        (cl-loop for (internal-key data-key) on column-map by #'cddr do
+                 (when data-key
+                   (cond
+                    ((eq format 'alist-rows)
+                     (unless (assoc data-key first-row)
+                       (error "Column %S not found in alist row" data-key)))
+                    ((eq format 'plist-rows)
+                     (unless (plist-member first-row data-key)
+                       (error "Column %S not found in plist row" data-key)))
+                    ((eq format 'list-rows)
+                     (unless (and (numberp data-key) (< data-key (length first-row)))
+                       (error "Column index %S out of range" data-key)))))))
+      
+      ;; For row-based, use mapcar for speed (C optimization)
+      (cl-loop for (internal-key data-key) on column-map by #'cddr do
+               (when data-key
+                 (let ((col (cond
+                             ((eq format 'alist-rows)
+                              (vconcat (mapcar (lambda (row) (cdr (assoc data-key row))) actual-data)))
+                             ((eq format 'plist-rows)
+                              (vconcat (mapcar (lambda (row) (plist-get row data-key)) actual-data)))
+                             ((eq format 'list-rows)
+                              (vconcat (mapcar (lambda (row) (nth data-key row)) actual-data))))))
+                   (push internal-key result)
+                   (push col result)))))
     (nreverse result)))
+
+(defun drake--normalize-data-all (data)
+  "Convert DATA of any format into a single columnar plist of vectors."
+  (let* ((actual-data (if (plist-get data :data) (plist-get data :data) data))
+         (format (drake--identify-format actual-data)))
+    (if (eq format 'columnar-plist)
+        actual-data
+      (let* ((first-row (car actual-data))
+             (all-keys (cond
+                        ((eq format 'alist-rows) (mapcar #'car first-row))
+                        ((eq format 'plist-rows) (cl-loop for (k v) on first-row by #'cddr collect k))
+                        ((eq format 'list-rows) (cl-loop for i from 0 below (length first-row) collect i))))
+             (column-map (cl-loop for k in all-keys nconc (list k k))))
+        (drake--normalize-data actual-data column-map)))))
 
 (defun drake--extract-column (data key)
   "Extract column KEY from DATA. Raise error if KEY is missing."
-  (cond
-   ;; Columnar plist
-   ((and (listp data) (keywordp (car-safe data)))
-    (unless (plist-member data key)
-      (error "Column %S not found in data. Available: %S" key (cl-loop for (k v) on data by #'cddr collect k)))
-    (drake--ensure-vector (plist-get data key)))
-   ;; List of Alists
-   ((and (listp data) (consp (car-safe data)) (consp (caar data)))
-    (unless (assoc key (car data))
-      (error "Column %S not found in alist row. Available: %S" key (mapcar #'car (car data))))
-    (vconcat (mapcar (lambda (row) (cdr (assoc key row))) data)))
-   ;; List of Plists
-   ((and (listp data) (listp (car-safe data)) (keywordp (caar data)))
-    (unless (plist-member (car data) key)
-      (error "Column %S not found in plist row. Available: %S" key (cl-loop for (k v) on (car data) by #'cddr collect k)))
-    (vconcat (mapcar (lambda (row) (plist-get row key)) data)))
-   ;; List of lists (Row-based)
-   ((and (listp data) (listp (car-safe data)))
-    (if (numberp key)
-        (let ((row (car data)))
-          (when (>= key (length row))
-            (error "Column index %d out of range (length %d)" key (length row)))
-          (vconcat (mapcar (lambda (row) (nth key row)) data)))
-      (error "Positional column index required for row-based data: %S" key)))
-   (t (error "Unsupported data format: %S" data))))
+  (let ((norm (drake--normalize-data data (list :out key))))
+    (plist-get norm :out)))
 
 (defun drake--get-range (vec)
   "Return (min . max) for vector VEC."

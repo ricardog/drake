@@ -114,8 +114,38 @@ Check the `examples/` directory for ready-to-run Elisp scripts:
 - `examples/tips-regression.el`
 - `examples/stage2-demo.el`
 
-## Running Tests
+## Development
+
+### Running Tests
+
+You can run the full test suite using `ctest` from the `build` directory:
+
+```sh
+mkdir -p build && cd build
+cmake ..
+make check
+```
+
+Or run a specific test file using Emacs directly:
 
 ```sh
 emacs -batch -L . -L tests -l tests/drake-tests.el -f ert-run-tests-batch-and-exit
+```
+
+### Running Benchmarks
+
+Benchmarks are used to track performance regressions in data normalization, filtering, and rendering backends.
+
+To run all benchmarks:
+
+```sh
+cd build
+make bench
+```
+
+Individual benchmarks can be run via `ctest`:
+
+```sh
+cd build
+ctest -L BENCHMARK --output-on-failure
 ```

@@ -134,41 +134,19 @@
 (defun drake-svg--post-process-tooltips (xml)
   "Convert drake-tooltip='...' attributes to <title>...</title> children.
 Handles self-closing tags by converting them to open/close tags with the title inside."
-  (let ((result xml)
-        (start 0))
-    (while (string-match " drake-tooltip=\"\\([^\"]*\\)\"" result start)
-      (let* ((tooltip (match-string 1 result))
-             (attr-start (match-beginning 0))
-             (attr-end (match-end 0))
-             ;; Find the end of this tag
-             (tag-end (string-match "[/ ]?>" result attr-end))
-             (tag-closer (match-string 0 result))
-             (is-self-closing (string-prefix-p "/" tag-closer))
-             ;; Find tag name to close it correctly if needed
-             (tag-name (save-match-data
-                         (if (string-match "<\\([a-z0-9]+\\)" result (max 0 (- attr-start 100)))
-                             (match-string 1 result)
-                           "circle"))))
-        ;; We will replace the attribute AND the tag closer in one or two steps
-        ;; to avoid issues with shifting indices.
-        ;; First, remove the attribute.
-        (setq result (concat (substring result 0 attr-start)
-                            (substring result attr-end)))
-        ;; Adjust tag-end because we removed characters
-        (setq tag-end (- tag-end (- attr-end attr-start)))
-        
-        (if is-self-closing
-            ;; Replace " />" with "><title>T</title></tag>"
-            (setq result (concat (substring result 0 tag-end)
-                                "><title>" tooltip "</title></" tag-name ">"
-                                (substring result (+ tag-end (length tag-closer)))))
-          ;; Replace ">" with "><title>T</title>"
-          (setq result (concat (substring result 0 tag-end)
-                              "><title>" tooltip "</title>"
-                              (substring result (+ tag-end (length tag-closer))))))
-        ;; Update start to search after the current tag
-        (setq start tag-end)))
-    result))
+  (replace-regexp-in-string
+   "\\(<[a-z0-9]+[^>]*?\\) drake-tooltip=\"\\([^\"]*\\)\"\\([^>]*?\\)\\(/?\\)>"
+   (lambda (match)
+     (let* ((prefix (match-string 1 match))
+            (tooltip (match-string 2 match))
+            (suffix (match-string 3 match))
+            (self-closing (string= (match-string 4 match) "/"))
+            (tag-name (when (string-match "<\\([a-z0-9]+\\)" prefix)
+                        (match-string 1 prefix))))
+       (if self-closing
+           (format "%s%s><title>%s</title></%s>" prefix suffix tooltip tag-name)
+         (format "%s%s><title>%s</title>" prefix suffix tooltip))))
+   xml t t))
 
 (defun drake-svg--draw-lm (svg x y width height plot)
   (let* ((data (drake-plot-data-internal plot))

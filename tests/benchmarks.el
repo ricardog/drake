@@ -1,0 +1,38 @@
+
+(require 'drake)
+(require 'cl-lib)
+
+(defun generate-alist-rows (n-rows)
+  (let (data)
+    (dotimes (i n-rows)
+      (push (list (cons :x (float i))
+                  (cons :y (float (* i 2)))
+                  (cons :hue (if (= 0 (% i 2)) "A" "B")))
+            data))
+    (nreverse data)))
+
+(defun benchmark-normalization (n-rows)
+  (let* ((data (generate-alist-rows n-rows))
+         (column-map '(:x :x :y :y :hue :hue))
+         (start (float-time)))
+    (drake--normalize-data data column-map)
+    (let ((end (float-time)))
+      (message "Normalization of %d alist rows took %.4f seconds" n-rows (- end start)))))
+
+(defun benchmark-filtering (n-rows)
+  (let* ((data (generate-alist-rows n-rows))
+         (filters (list (cons :hue "A")))
+         (start (float-time)))
+    (drake--filter-data data filters)
+    (let ((end (float-time)))
+      (message "Filtering %d rows took %.4f seconds" n-rows (- end start)))))
+
+(defun run-all-benchmarks ()
+  (message "Starting benchmarks...")
+  (benchmark-normalization 10000)
+  (benchmark-normalization 50000)
+  (benchmark-filtering 10000)
+  (benchmark-filtering 20000)
+  (message "Benchmarks complete."))
+
+(run-all-benchmarks)

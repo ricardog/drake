@@ -39,7 +39,7 @@
 
 ### Code Quality & Robustness
 - [X] **Hardened Rust Module:** Replace `unwrap()` calls in `rust/src/lib.rs` with proper `Result` handling to prevent Emacs crashes on malformed data.
-- [ ] **Refactor Data Normalization:** Streamline `drake--normalize-data` and `drake--extract-column` for better maintainability and performance.
+- [X] **Refactor Data Normalization:** Streamline `drake--normalize-data` and `drake--extract-column` for better maintainability and performance.
 - [ ] **Enhanced KDE:** Implement automatic bandwidth selection methods beyond Silverman's rule (e.g., Scott's Rule, Cross-validation).
 
 ### API & Ergonomics

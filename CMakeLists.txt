@@ -78,11 +78,31 @@ if(EMACS_EXECUTABLE)
         endif()
     endforeach()
 
-    # Custom target to run all tests
+    # Performance benchmarks
+    add_test(NAME bench-normalization
+        COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} -l tests/benchmarks.el
+        WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
+    )
+    set_tests_properties(bench-normalization PROPERTIES LABELS BENCHMARK)
+
+    add_test(NAME bench-rendering
+        COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} -l examples/performance-bench.el
+        WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
+    )
+    set_tests_properties(bench-rendering PROPERTIES LABELS BENCHMARK)
+
+    # Custom target to run all tests (excluding benchmarks)
     add_custom_target(check
-        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        COMMAND ${CMAKE_CTEST_COMMAND} -E "bench-" --output-on-failure
         DEPENDS module
         COMMENT "Running all tests..."
+    )
+
+    # Custom target to run benchmarks
+    add_custom_target(bench
+        COMMAND ${CMAKE_CTEST_COMMAND} -L BENCHMARK --output-on-failure
+        DEPENDS module
+        COMMENT "Running all benchmarks..."
     )
 
     add_custom_target(demo
