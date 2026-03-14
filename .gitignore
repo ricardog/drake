@@ -13,6 +13,9 @@ drake-rust-module.so
 # Built distribution
 dist/
 
+# Rust module build dir
+build/
+
 # Backup files
 *~
 
