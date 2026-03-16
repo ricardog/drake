@@ -3,6 +3,8 @@ A high performance statistics plotting library for Emacs.
 
 `drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
 
+**Quick Links:** [Theming Guide](THEMING.md) | [Palette Browser](PALETTE_BROWSER_QUICKSTART.md) | [Examples](examples/) | [Documentation](#documentation)
+
 ## Status: Stage 5 (High Performance & Advanced Features)
 - **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
 - **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats), interactive tooltips, **native faceting**, **logarithmic scales**, and **date/time axes**.
@@ -172,6 +174,10 @@ Palettes can be applied in three ways:
                :palette 'rdbu)
 ```
 
+**Learn More:**
+- [Palette Browser Quick Start](PALETTE_BROWSER_QUICKSTART.md) - Get started in 60 seconds
+- [Palette Demo](examples/palette-demo.el) - Interactive demonstrations
+
 ## Theming
 
 Drake includes a comprehensive theming system that automatically adapts to your Emacs configuration:
@@ -217,7 +223,11 @@ Drake includes a comprehensive theming system that automatically adapts to your 
 (drake-set-theme my-theme)
 ```
 
-Themes control colors, fonts, grid styles, and default palettes across all plot types and backends. See `THEMING.md` for comprehensive documentation.
+Themes control colors, fonts, grid styles, and default palettes across all plot types and backends.
+
+**Learn More:**
+- [Theming Documentation](THEMING.md) - Comprehensive theming guide
+- [Theme Demo](examples/theme-demo.el) - Interactive demonstrations
 
 ## Advanced Features
 
@@ -325,11 +335,33 @@ For plots displayed in a buffer, you can also use the interactive command **`M-x
 
 ## Running Examples
 
-Check the `examples/` directory for ready-to-run Elisp scripts:
-- `examples/iris-scatter.el`
-- `examples/tips-scatter.el`
-- `examples/tips-regression.el`
-- `examples/stage2-demo.el`
+The `examples/` directory contains ready-to-run demonstrations:
+
+**Basic Plotting:**
+- [iris-scatter.el](examples/iris-scatter.el) - Basic scatter plot
+- [tips-scatter.el](examples/tips-scatter.el) - Scatter with grouping
+- [tips-regression.el](examples/tips-regression.el) - Linear regression
+- [stage2-demo.el](examples/stage2-demo.el) - Comprehensive plot types
+
+**Advanced Features:**
+- [theme-demo.el](examples/theme-demo.el) - Theme system demonstrations
+- [palette-demo.el](examples/palette-demo.el) - Palette browser and management
+- [performance-bench.el](examples/performance-bench.el) - Benchmarking suite
+
+## Documentation
+
+**Core Documentation:**
+- [README.md](README.md) - This file (getting started, features, API)
+- [drake-spec.md](drake-spec.md) - Original specification and design
+
+**Feature Guides:**
+- [THEMING.md](THEMING.md) - Comprehensive theming system guide
+- [PALETTE_BROWSER_QUICKSTART.md](PALETTE_BROWSER_QUICKSTART.md) - Palette browser quick start
+
+**Implementation Details:**
+- [MATH_OFFLOAD_IMPLEMENTATION.md](MATH_OFFLOAD_IMPLEMENTATION.md) - Rust math offload details
+- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Stage 5 implementation summary
+- [TODO.md](TODO.md) - Roadmap and future features
 
 ## Development
 
