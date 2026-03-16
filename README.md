@@ -48,57 +48,129 @@ To use the Rust backend, you must compile the dynamic module:
 
 ### Palette Browser
 
-Visually explore all available palettes:
+Visually explore all available palettes with the interactive browser:
 
 ```elisp
-;; Open interactive browser with color swatches
-(drake-palette-browser)
+M-x drake-palette-browser
+```
 
-;; Quick palette selection
+**Browser Keyboard Shortcuts:**
+- `RET`, `a` - Apply palette to current theme
+- `c` - Copy palette name
+- `f` - Fetch ColorBrewer palettes (100+)
+- `s` - Search palettes by name
+- `n`, `p` - Navigate next/previous
+- `q` - Quit
+- `?` - Help
+
+**Quick commands:**
+```elisp
+;; Quick palette selection with completion
 (drake-palette-browser-quick-select)
 
 ;; Preview a specific palette
 (drake-palette-preview 'viridis)
-```
 
-**Browser Features:**
-- Visual color swatches for all palettes
-- Search and filter by name
-- Apply palettes to current theme
-- Export/import palettes
-- Fetch 100+ ColorBrewer palettes
+;; Fetch additional palettes
+M-x drake-fetch-palettes-improved
+```
 
 ### Built-in Palettes
 
-- **Sequential (ordered data):** `viridis`, `magma`, `inferno`, `plasma`, `blues`
-- **Categorical (distinct groups):** `set1`, `set2`, `dark2`, `paired`
-- **Diverging (center point):** `rdbu`, `spectral`
+Drake includes 13 built-in palettes organized by type:
 
-### Fetch More Palettes
+**Sequential** (for ordered data - low to high values):
+- `viridis` - Perceptually uniform, colorblind-friendly (default)
+- `magma`, `plasma`, `inferno` - Perceptually uniform variants
+- `blues` - Single-hue sequential
 
-Download 100+ professional palettes from ColorBrewer:
+*Best for:* Heatmaps, choropleth maps, continuous values, temperature data
+
+**Categorical** (for distinct, unordered groups):
+- `set1` - Bright, high contrast colors
+- `set2` - Softer, pastel colors
+- `dark2` - Darker tones for light backgrounds
+- `paired` - Pairs of related colors
+
+*Best for:* Categories, regions, products, qualitative differences
+
+**Diverging** (for data with a meaningful center point):
+- `rdbu` - Red to blue
+- `spectral` - Multi-color spectrum
+
+*Best for:* Data above/below average, positive/negative values, gain/loss
+
+### ColorBrewer Integration
+
+Download 100+ additional professional palettes from ColorBrewer:
 
 ```elisp
 M-x drake-fetch-palettes-improved
 ```
 
-Includes sequential, diverging, and qualitative palettes designed for data visualization. Palettes are cached locally for offline use.
+Includes sequential (Blues, Greens, Oranges, etc.), diverging (BrBG, PiYG, RdYlGn, etc.), and qualitative (Accent, Pastel1, Set3, etc.) palettes. All palettes are cached locally at `~/.emacs.d/drake/palettes-cache.el` for offline use.
 
 ### Custom Palettes
+
+Create and register your own color schemes:
 
 ```elisp
 ;; Register a custom palette
 (drake-register-palette 'my-brand '("#1a5490" "#e84a27" "#f39c12"))
 
-;; Use inline
-(drake-plot-scatter ... :palette '("#ff0000" "#00ff00" "#0000ff"))
+;; Use inline in any plot
+(drake-plot-scatter :data data :x :x :y :y
+                   :palette '("#ff0000" "#00ff00" "#0000ff"))
 
-;; Export/import
+;; Export for sharing
 (drake-palette-export 'viridis "my-palette.txt")
+
+;; Import from file
 (drake-palette-import "my-palette.txt" 'imported)
 ```
 
-See `PALETTE_BROWSER.md` for comprehensive documentation.
+### Using Palettes
+
+Palettes can be applied in three ways:
+
+```elisp
+;; 1. Explicit palette in plot
+(drake-plot-scatter :data data :x :x :y :y :hue :category :palette 'viridis)
+
+;; 2. Set as theme default (apply to all future plots)
+(let ((theme (drake-get-current-theme)))
+  (setf (drake-theme-palette theme) 'plasma))
+
+;; 3. Theme automatically includes a default palette
+(drake-set-theme 'dark)  ; Uses viridis by default
+```
+
+### Best Practices
+
+**Choosing Palettes:**
+- Match data type to palette type (sequential for ordered, categorical for groups)
+- Use colorblind-friendly palettes (viridis, magma, plasma, inferno)
+- Test in grayscale for print publications
+- Use high-contrast palettes for presentations (set1, high-contrast theme)
+
+**Accessibility:**
+- ✓ Colorblind-friendly: viridis, magma, plasma, inferno, set2
+- ✗ Avoid: Red-green combinations, rainbow palettes
+
+**Examples:**
+```elisp
+;; Sequential for temperature data
+(drake-plot-scatter :data climate :x :date :y :temp
+                   :hue :temp :palette 'viridis)
+
+;; Categorical for regions
+(drake-plot-bar :data sales :x :quarter :y :revenue
+               :hue :region :palette 'set1)
+
+;; Diverging for changes
+(drake-plot-bar :data changes :x :category :y :change-pct
+               :palette 'rdbu)
+```
 
 ## Theming
 
