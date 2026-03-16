@@ -17,6 +17,12 @@
 (require 'url)
 (require 'drake-theme)
 
+;; Optional palette browser (loaded on demand)
+(autoload 'drake-palette-browser "drake-palette-browser" "Open palette browser" t)
+(autoload 'drake-palette-preview "drake-palette-browser" "Preview a palette" t)
+(autoload 'drake-palette-browser-quick-select "drake-palette-browser" "Quick palette selection" t)
+(autoload 'drake-fetch-palettes-improved "drake-palette-browser" "Fetch palettes with better error handling" t)
+
 (defgroup drake nil
   "High-level statistical visualization."
   :group 'data
@@ -77,36 +83,47 @@ Valid options are 'scott and 'silverman."
   (push (cons name colors) drake--user-palettes))
 
 (defun drake-fetch-palettes ()
-  "Fetch and cache additional palettes from `drake-palette-url`."
+  "Fetch and cache additional palettes from `drake-palette-url`.
+This is a simple synchronous version. For better error handling and
+async fetching, use `drake-fetch-palettes-improved' instead."
   (interactive)
-  (message "Fetching additional palettes from %s..." drake-palette-url)
-  (let ((url-request-method "GET"))
-    (with-current-buffer (url-retrieve-synchronously drake-palette-url)
-      (goto-char (point-min))
-      (re-search-forward "^$" nil t)
-      (let* ((json-object-type 'alist)
-             (raw-data (json-read))
-             (processed nil))
-        (dolist (entry raw-data)
-          (let* ((name (symbol-name (car entry)))
-                 (data (cdr entry))
-                 ;; Get the largest available class count (k)
-                 (max-k (apply #'max (mapcar (lambda (k-entry)
-                                               (if (string-match "^[0-9]+$" (symbol-name (car k-entry)))
-                                                   (string-to-number (symbol-name (car k-entry)))
-                                                 0))
-                                             data)))
-                 (colors (cdr (assoc (intern (number-to-string max-k)) data))))
-            (when (vectorp colors)
-              (push (cons (intern (downcase name)) (append colors nil)) processed))))
-        (setq drake--palette-cache processed)
-        ;; Simple persistence in ~/.emacs.d/drake/
-        (let ((cache-dir (expand-file-name "drake" user-emacs-directory)))
-          (unless (file-exists-p cache-dir) (make-directory cache-dir t))
-          (with-temp-file (expand-file-name "palettes-cache.el" cache-dir)
-            (insert ";;; Generated drake palettes cache\n")
-            (insert (format "(setq drake--palette-cache '%S)" processed))))
-        (message "Successfully loaded %d additional palettes." (length processed))))))
+  (if (fboundp 'drake-fetch-palettes-improved)
+      (drake-fetch-palettes-improved)
+    (condition-case err
+        (progn
+          (message "Fetching additional palettes from %s..." drake-palette-url)
+          (let ((url-request-method "GET"))
+            (with-current-buffer (url-retrieve-synchronously drake-palette-url t nil 30)
+              (goto-char (point-min))
+              (unless (re-search-forward "^$" nil t)
+                (error "Invalid response from server"))
+              (let* ((json-object-type 'alist)
+                     (raw-data (json-read))
+                     (processed nil))
+                (dolist (entry raw-data)
+                  (let* ((name (symbol-name (car entry)))
+                         (data (cdr entry))
+                         ;; Get the largest available class count (k)
+                         (max-k (apply #'max (mapcar (lambda (k-entry)
+                                                       (if (string-match "^[0-9]+$" (symbol-name (car k-entry)))
+                                                           (string-to-number (symbol-name (car k-entry)))
+                                                         0))
+                                                     data)))
+                         (colors (cdr (assoc (intern (number-to-string max-k)) data))))
+                    (when (vectorp colors)
+                      (push (cons (intern (downcase name)) (append colors nil)) processed))))
+                (setq drake--palette-cache processed)
+                ;; Simple persistence in ~/.emacs.d/drake/
+                (let ((cache-dir (expand-file-name "drake" user-emacs-directory)))
+                  (unless (file-exists-p cache-dir) (make-directory cache-dir t))
+                  (with-temp-file (expand-file-name "palettes-cache.el" cache-dir)
+                    (insert ";;; Generated drake palettes cache\n")
+                    (insert (format "(setq drake--palette-cache '%S)" processed))))
+                (message "Successfully loaded %d additional palettes." (length processed))))))
+      (error
+       (message "Failed to fetch palettes: %s" (error-message-string err))
+       (message "Try: M-x drake-fetch-palettes-improved for better error handling")
+       nil))))
 
 (defun drake--load-cache-if-needed ()
   "Load palettes from disk cache if not already loaded."

@@ -45,7 +45,7 @@
 ### API & Ergonomics
 - [X] **Thematic Styling:** [DONE] Add `drake-set-theme` to globally manage fonts, grid styles, and color schemes. Includes 8 built-in themes and automatic Emacs theme detection with `drake-auto-theme`.
 - [ ] **Coordinate Flipping:** Add a `:flip` argument to easily swap X and Y axes (e.g., for horizontal bar charts).
-- [ ] **Palette Browser:** Improve `drake-fetch-palettes` with better error handling and a simple UI to preview available palettes.
+- [X] **Palette Browser:** [DONE] Interactive palette browser with visual previews, search, export/import, and improved ColorBrewer fetching with async support and error handling.
 
 ### Documentation & Testing
 - [ ] **Visual Regression Suite:** Implement tests that verify visual consistency across `svg`, `gnuplot`, and `rust` backends.

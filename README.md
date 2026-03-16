@@ -44,18 +44,61 @@ To use the Rust backend, you must compile the dynamic module:
 
 ## Color Palettes
 
-`drake` includes a variety of built-in palettes and supports fetching hundreds more.
+`drake` includes a comprehensive palette system with an interactive browser for exploring and managing colors.
 
-- **Built-in Palettes:** `viridis` (default), `magma`, `inferno`, `plasma`, `set1`, `set2`, `dark2`, `paired`, `rdbu`, `spectral`, and `blues`.
-- **Fetch More:** Run `M-x drake-fetch-palettes` to download the full set of ColorBrewer palettes and cache them locally.
-- **Custom Palettes:** You can provide a list of HEX strings directly to the `:palette` argument:
-  ```elisp
-  (drake-plot-scatter ... :palette '("#ff0000" "#00ff00" "#0000ff"))
-  ```
-  Or register a custom palette globally:
-  ```elisp
-  (drake-register-palette 'my-theme '("#1a1a1a" "#bada55" "#abcdef"))
-  ```
+### Palette Browser
+
+Visually explore all available palettes:
+
+```elisp
+;; Open interactive browser with color swatches
+(drake-palette-browser)
+
+;; Quick palette selection
+(drake-palette-browser-quick-select)
+
+;; Preview a specific palette
+(drake-palette-preview 'viridis)
+```
+
+**Browser Features:**
+- Visual color swatches for all palettes
+- Search and filter by name
+- Apply palettes to current theme
+- Export/import palettes
+- Fetch 100+ ColorBrewer palettes
+
+### Built-in Palettes
+
+- **Sequential (ordered data):** `viridis`, `magma`, `inferno`, `plasma`, `blues`
+- **Categorical (distinct groups):** `set1`, `set2`, `dark2`, `paired`
+- **Diverging (center point):** `rdbu`, `spectral`
+
+### Fetch More Palettes
+
+Download 100+ professional palettes from ColorBrewer:
+
+```elisp
+M-x drake-fetch-palettes-improved
+```
+
+Includes sequential, diverging, and qualitative palettes designed for data visualization. Palettes are cached locally for offline use.
+
+### Custom Palettes
+
+```elisp
+;; Register a custom palette
+(drake-register-palette 'my-brand '("#1a5490" "#e84a27" "#f39c12"))
+
+;; Use inline
+(drake-plot-scatter ... :palette '("#ff0000" "#00ff00" "#0000ff"))
+
+;; Export/import
+(drake-palette-export 'viridis "my-palette.txt")
+(drake-palette-import "my-palette.txt" 'imported)
+```
+
+See `PALETTE_BROWSER.md` for comprehensive documentation.
 
 ## Theming
 
