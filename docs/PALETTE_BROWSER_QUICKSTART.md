@@ -157,7 +157,7 @@ Downloads 100+ professional palettes. Cached locally for offline use.
 
 ## Next Steps
 
-- Read `PALETTE_BROWSER.md` for comprehensive documentation
+- Read the [Color Palettes](../README.md#color-palettes) section in README for comprehensive documentation
 - Run `examples/palette-demo.el` for interactive demonstrations
 - Try `M-x drake-palette-tutorial` for an org-mode guide
 
@@ -178,5 +178,5 @@ A: Custom palettes are session-only. Add to init file:
 
 ---
 
-**Full Documentation**: See `PALETTE_BROWSER.md`
+**Full Documentation**: See the [Color Palettes](../README.md#color-palettes) section in README
 **Examples**: See `examples/palette-demo.el`

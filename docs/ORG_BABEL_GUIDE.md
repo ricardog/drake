@@ -428,9 +428,9 @@ the strongest growth.
 ## Further Reading
 
 - **[ORG_INTEGRATION.md](ORG_INTEGRATION.md)** - Complete design documentation
-- **[README.md](README.md)** - Drake main documentation
+- **[README.md](../README.md)** - Drake main documentation
 - **[THEMING.md](THEMING.md)** - Theming and styling guide
-- **[examples/](examples/)** - More example code
+- **[examples/](../examples/)** - More example code
 
 ## Getting Help
 

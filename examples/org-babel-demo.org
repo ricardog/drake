@@ -6,8 +6,8 @@
 
 * Introduction
 
-This document demonstrates Drake's org-babel integration. Execute any code block
-with =C-c C-c= to generate plots inline.
+This document demonstrates Drake's org-babel integration. Execute any
+code block with =C-c C-c= to generate plots inline.
 
 * Basic Plotting
 
@@ -272,8 +272,7 @@ You can reference plots by ID:
 #+RESULTS:
 [[file:figures/ref-plot.svg]]
 
-As shown in [[drake:fig-ref][the referenced plot]], sepal length and width
-are correlated.
+As shown in [[drake:fig-ref][the referenced plot]], sepal length and width are correlated.
 
 You can also link directly to files: [[drake:file:figures/ref-plot.svg]]
 
@@ -330,21 +329,21 @@ workflow. Key features:
 - ✓ Multiple backends
 - ✓ Export support
 
-See the [[file:../ORG_BABEL_GUIDE.md][Org-Babel Guide]] for complete documentation.
+See the [[file:../docs/ORG_BABEL_GUIDE.md][Org-Babel Guide]] for complete documentation.
 
 * Appendix: Header Arguments Reference
 
-| Argument    | Description                  | Example              |
-|-------------+------------------------------+----------------------|
-| =:file=     | Output filename (required)   | =:file plot.svg=     |
-| =:session=  | Named session                | =:session analysis=  |
-| =:backend=  | Drake backend                | =:backend rust=      |
-| =:theme=    | Drake theme                  | =:theme dark=        |
-| =:palette=  | Color palette                | =:palette viridis=   |
-| =:var=      | Variable from another block  | =:var data=mydata=   |
-| =:id=       | Plot ID for links            | =:id fig1=           |
-| =:exports=  | What to export               | =:exports results=   |
-| =:eval=     | When to evaluate             | =:eval never-export= |
+| Argument | Description                 | Example            |
+|----------+-----------------------------+--------------------|
+| =:file=    | Output filename (required)  | =:file plot.svg=     |
+| =:session= | Named session               | =:session analysis=  |
+| =:backend= | Drake backend               | =:backend rust=      |
+| =:theme=   | Drake theme                 | =:theme dark=        |
+| =:palette= | Color palette               | =:palette viridis=   |
+| =:var=     | Variable from another block | =:var data=mydata=   |
+| =:id=      | Plot ID for links           | =:id fig1=           |
+| =:exports= | What to export              | =:exports results=   |
+| =:eval=    | When to evaluate            | =:eval never-export= |
 
 * Setup for This Document
 

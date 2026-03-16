@@ -3,7 +3,7 @@ A high performance statistics plotting library for Emacs.
 
 `drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
 
-**Quick Links:** [Theming Guide](THEMING.md) | [Palette Browser](PALETTE_BROWSER_QUICKSTART.md) | [Examples](examples/) | [Documentation](#documentation)
+**Quick Links:** [Theming Guide](docs/THEMING.md) | [Palette Browser](docs/PALETTE_BROWSER_QUICKSTART.md) | [Examples](examples/) | [Documentation](#documentation)
 
 ## Status: Stage 5 (High Performance & Advanced Features)
 - **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
@@ -175,7 +175,7 @@ Palettes can be applied in three ways:
 ```
 
 **Learn More:**
-- [Palette Browser Quick Start](PALETTE_BROWSER_QUICKSTART.md) - Get started in 60 seconds
+- [Palette Browser Quick Start](docs/PALETTE_BROWSER_QUICKSTART.md) - Get started in 60 seconds
 - [Palette Demo](examples/palette-demo.el) - Interactive demonstrations
 
 ## Theming
@@ -226,7 +226,7 @@ Drake includes a comprehensive theming system that automatically adapts to your 
 Themes control colors, fonts, grid styles, and default palettes across all plot types and backends.
 
 **Learn More:**
-- [Theming Documentation](THEMING.md) - Comprehensive theming guide
+- [Theming Documentation](docs/THEMING.md) - Comprehensive theming guide
 - [Theme Demo](examples/theme-demo.el) - Interactive demonstrations
 
 ## Org-Mode Integration
@@ -294,8 +294,8 @@ Press `C-c C-c` to execute. The plot appears inline automatically!
 ```
 
 **Learn More:**
-- [Org-Babel Guide](ORG_BABEL_GUIDE.md) - Complete usage guide with examples
-- [Org Integration Design](ORG_INTEGRATION.md) - Technical implementation details
+- [Org-Babel Guide](docs/ORG_BABEL_GUIDE.md) - Complete usage guide with examples
+- [Org Integration Design](docs/ORG_INTEGRATION.md) - Technical implementation details
 
 ## Advanced Features
 
@@ -420,22 +420,24 @@ The `examples/` directory contains ready-to-run demonstrations:
 
 **Core Documentation:**
 - [README.md](README.md) - This file (getting started, features, API)
-- [drake-spec.md](drake-spec.md) - Original specification and design
+- [drake-spec.md](docs/drake-spec.md) - Original specification and design
+- [TODO.md](TODO.md) - Roadmap and future features
 
 **Feature Guides:**
-- [THEMING.md](THEMING.md) - Comprehensive theming system guide
-- [PALETTE_BROWSER_QUICKSTART.md](PALETTE_BROWSER_QUICKSTART.md) - Palette browser quick start
-- [ORG_BABEL_GUIDE.md](ORG_BABEL_GUIDE.md) - Org-mode integration and usage guide
+- [THEMING.md](docs/THEMING.md) - Comprehensive theming system guide
+- [PALETTE_BROWSER_QUICKSTART.md](docs/PALETTE_BROWSER_QUICKSTART.md) - Palette browser quick start
+- [ORG_BABEL_GUIDE.md](docs/ORG_BABEL_GUIDE.md) - Org-mode integration and usage guide
 
 **Design Documents:**
-- [ORG_INTEGRATION.md](ORG_INTEGRATION.md) - Org-babel integration design
-- [AGGREGATION_DESIGN.md](AGGREGATION_DESIGN.md) - Aggregation strategy and design philosophy
-- [GAP_ANALYSIS.md](GAP_ANALYSIS.md) - Feature gap analysis and future roadmap
+- [ORG_INTEGRATION.md](docs/ORG_INTEGRATION.md) - Org-babel integration design
+- [AGGREGATION_DESIGN.md](docs/AGGREGATION_DESIGN.md) - Aggregation strategy and design philosophy
+- [GAP_ANALYSIS.md](docs/GAP_ANALYSIS.md) - Feature gap analysis and future roadmap
+- [RUST_EXPLORATION.md](docs/RUST_EXPLORATION.md) - Rust backend exploration and analysis
 
 **Implementation Details:**
-- [MATH_OFFLOAD_IMPLEMENTATION.md](MATH_OFFLOAD_IMPLEMENTATION.md) - Rust math offload details
-- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Stage 5 implementation summary
-- [TODO.md](TODO.md) - Roadmap and future features
+- [MATH_OFFLOAD_IMPLEMENTATION.md](docs/MATH_OFFLOAD_IMPLEMENTATION.md) - Rust math offload implementation
+- [MATH_OFFLOAD_ANALYSIS.md](docs/MATH_OFFLOAD_ANALYSIS.md) - Performance analysis of math offloading
+- [IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md) - Stage 5 implementation summary
 
 ## Development
 
