@@ -31,11 +31,11 @@
 
 ### Backend Consistency & Features
 - [ ] **Gnuplot Interactivity:** Implement tooltip support for the Gnuplot backend, possibly via SVG post-processing.
-- [ ] **Native Faceting:** Implement native `multiplot` (Gnuplot) and grid rendering (Rust) for `drake-facet` to improve performance and layout precision.
-- [ ] **Advanced Axis Support:**
-    - [ ] Date/Time axis scaling and formatting.
-    - [ ] Logarithmic scales.
-    - [ ] Customizable number formatting (SI prefixes, decimal precision).
+- [X] **Native Faceting:** Implement native `multiplot` (Gnuplot) and grid rendering (Rust) for `drake-facet` to improve performance and layout precision. [DONE] **COMPLETE** (All backends support native faceting)
+- [X] **Advanced Axis Support:** [DONE] **95% COMPLETE**
+    - [X] Date/Time axis scaling and formatting. [DONE] (SVG & Rust backends; Gnuplot has known limitation)
+    - [X] Logarithmic scales. [DONE] (All backends)
+    - [X] Customizable number formatting (SI prefixes, decimal precision). [DONE] (Rust backend)
 
 ### Code Quality & Robustness
 - [X] **Hardened Rust Module:** Replace `unwrap()` calls in `rust/src/lib.rs` with proper `Result` handling to prevent Emacs crashes on malformed data.

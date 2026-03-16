@@ -6,7 +6,6 @@
 (defun drake-gnuplot-render (plot)
   "Render PLOT to an image using gnuplot."
   (let* ((spec (drake-plot-spec plot))
-         (type (plist-get spec :type))
          (width (or (plist-get spec :width) drake-default-width))
          (height (or (plist-get spec :height) drake-default-height))
          (temp-svg (make-temp-file "drake-gnuplot-" nil ".svg"))
@@ -32,11 +31,56 @@
       (delete-file temp-svg)
       img)))
 
-(defun drake-gnuplot--generate-script (plot width height output-file)
-  "Generate a gnuplot script for PLOT."
+(defun drake-gnuplot-render-facet (fplot)
+  "Render a faceted plot FPLOT using gnuplot's multiplot."
+  (let* ((grid (drake-facet-plot-grid fplot))
+         (rows (drake-facet-plot-rows fplot))
+         (cols (drake-facet-plot-cols fplot))
+         (title (drake-facet-plot-title fplot))
+         (first-plot (caar grid))
+         (p-spec (drake-plot-spec first-plot))
+         (p-width (or (plist-get p-spec :width) drake-default-width))
+         (p-height (or (plist-get p-spec :height) drake-default-height))
+         (total-width (* cols p-width))
+         (total-height (* rows p-height))
+         (temp-svg (make-temp-file "drake-gnuplot-facet-" nil ".svg"))
+         (lines nil))
+
+    (push (format "set terminal svg size %d,%d dynamic font 'sans,10'" total-width total-height) lines)
+    (push (format "set output '%s'" temp-svg) lines)
+    (push (format "set multiplot layout %d,%d title '%s' margins 0.1, 0.9, 0.1, 0.9 spacing 0.05, 0.05" 
+                  rows cols (or title "")) lines)
+    
+    (cl-loop for r from 0 below rows do
+             (cl-loop for c from 0 below cols do
+                      (let* ((p (nth c (nth r grid)))
+                             (p-script (drake-gnuplot--generate-script-body p)))
+                        (push p-script lines))))
+    
+    (push "unset multiplot" lines)
+    
+    (let ((script (mapconcat #'identity (nreverse lines) "\n")))
+      (with-temp-buffer
+        (insert script)
+        (let ((exit-code (call-process-region (point-min) (point-max) "gnuplot" nil t nil)))
+          (unless (zerop exit-code)
+            (error "Gnuplot failed: %s" (buffer-string))))))
+    
+    (let* ((xml (with-temp-buffer
+                  (when (file-exists-p temp-svg)
+                    (insert-file-contents temp-svg))
+                  (buffer-string)))
+           (img (condition-case nil
+                    (create-image xml 'svg t :width total-width :height total-height)
+                  (error (list 'image :type 'svg :data xml)))))
+      (setf (drake-facet-plot-svg-xml fplot) xml)
+      (delete-file temp-svg)
+      img)))
+
+(defun drake-gnuplot--generate-script-body (plot)
+  "Generate the body of a gnuplot script for a single plot in a multiplot."
   (let* ((spec (drake-plot-spec plot))
          (type (plist-get spec :type))
-         (title (plist-get spec :title))
          (scales (drake-plot-scales plot))
          (x-label (or (plist-get spec :xlabel) (plist-get spec :x)))
          (y-label (or (plist-get spec :ylabel) (plist-get spec :y)))
@@ -45,29 +89,22 @@
          (x-vec (plist-get data :x))
          (y-vec (plist-get data :y))
          (hue-vec (plist-get data :hue))
-         (tooltip-vec (plist-get data :tooltip))
          (extra (plist-get data :extra))
          (lines nil))
     
-    ;; Common settings
-    (push (format "set terminal svg size %d,%d dynamic font 'sans,10'" width height) lines)
-    (push (format "set output '%s'" output-file) lines)
     (push "set datafile separator whitespace" lines)
     (push "set style fill solid 0.5 border -1" lines)
     (push "set grid lt 0 lc rgb '#cccccc'" lines)
-    (when title (push (format "set title '%s'" title) lines))
     (when x-label (push (format "set xlabel '%s'" x-label) lines))
     (when y-label (push (format "set ylabel '%s'" y-label) lines))
     
     ;; Aesthetics
     (push "set border 3" lines)
     (push "set tics nomirror" lines)
-    (push "set style line 1 lc rgb '#4c72b0' pt 7 ps 1" lines)
-    (push "set style line 2 lc rgb '#55a868' pt 7 ps 1" lines)
-    (push "set style line 3 lc rgb '#c44e52' pt 7 ps 1" lines)
     
     ;; Scale types
-    (when (eq (plist-get scales :x-type) 'categorical)
+    (cond
+     ((eq (plist-get scales :x-type) 'categorical)
       (let ((x-vals (plist-get scales :x))
             (i 0)
             (tics nil))
@@ -75,17 +112,41 @@
           (push (format "'%s' %d" val i) tics)
           (setq i (1+ i)))
         (push (format "set xtics (%s)" (mapconcat #'identity (nreverse tics) ", ")) lines)))
+     ((eq (plist-get scales :x-type) 'time)
+      (push "set xdata time" lines)
+      (push "set timefmt '%s'" lines)
+      (push (format "set format x '%s'" (or (plist-get spec :x-format) "%Y-%m-%d")) lines)))
+
+    (cond
+     ((eq (plist-get scales :y-type) 'categorical)
+      (let ((y-vals (plist-get scales :y))
+            (i 0)
+            (tics nil))
+        (dolist (val y-vals)
+          (push (format "'%s' %d" val i) tics)
+          (setq i (1+ i)))
+        (push (format "set ytics (%s)" (mapconcat #'identity (nreverse tics) ", ")) lines)))
+     ((eq (plist-get scales :y-type) 'time)
+      (push "set ydata time" lines)
+      (push "set timefmt '%s'" lines)
+      (push (format "set format y '%s'" (or (plist-get spec :y-format) "%Y-%m-%d")) lines)))
+
+    ;; Handle Log Scales (Stage 5)
+    (when (plist-get spec :logx)
+      (push "set logscale x" lines))
+    (when (plist-get spec :logy)
+      (push "set logscale y" lines))
     
     (setq lines
           (cond
            ((eq type 'scatter)
-            (drake-gnuplot--script-scatter lines hue-map x-vec y-vec hue-vec tooltip-vec))
+            (drake-gnuplot--script-scatter lines hue-map x-vec y-vec hue-vec nil))
            ((eq type 'line)
-            (drake-gnuplot--script-line lines hue-map x-vec y-vec hue-vec tooltip-vec))
+            (drake-gnuplot--script-line lines hue-map x-vec y-vec hue-vec nil))
            ((eq type 'bar)
-            (drake-gnuplot--script-bar lines hue-map x-vec y-vec hue-vec tooltip-vec))
+            (drake-gnuplot--script-bar lines hue-map x-vec y-vec hue-vec nil))
            ((eq type 'hist)
-            (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec tooltip-vec))
+            (drake-gnuplot--script-hist lines hue-map x-vec y-vec hue-vec nil))
            ((eq type 'lm)
             (drake-gnuplot--script-lm lines hue-map x-vec y-vec hue-vec extra))
            ((eq type 'smooth)
@@ -95,6 +156,21 @@
            ((eq type 'violin)
             (drake-gnuplot--script-violin lines hue-map x-vec y-vec hue-vec extra))
            (t (error "Unsupported plot type for gnuplot backend: %s" type))))
+    
+    (mapconcat #'identity (nreverse lines) "\n")))
+
+(defun drake-gnuplot--generate-script (plot width height output-file)
+  "Generate a gnuplot script for PLOT."
+  (let* ((spec (drake-plot-spec plot))
+         (title (plist-get spec :title))
+         (lines nil))
+    
+    ;; Common settings
+    (push (format "set terminal svg size %d,%d dynamic font 'sans,10'" width height) lines)
+    (push (format "set output '%s'" output-file) lines)
+    (when title (push (format "set title '%s'" title) lines))
+    
+    (push (drake-gnuplot--generate-script-body plot) lines)
     
     (mapconcat #'identity (nreverse lines) "\n")))
 
@@ -344,6 +420,7 @@
   (make-drake-backend
    :name 'gnuplot
    :render-fn #'drake-gnuplot-render
+   :render-facet-fn #'drake-gnuplot-render-facet
    :supported-types '(scatter line bar hist lm smooth box violin)))
 
 (if (executable-find "gnuplot")

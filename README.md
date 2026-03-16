@@ -3,13 +3,13 @@ A high performance statistics plotting library for Emacs.
 
 `drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
 
-## Status: Stage 4 (Relational Regression)
+## Status: Stage 5 (High Performance & Advanced Features)
 - **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
-- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats), and interactive tooltips.
-- **Backends:** 
+- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats), interactive tooltips, **native faceting**, **logarithmic scales**, and **date/time axes**.
+- **Backends:**
   - **Native SVG (`svg`)**: Pure Elisp, zero dependencies.
   - **Gnuplot (`gnuplot`)**: High-quality SVG rendering via external `gnuplot`.
-  - **Rust (`rust`)**: High-performance rendering for large datasets (Stage 5 preview).
+  - **Rust (`rust`)**: High-performance rendering for large datasets (10-13x faster than SVG).
 
 ## Backends
 
@@ -59,11 +59,66 @@ To use the Rust backend, you must compile the dynamic module:
 
 ## Advanced Features
 
-### Faceting (Small Multiples)
-Create a grid of plots based on categorical variables using `drake-facet`:
+### Native Faceting (Small Multiples)
+Create grids of plots based on categorical variables using `drake-facet`. All backends now use native rendering for optimal performance:
+
+- **Gnuplot**: Uses `multiplot` layout for efficient grid rendering
+- **Rust**: Uses plotters' native grid splitting for maximum performance
+- **SVG**: Pure Elisp compositor for portability
+
 ```elisp
-(drake-facet :data tips :row :sex :col :time :plot-fn #'drake-plot-scatter :args '(:x :total_bill :y :tip))
+;; Column faceting
+(drake-facet :data tips
+            :col :time
+            :plot-fn #'drake-plot-scatter
+            :args '(:x :total_bill :y :tip)
+            :backend 'rust)
+
+;; Row and column faceting with overall title
+(drake-facet :data tips
+            :row :sex
+            :col :time
+            :plot-fn #'drake-plot-scatter
+            :args '(:x :total_bill :y :tip)
+            :title "Tips by Gender and Time"
+            :backend 'gnuplot)
 ```
+
+### Logarithmic Scales
+Apply logarithmic scaling to either or both axes using `:logx` and `:logy`:
+
+```elisp
+;; Logarithmic X axis (useful for exponential data)
+(drake-plot-scatter :data data :x :population :y :gdp :logx t)
+
+;; Both axes logarithmic (for power-law relationships)
+(drake-plot-scatter :data data :x :magnitude :y :frequency :logx t :logy t)
+
+;; Works with hue grouping and regression
+(drake-plot-lm :data data :x :dose :y :response :hue :treatment :logx t)
+```
+
+Logarithmic scales are supported across all backends (SVG, Gnuplot, Rust) and work with all plot types including scatter, line, bar, and regression plots.
+
+### Date/Time Axes
+Date and time data is automatically detected and formatted appropriately. Supports ISO 8601 format strings:
+
+```elisp
+;; Automatic detection from ISO 8601 timestamps
+(drake-plot-line :data timeseries
+                :x :timestamp  ; e.g., ["2026-01-01 00:00:00" "2026-02-01 00:00:00" ...]
+                :y :temperature
+                :backend 'rust)
+
+;; Works with hue grouping for multiple time series
+(drake-plot-line :data sensors
+                :x :timestamp
+                :y :reading
+                :hue :sensor_id
+                :backend 'svg)
+```
+
+**Note:** Date/time axes are fully supported in SVG and Rust backends. Gnuplot backend requires raw timestamp data (planned for future enhancement).
 
 ### Legend Placement
 By default, `drake` intelligently places the legend in the emptiest corner of the plot. You can manually override this using the `:legend` argument:

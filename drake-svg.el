@@ -65,6 +65,20 @@
           (create-image xml 'svg t :width width :height height)
         (error (list 'image :type 'svg :data xml))))))
 
+(defun drake-svg--format-tick (val type format)
+  "Format VAL based on TYPE and optional FORMAT string."
+  (cond
+   (format (if (eq type 'time) 
+               (format-time-string format (seconds-to-time val)) 
+             (format format val)))
+   ((eq type 'time) (format-time-string "%Y-%m-%d" (seconds-to-time val)))
+   ((eq type 'numeric) 
+    (cond
+     ((>= (abs val) 1000000) (format "%.1fM" (/ val 1000000.0)))
+     ((>= (abs val) 1000) (format "%.1fK" (/ val 1000.0)))
+     (t (format "%.1f" val))))
+   (t (format "%s" val))))
+
 (defun drake-svg--draw-axes (svg x y width height plot)
   "Draw axes, ticks, and grid lines."
   (let* ((scales (drake-plot-scales plot))
@@ -73,17 +87,24 @@
          (y-range (plist-get scales :y))
          (x-type (plist-get scales :x-type))
          (y-type (plist-get scales :y-type))
+         (x-format (plist-get spec :x-format))
+         (y-format (plist-get spec :y-format))
          (num-ticks 5))
     
     ;; Y Axis Ticks and Grid
-    (if (eq y-type 'numeric)
+    (if (or (eq y-type 'numeric) (eq y-type 'time))
         (cl-loop for i from 0 to num-ticks do
                  (let* ((ratio (/ (float i) num-ticks))
                         (py (+ y (- height (* ratio height))))
-                        (val (+ (car y-range) (* ratio (- (cdr y-range) (car y-range))))))
+                        (val (if (plist-get scales :y-log)
+                                 (let ((lmin (log (max 1e-10 (car y-range))))
+                                       (lmax (log (max 1e-10 (cdr y-range)))))
+                                   (exp (+ lmin (* ratio (- lmax lmin)))))
+                               (+ (car y-range) (* ratio (- (cdr y-range) (car y-range)))))))
                    (svg-line svg x py (+ x width) py :stroke "#eee" :stroke-width 1)
                    (svg-line svg (- x 5) py x py :stroke "black")
-                   (svg-text svg (format "%.1f" val) :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size "10px")))
+                   (svg-text svg (drake-svg--format-tick val y-type y-format) 
+                            :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size "10px")))
       ;; Categorical Y
       (let* ((n (length y-range))
              (i 0))
@@ -95,14 +116,19 @@
             (setq i (1+ i))))))
 
     ;; X Axis Ticks and Grid
-    (if (eq x-type 'numeric)
+    (if (or (eq x-type 'numeric) (eq x-type 'time))
         (cl-loop for i from 0 to num-ticks do
                  (let* ((ratio (/ (float i) num-ticks))
                         (px (+ x (* ratio width)))
-                        (val (+ (car x-range) (* ratio (- (cdr x-range) (car x-range))))))
+                        (val (if (plist-get scales :x-log)
+                                 (let ((lmin (log (max 1e-10 (car x-range))))
+                                       (lmax (log (max 1e-10 (cdr x-range)))))
+                                   (exp (+ lmin (* ratio (- lmax lmin)))))
+                               (+ (car x-range) (* ratio (- (cdr x-range) (car x-range)))))))
                    (svg-line svg px y px (+ y height) :stroke "#eee" :stroke-width 1)
                    (svg-line svg px (+ y height) px (+ y height 5) :stroke "black")
-                   (svg-text svg (format "%.1f" val) :x px :y (+ y height 20) :text-anchor "middle" :font-size "10px")))
+                   (svg-text svg (drake-svg--format-tick val x-type x-format) 
+                            :x px :y (+ y height 20) :text-anchor "middle" :font-size "10px")))
       ;; Categorical X
       (let* ((n (length x-range))
              (i 0))

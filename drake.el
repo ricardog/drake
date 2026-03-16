@@ -151,6 +151,7 @@ Valid options are 'scott and 'silverman."
 (cl-defstruct drake-backend
   name             ;; Symbol identifying the backend (e.g., 'svg)
   render-fn        ;; Function (plot) -> emacs-image
+  render-facet-fn  ;; Function (facet-plot) -> emacs-image (Stage 5)
   supported-types  ;; List of plot types (e.g., '(scatter line))
   capabilities     ;; Plist of features
   )
@@ -226,6 +227,7 @@ See `drake-plot-scatter' for ARGS."
   cols           ;; Number of columns
   image          ;; Composite image
   svg-xml        ;; Raw SVG XML data
+  spec           ;; Original facet spec (Stage 5)
   )
 
 (defun drake-facet (&rest args)
@@ -236,12 +238,15 @@ ARGS is a plist containing:
 :col     - Column identifier to facet by column.
 :plot-fn - Plotting function to use for each facet (e.g., #'drake-plot-scatter).
 :args    - Additional arguments to pass to :plot-fn.
-:title   - Overall title."
+:title   - Overall title.
+:backend - Backend to use (symbol)."
   (let* ((data (drake--normalize-data-all (plist-get args :data)))
          (row-key (plist-get args :row))
          (col-key (plist-get args :col))
          (plot-fn (plist-get args :plot-fn))
          (plot-args (plist-get args :args))
+         (backend-sym (or (plist-get args :backend) drake-default-backend))
+         (backend (gethash backend-sym drake--backends))
          (rows (if row-key (drake--get-unique-values (plist-get data row-key)) '(nil)))
          (cols (if col-key (drake--get-unique-values (plist-get data col-key)) '(nil)))
          (grid nil))
@@ -251,7 +256,7 @@ ARGS is a plist containing:
           (let* ((filters (cl-remove-if (lambda (f) (null (car f)))
                                        (list (cons row-key r) (cons col-key c))))
                  (subset (drake--filter-data data filters))
-                 (p (apply plot-fn :data subset :buffer nil plot-args)))
+                 (p (apply plot-fn :data subset :buffer nil :backend backend-sym plot-args)))
             (push p row-data)))
         (push (nreverse row-data) grid)))
     (setq grid (nreverse grid))
@@ -259,8 +264,11 @@ ARGS is a plist containing:
                    :grid grid
                    :title (plist-get args :title)
                    :rows (length rows)
-                   :cols (length cols))))
-      (setf (drake-facet-plot-image fplot) (drake--render-facet fplot))
+                   :cols (length cols)
+                   :spec args)))
+      (if (and backend (drake-backend-render-facet-fn backend))
+          (setf (drake-facet-plot-image fplot) (funcall (drake-backend-render-facet-fn backend) fplot))
+        (setf (drake-facet-plot-image fplot) (drake--render-facet fplot)))
       (drake--display-in-buffer fplot (or (plist-get args :buffer) "*drake-facet*"))
       fplot)))
 
@@ -352,8 +360,8 @@ ARGS is a plist containing:
          (x-scale (drake--make-scale x-final x-type))
          (y-scale (drake--make-scale y-final y-type))
          ;; 5. Scale data to 0.0-1.0
-         (x-scaled (drake--apply-scale x-final x-scale))
-         (y-scaled (drake--apply-scale y-final y-scale))
+         (x-scaled (drake--apply-scale x-final x-scale (plist-get args :logx)))
+         (y-scaled (drake--apply-scale y-final y-scale (plist-get args :logy)))
          ;; 6. Handle Hue
          (hue-info (when hue-final (drake--process-hue hue-final (plist-get args :palette))))
 
@@ -372,9 +380,12 @@ ARGS is a plist containing:
                 :data-internal (list :x x-scaled :y y-scaled :hue (plist-get hue-info :values) 
                                      :extra extra-data :tooltip final-tooltips)
                 :scales (list :x x-scale :y y-scale :hue (plist-get hue-info :map)
-                              :x-type x-type :y-type y-type))))
+                              :x-type x-type :y-type y-type
+                              :x-log (plist-get args :logx) :y-log (plist-get args :logy)))))
     (unless backend
       (error "Backend '%s' not found. Is it loaded?" backend-sym))
+
+    (message "DEBUG: x-type=%S y-type=%S scales=%S" x-type y-type (drake-plot-scales plot))
 
     ;; 7. Render
     (setf (drake-plot-image plot) (funcall (drake-backend-render-fn backend) plot))
@@ -632,31 +643,62 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
 ;;; Internal Helpers
 
 (defun drake--detect-type (vec)
-  "Detect if VEC is 'numeric or 'categorical."
-  (if (and (> (length vec) 0)
-           (cl-every (lambda (x) (or (numberp x) (null x))) vec))
-      'numeric
-    'categorical))
+  "Detect if VEC is 'numeric, 'time or 'categorical."
+  (cond
+   ((and (> (length vec) 0)
+         (cl-every (lambda (x) (or (numberp x) (null x))) vec))
+    'numeric)
+   ((and (> (length vec) 0)
+         (cl-every (lambda (x) (or (null x) 
+                                   (and (listp x) (>= (length x) 2) (cl-every #'integerp x))
+                                   (and (stringp x) (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}" x)))) 
+               vec))
+    'time)
+   (t 'categorical)))
+
+(defun drake--to-timestamp (val)
+  "Convert VAL to a float-time value."
+  (cond
+   ((null val) 0.0)
+   ((numberp val) (float val))
+   ((and (listp val) (>= (length val) 2)) (float-time val))
+   ((stringp val) (float-time (date-to-time val)))
+   (t 0.0)))
 
 (defun drake--make-scale (vec type)
   "Create scale for VEC based on TYPE."
-  (if (eq type 'numeric)
-      (drake--get-range vec)
-    (drake--get-unique-values vec)))
+  (cond
+   ((eq type 'numeric) (drake--get-range vec))
+   ((eq type 'time)
+    (let ((timestamps (mapcar #'drake--to-timestamp vec)))
+      (cons (apply #'min timestamps) (apply #'max timestamps))))
+   (t (drake--get-unique-values vec))))
 
-(defun drake--apply-scale (vec scale)
-  "Scale VEC using SCALE."
-  (if (and (consp scale) (numberp (car scale))) ;; numeric (min . max)
-      (drake--scale-vector vec scale)
-    ;; categorical (list of unique values)
+(defun drake--apply-scale (vec scale &optional log)
+  "Scale VEC using SCALE. If LOG is non-nil, use logarithmic scaling."
+  (cond
+   ((and (consp scale) (numberp (car scale))) ;; numeric or time
+    (let* ((min (car scale))
+           (max (cdr scale))
+           (vals (if (listp (aref vec 0)) ;; time list
+                     (vconcat (mapcar #'drake--to-timestamp vec))
+                   (if (stringp (aref vec 0)) ;; iso date
+                       (vconcat (mapcar #'drake--to-timestamp vec))
+                     vec))))
+      (if log
+          (let* ((lmin (log (max 1e-10 min)))
+                 (lmax (log (max 1e-10 max)))
+                 (ldiff (if (= lmax lmin) 1.0 (- lmax lmin))))
+            (vconcat (mapcar (lambda (v) (/ (- (log (max 1e-10 v)) lmin) ldiff)) vals)))
+        (drake--scale-vector vals scale))))
+   (t ;; categorical
     (let* ((n (length scale))
            (map (make-hash-table :test 'equal))
            (i 0))
       (dolist (val scale)
-        ;; For categorical, we space them evenly
         (puthash val (if (> n 1) (/ (float i) (1- n)) 0.5) map)
         (setq i (1+ i)))
-      (vconcat (mapcar (lambda (val) (gethash val map 0.0)) vec)))))
+      (vconcat (mapcar (lambda (val) (gethash val map 0.0)) vec))))))
 
 (defun drake--ensure-vector (seq)
   "Ensure SEQ is a vector. Convert if it is a list."

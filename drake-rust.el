@@ -89,11 +89,31 @@
         (create-image xml 'svg t :width width :height height)
       (error (list 'image :type 'svg :data xml)))))
 
+(defun drake-rust-render-facet (fplot)
+  "Render a faceted plot FPLOT using the Rust backend."
+  (drake-rust-load-module)
+  (let* ((title (drake-facet-plot-title fplot))
+         (rows (drake-facet-plot-rows fplot))
+         (cols (drake-facet-plot-cols fplot))
+         (grid (drake-facet-plot-grid fplot))
+         (first-plot (caar grid))
+         (p-spec (drake-plot-spec first-plot))
+         (p-width (or (plist-get p-spec :width) drake-default-width))
+         (p-height (or (plist-get p-spec :height) drake-default-height))
+         (total-width (* cols p-width))
+         (total-height (+ (* rows p-height) (if title 40 0)))
+         (xml (drake-rust-module/render-facet fplot)))
+    (setf (drake-facet-plot-svg-xml fplot) xml)
+    (condition-case nil
+        (create-image xml 'svg t :width total-width :height total-height)
+      (error (list 'image :type 'svg :data xml)))))
+
 ;; Register the backend
 (drake-register-backend
  (make-drake-backend
   :name 'rust
   :render-fn #'drake-rust-render
+  :render-facet-fn #'drake-rust-render-facet
   :supported-types '(scatter line bar hist box violin lm smooth)
   :capabilities '(:high-performance t :vector-data t)))
 
