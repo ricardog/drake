@@ -57,6 +57,53 @@ To use the Rust backend, you must compile the dynamic module:
   (drake-register-palette 'my-theme '("#1a1a1a" "#bada55" "#abcdef"))
   ```
 
+## Theming
+
+Drake includes a comprehensive theming system that automatically adapts to your Emacs configuration:
+
+```elisp
+;; Automatically match your Emacs theme
+(drake-auto-theme)
+
+;; Or manually set a theme
+(drake-set-theme 'dark)         ; Dark mode
+(drake-set-theme 'light)        ; Light mode
+(drake-set-theme 'minimal)      ; ggplot2-inspired
+(drake-set-theme 'seaborn)      ; Seaborn-inspired
+(drake-set-theme 'solarized-dark)  ; Solarized Dark
+
+;; List all available themes
+(drake-list-themes)
+
+;; Preview a theme before applying
+(drake-preview-theme 'dark)
+```
+
+**Built-in Themes:**
+- `default` - Current default Drake style
+- `light` - Clean, bright theme for light backgrounds
+- `dark` - Professional dark theme (uses Viridis palette)
+- `minimal` - ggplot2-inspired with subtle grids
+- `seaborn` - Inspired by Python's Seaborn
+- `high-contrast` - Maximum contrast for accessibility
+- `solarized-light` / `solarized-dark` - Solarized color schemes
+
+**Custom Themes:**
+```elisp
+(defvar my-theme
+  (make-drake-theme
+   :name 'my-custom
+   :background "#2e3440"
+   :foreground "#d8dee9"
+   :grid-color "#3b4252"
+   :font-size 11
+   :palette 'viridis))
+
+(drake-set-theme my-theme)
+```
+
+Themes control colors, fonts, grid styles, and default palettes across all plot types and backends. See `THEMING.md` for comprehensive documentation.
+
 ## Advanced Features
 
 ### Native Faceting (Small Multiples)

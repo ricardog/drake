@@ -15,6 +15,7 @@
 (require 'cl-lib)
 (require 'json)
 (require 'url)
+(require 'drake-theme)
 
 (defgroup drake nil
   "High-level statistical visualization."
@@ -115,7 +116,8 @@ Valid options are 'scott and 'silverman."
         (load cache-file t t)))))
 
 (defun drake--get-palette (name)
-  "Return color list for palette NAME."
+  "Return color list for palette NAME.
+If NAME is nil, uses the palette specified by the current theme."
   (cond
    ((and name (listp name)) name) ;; Direct list of colors
    ((symbolp name)
@@ -123,8 +125,17 @@ Valid options are 'scott and 'silverman."
     (or (and name (cdr (assoc name drake--user-palettes)))
         (and name (cdr (assoc name drake--bundled-palettes)))
         (and name (cdr (assoc name drake--palette-cache)))
-        (cdr (assoc 'default drake--bundled-palettes))))
-   (t (cdr (assoc 'default drake--bundled-palettes)))))
+        ;; Fall back to theme palette
+        (let ((theme-palette (drake-theme-get :palette)))
+          (if theme-palette
+              (drake--get-palette theme-palette)
+            (cdr (assoc 'default drake--bundled-palettes))))))
+   (t
+    ;; No name provided, use theme palette or default
+    (let ((theme-palette (drake-theme-get :palette)))
+      (if theme-palette
+          (drake--get-palette theme-palette)
+        (cdr (assoc 'default drake--bundled-palettes)))))))
 
 (defun drake--color-manager (unique-values palette-name)
   "Return an alist mapping values to colors based on PALETTE-NAME."

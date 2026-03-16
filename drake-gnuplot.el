@@ -1,6 +1,7 @@
 ;;; drake-gnuplot.el --- gnuplot backend for drake -*- lexical-binding: t; -*-
 
 (require 'drake)
+(require 'drake-theme)
 (require 'cl-lib)
 
 (defun drake-gnuplot-render (plot)
@@ -94,10 +95,25 @@
     
     (push "set datafile separator whitespace" lines)
     (push "set style fill solid 0.5 border -1" lines)
-    (push "set grid lt 0 lc rgb '#cccccc'" lines)
-    (when x-label (push (format "set xlabel '%s'" x-label) lines))
-    (when y-label (push (format "set ylabel '%s'" y-label) lines))
-    
+
+    ;; Theme-aware grid and colors
+    (let ((grid-color (drake-theme-get :grid-color))
+          (text-color (drake-theme-get :text-color))
+          (bg-color (drake-theme-get :background)))
+      (push (format "set grid lt %s lc rgb '%s'"
+                   (if (eq (drake-theme-get :grid-style) 'dashed) "2" "0")
+                   grid-color)
+           lines)
+      (push (format "set border lc rgb '%s'" text-color) lines)
+      (push (format "set xtics textcolor rgb '%s'" text-color) lines)
+      (push (format "set ytics textcolor rgb '%s'" text-color) lines)
+      (when x-label (push (format "set xlabel '%s' textcolor rgb '%s'" x-label text-color) lines))
+      (when y-label (push (format "set ylabel '%s' textcolor rgb '%s'" y-label text-color) lines))
+      ;; Background color (only for certain terminals that support it)
+      (push (format "set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb '%s' behind"
+                   bg-color)
+           lines))
+
     ;; Aesthetics
     (push "set border 3" lines)
     (push "set tics nomirror" lines)

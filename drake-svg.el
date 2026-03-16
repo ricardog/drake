@@ -1,6 +1,7 @@
 ;;; drake-svg.el --- SVG backend for drake -*- lexical-binding: t; -*-
 
 (require 'drake)
+(require 'drake-theme)
 (require 'svg)
 (require 'cl-lib)
 (require 'dom)
@@ -19,10 +20,12 @@
          (y-scaled (plist-get data :y))
          (hue-colors (plist-get data :hue))
          (tooltips (plist-get data :tooltip))
-         (svg (svg-create width height)))
+         (svg (svg-create width height))
+         (bg-color (drake-theme-get :background))
+         (text-color (drake-theme-get :text-color)))
 
     ;; Background
-    (svg-rectangle svg 0 0 width height :fill "white")
+    (svg-rectangle svg 0 0 width height :fill bg-color)
 
     ;; Grid lines and ticks
     (drake-svg--draw-axes svg margin margin inner-width inner-height plot)
@@ -53,7 +56,9 @@
 
     ;; Title
     (when-let ((title (plist-get spec :title)))
-      (svg-text svg title :x (/ width 2) :y (/ margin 2) :text-anchor "middle" :font-size "16px" :fill "black" :font-weight "bold"))
+      (svg-text svg title :x (/ width 2) :y (/ margin 2) :text-anchor "middle"
+               :font-size (format "%dpx" (+ (drake-theme-get :font-size) 6))
+               :fill text-color :font-weight "bold"))
 
     (let ((xml (with-temp-buffer
                  (svg-print svg)
@@ -89,7 +94,15 @@
          (y-type (plist-get scales :y-type))
          (x-format (plist-get spec :x-format))
          (y-format (plist-get spec :y-format))
-         (num-ticks 5))
+         (num-ticks 5)
+         ;; Theme settings
+         (grid-color (drake-theme-get :grid-color))
+         (grid-width (drake-theme-get :grid-width))
+         (grid-dasharray (drake-theme-grid-dasharray))
+         (axis-color (drake-theme-get :axis-color))
+         (axis-width (drake-theme-get :axis-width))
+         (text-color (drake-theme-get :text-color))
+         (font-size (format "%dpx" (drake-theme-get :font-size))))
     
     ;; Y Axis Ticks and Grid
     (if (or (eq y-type 'numeric) (eq y-type 'time))
@@ -101,18 +114,19 @@
                                        (lmax (log (max 1e-10 (cdr y-range)))))
                                    (exp (+ lmin (* ratio (- lmax lmin)))))
                                (+ (car y-range) (* ratio (- (cdr y-range) (car y-range)))))))
-                   (svg-line svg x py (+ x width) py :stroke "#eee" :stroke-width 1)
-                   (svg-line svg (- x 5) py x py :stroke "black")
-                   (svg-text svg (drake-svg--format-tick val y-type y-format) 
-                            :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size "10px")))
+                   (svg-line svg x py (+ x width) py :stroke grid-color :stroke-width grid-width :stroke-dasharray grid-dasharray)
+                   (when (> axis-width 0)
+                     (svg-line svg (- x 5) py x py :stroke axis-color :stroke-width axis-width))
+                   (svg-text svg (drake-svg--format-tick val y-type y-format)
+                            :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size font-size :fill text-color)))
       ;; Categorical Y
       (let* ((n (length y-range))
              (i 0))
         (dolist (val y-range)
           (let* ((ratio (if (> n 1) (/ (float i) (1- n)) 0.5))
                  (py (+ y (- height (* ratio height)))))
-            (svg-line svg x py (+ x width) py :stroke "#eee" :stroke-width 1)
-            (svg-text svg (format "%s" val) :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size "10px")
+            (svg-line svg x py (+ x width) py :stroke grid-color :stroke-width grid-width :stroke-dasharray grid-dasharray)
+            (svg-text svg (format "%s" val) :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size font-size :fill text-color)
             (setq i (1+ i))))))
 
     ;; X Axis Ticks and Grid
@@ -125,29 +139,34 @@
                                        (lmax (log (max 1e-10 (cdr x-range)))))
                                    (exp (+ lmin (* ratio (- lmax lmin)))))
                                (+ (car x-range) (* ratio (- (cdr x-range) (car x-range)))))))
-                   (svg-line svg px y px (+ y height) :stroke "#eee" :stroke-width 1)
-                   (svg-line svg px (+ y height) px (+ y height 5) :stroke "black")
-                   (svg-text svg (drake-svg--format-tick val x-type x-format) 
-                            :x px :y (+ y height 20) :text-anchor "middle" :font-size "10px")))
+                   (svg-line svg px y px (+ y height) :stroke grid-color :stroke-width grid-width :stroke-dasharray grid-dasharray)
+                   (when (> axis-width 0)
+                     (svg-line svg px (+ y height) px (+ y height 5) :stroke axis-color :stroke-width axis-width))
+                   (svg-text svg (drake-svg--format-tick val x-type x-format)
+                            :x px :y (+ y height 20) :text-anchor "middle" :font-size font-size :fill text-color)))
       ;; Categorical X
       (let* ((n (length x-range))
              (i 0))
         (dolist (val x-range)
           (let* ((ratio (if (> n 1) (/ (float i) (1- n)) 0.5))
                  (px (+ x (* ratio width))))
-            (svg-line svg px y px (+ y height) :stroke "#eee" :stroke-width 1)
-            (svg-text svg (format "%s" val) :x px :y (+ y height 20) :text-anchor "middle" :font-size "10px")
+            (svg-line svg px y px (+ y height) :stroke grid-color :stroke-width grid-width :stroke-dasharray grid-dasharray)
+            (svg-text svg (format "%s" val) :x px :y (+ y height 20) :text-anchor "middle" :font-size font-size :fill text-color)
             (setq i (1+ i))))))
 
     ;; Axis lines
-    (svg-line svg x y x (+ y height) :stroke "black" :stroke-width 1)
-    (svg-line svg x (+ y height) (+ x width) (+ y height) :stroke "black" :stroke-width 1)
+    (when (> axis-width 0)
+      (svg-line svg x y x (+ y height) :stroke axis-color :stroke-width axis-width)
+      (svg-line svg x (+ y height) (+ x width) (+ y height) :stroke axis-color :stroke-width axis-width))
 
     ;; Axis Labels
     (when-let ((xlabel (or (plist-get spec :xlabel) (plist-get spec :x))))
-      (svg-text svg (format "%s" xlabel) :x (+ x (/ width 2)) :y (+ y height 40) :text-anchor "middle" :font-size "12px" :fill "black"))
+      (svg-text svg (format "%s" xlabel) :x (+ x (/ width 2)) :y (+ y height 40)
+               :text-anchor "middle" :font-size (format "%dpx" (+ (drake-theme-get :font-size) 2)) :fill text-color))
     (when-let ((ylabel (or (plist-get spec :ylabel) (plist-get spec :y))))
-      (svg-text svg (format "%s" ylabel) :x (- x 50) :y (+ y (/ height 2)) :text-anchor "middle" :font-size "12px" :fill "black" :transform (format "rotate(-90 %d %d)" (- x 50) (+ y (/ height 2)))))))
+      (svg-text svg (format "%s" ylabel) :x (- x 50) :y (+ y (/ height 2))
+               :text-anchor "middle" :font-size (format "%dpx" (+ (drake-theme-get :font-size) 2)) :fill text-color
+               :transform (format "rotate(-90 %d %d)" (- x 50) (+ y (/ height 2)))))))
 
 (defun drake-svg--draw-scatter (svg x y width height x-scaled y-scaled hue-colors tooltips)
   (cl-loop for i from 0 below (length x-scaled) do
@@ -399,12 +418,17 @@ Handles self-closing tags by converting them to open/close tags with the title i
          (ly (cdr coords))
          (i 0))
 
-    (svg-rectangle svg lx ly l-width l-height :fill "white" :fill-opacity 0.8 :stroke "#ccc")
+    (svg-rectangle svg lx ly l-width l-height
+                  :fill (drake-theme-get :legend-bg)
+                  :fill-opacity (drake-theme-get :legend-opacity)
+                  :stroke (drake-theme-get :legend-border))
     (dolist (entry hue-map)
       (let ((val (car entry))
             (color (cdr entry)))
         (svg-circle svg (+ lx 10) (+ ly 10 (* i 20)) 5 :fill color)
-        (svg-text svg (format "%s" val) :x (+ lx 20) :y (+ ly 15 (* i 20)) :font-size "10px")
+        (svg-text svg (format "%s" val) :x (+ lx 20) :y (+ ly 15 (* i 20))
+                 :font-size (format "%dpx" (drake-theme-get :font-size))
+                 :fill (drake-theme-get :text-color))
         (setq i (1+ i))))))
 
 (defvar drake-svg-backend

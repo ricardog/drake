@@ -43,7 +43,7 @@
 - [X] **Enhanced KDE:** Implement automatic bandwidth selection methods beyond Silverman's rule (e.g., Scott's Rule, Cross-validation).
 
 ### API & Ergonomics
-- [ ] **Thematic Styling:** Add `drake-set-theme` to globally manage fonts, grid styles, and color schemes.
+- [X] **Thematic Styling:** [DONE] Add `drake-set-theme` to globally manage fonts, grid styles, and color schemes. Includes 8 built-in themes and automatic Emacs theme detection with `drake-auto-theme`.
 - [ ] **Coordinate Flipping:** Add a `:flip` argument to easily swap X and Y axes (e.g., for horizontal bar charts).
 - [ ] **Palette Browser:** Improve `drake-fetch-palettes` with better error handling and a simple UI to preview available palettes.
 
