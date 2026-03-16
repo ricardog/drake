@@ -229,6 +229,74 @@ Themes control colors, fonts, grid styles, and default palettes across all plot 
 - [Theming Documentation](THEMING.md) - Comprehensive theming guide
 - [Theme Demo](examples/theme-demo.el) - Interactive demonstrations
 
+## Org-Mode Integration
+
+Drake seamlessly integrates with org-mode through org-babel, enabling statistical plotting directly in org documents, notebooks, and literate programming workflows.
+
+### Quick Start
+
+```elisp
+;; Enable org-babel support
+(with-eval-after-load 'org
+  (require 'ob-drake)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (drake . t))))
+```
+
+### Basic Usage
+
+Execute Drake code in org source blocks:
+
+```org
+#+BEGIN_SRC drake :file scatter.svg
+(drake-plot-scatter :data iris
+                   :x :sepal_length
+                   :y :sepal_width
+                   :hue :species)
+#+END_SRC
+```
+
+Press `C-c C-c` to execute. The plot appears inline automatically!
+
+### Features
+
+- **File output** - Plots save to `:file` parameter and create org links
+- **Sessions** - Persistent environments with `:session` for multi-block workflows
+- **Variable passing** - Share data between blocks with `:var`
+- **Header arguments** - Control backend, theme, palette via block headers
+- **Custom links** - Reference plots semantically with `[[drake:plot-id]]`
+- **Export support** - Automatic conversion for HTML, LaTeX, Markdown
+- **Quick templates** - Type `<drake` + TAB for instant code blocks
+
+### Example Notebook
+
+```org
+#+TITLE: Iris Analysis
+
+* Data Loading
+#+BEGIN_SRC drake :session analysis
+(setq iris-data (drake-load-csv "datasets/iris.csv.gz"))
+#+END_SRC
+
+* Visualization
+#+BEGIN_SRC drake :session analysis :file figures/scatter.svg :theme dark
+(drake-plot-scatter :data iris-data
+                   :x :sepal_length
+                   :y :sepal_width
+                   :hue :species
+                   :title "Iris Species Comparison")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/scatter.svg]]
+```
+
+**Learn More:**
+- [Org-Babel Guide](ORG_BABEL_GUIDE.md) - Complete usage guide with examples
+- [Org Integration Design](ORG_INTEGRATION.md) - Technical implementation details
+
 ## Advanced Features
 
 ### Native Faceting (Small Multiples)
@@ -357,6 +425,12 @@ The `examples/` directory contains ready-to-run demonstrations:
 **Feature Guides:**
 - [THEMING.md](THEMING.md) - Comprehensive theming system guide
 - [PALETTE_BROWSER_QUICKSTART.md](PALETTE_BROWSER_QUICKSTART.md) - Palette browser quick start
+- [ORG_BABEL_GUIDE.md](ORG_BABEL_GUIDE.md) - Org-mode integration and usage guide
+
+**Design Documents:**
+- [ORG_INTEGRATION.md](ORG_INTEGRATION.md) - Org-babel integration design
+- [AGGREGATION_DESIGN.md](AGGREGATION_DESIGN.md) - Aggregation strategy and design philosophy
+- [GAP_ANALYSIS.md](GAP_ANALYSIS.md) - Feature gap analysis and future roadmap
 
 **Implementation Details:**
 - [MATH_OFFLOAD_IMPLEMENTATION.md](MATH_OFFLOAD_IMPLEMENTATION.md) - Rust math offload details

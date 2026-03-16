@@ -23,6 +23,11 @@
 (autoload 'drake-palette-browser-quick-select "drake-palette-browser" "Quick palette selection" t)
 (autoload 'drake-fetch-palettes-improved "drake-palette-browser" "Fetch palettes with better error handling" t)
 
+;; Optional org-babel support (loaded on demand)
+(autoload 'org-babel-execute:drake "ob-drake" "Execute Drake code in org-babel" nil)
+(autoload 'drake-org-update-plot-at-point "ob-drake" "Update Drake plot at point" t)
+(autoload 'drake-org-clear-plot-registry "ob-drake" "Clear plot registry" t)
+
 (defgroup drake nil
   "High-level statistical visualization."
   :group 'data
@@ -969,7 +974,8 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
                          (format "Type: %s\n" type)
                          (format "X: %s\n" x-key)
                          (when y-key (format "Y: %s\n" y-key)))))
-    (if (imagep img)
+    ;; Only attach tooltip if imagep is available (not in batch mode)
+    (if (and (fboundp 'imagep) (imagep img))
         (progn
           (plist-put (cdr img) :help-echo tooltip)
           img)

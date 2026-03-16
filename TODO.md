@@ -46,6 +46,7 @@
 - [X] **Thematic Styling:** [DONE] Add `drake-set-theme` to globally manage fonts, grid styles, and color schemes. Includes 8 built-in themes and automatic Emacs theme detection with `drake-auto-theme`.
 - [ ] **Coordinate Flipping:** Add a `:flip` argument to easily swap X and Y axes (e.g., for horizontal bar charts).
 - [X] **Palette Browser:** [DONE] Interactive palette browser with visual previews, search, export/import, and improved ColorBrewer fetching with async support and error handling.
+- [X] **Org-Mode Integration:** [DONE] Full org-babel support with `ob-drake.el`. Execute Drake code in org blocks with file output, sessions, variable passing, custom links, and export support for HTML/LaTeX/Markdown.
 
 ### Documentation & Testing
 - [ ] **Visual Regression Suite:** Implement tests that verify visual consistency across `svg`, `gnuplot`, and `rust` backends.

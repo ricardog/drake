@@ -1,0 +1,362 @@
+#+TITLE: Drake Org-Babel Demo
+#+AUTHOR: Drake Contributors
+#+DATE: 2026-03-16
+#+OPTIONS: toc:t num:nil
+#+STARTUP: showall inlineimages
+
+* Introduction
+
+This document demonstrates Drake's org-babel integration. Execute any code block
+with =C-c C-c= to generate plots inline.
+
+* Basic Plotting
+
+** Simple Scatter Plot
+
+The simplest Drake plot in org-mode:
+
+#+BEGIN_SRC drake :file figures/simple-scatter.svg
+(drake-plot-scatter :data '(:x [1 2 3 4 5] :y [2 4 6 8 10])
+                   :x :x
+                   :y :y
+                   :title "Simple Scatter")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/simple-scatter.svg]]
+
+** Using Built-in Datasets
+
+Drake includes sample datasets. Let's load the iris dataset:
+
+#+BEGIN_SRC emacs-lisp :results silent
+(setq iris (drake-load-csv "../datasets/iris.csv.gz"))
+#+END_SRC
+
+Now plot it:
+
+#+BEGIN_SRC drake :file figures/iris-scatter.svg
+(drake-plot-scatter :data iris
+                   :x :sepal_length
+                   :y :sepal_width
+                   :hue :species
+                   :title "Iris Dataset - Sepal Dimensions")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/iris-scatter.svg]]
+
+* Sessions for Persistent Data
+
+Sessions maintain data across multiple blocks. Perfect for exploratory analysis!
+
+** Load Data in Session
+
+#+BEGIN_SRC drake :session analysis
+(setq tips (drake-load-csv "../datasets/tips.csv.gz"))
+(message "Loaded %d rows" (length (plist-get tips :total_bill)))
+#+END_SRC
+
+#+RESULTS:
+: Loaded 244 rows
+
+** Multiple Plots from Same Session
+
+Now we can create multiple plots using the same data:
+
+*** Scatter Plot
+
+#+BEGIN_SRC drake :session analysis :file figures/tips-scatter.svg
+(drake-plot-scatter :data tips
+                   :x :total_bill
+                   :y :tip
+                   :hue :time
+                   :title "Tips vs Bill Amount")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/tips-scatter.svg]]
+
+*** Box Plot
+
+#+BEGIN_SRC drake :session analysis :file figures/tips-box.svg
+(drake-plot-box :data tips
+                :x :day
+                :y :total_bill
+                :title "Bill Distribution by Day")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/tips-box.svg]]
+
+*** Violin Plot
+
+#+BEGIN_SRC drake :session analysis :file figures/tips-violin.svg
+(drake-plot-violin :data tips
+                   :x :day
+                   :y :tip
+                   :hue :time
+                   :title "Tip Distribution by Day and Time")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/tips-violin.svg]]
+
+* Variable Passing Between Blocks
+
+You can pass data from one block to another using =:var=:
+
+** Prepare Data
+
+#+NAME: my-data
+#+BEGIN_SRC emacs-lisp
+'(:x [10 20 30 40 50]
+  :y [15 35 25 50 45]
+  :category ["A" "B" "A" "B" "A"])
+#+END_SRC
+
+#+RESULTS: my-data
+| :x | [10 20 30 40 50] | :y | [15 35 25 50 45] | :category | [A B A B A] |
+
+** Plot the Data
+
+#+BEGIN_SRC drake :var data=my-data :file figures/var-passing.svg
+(drake-plot-scatter :data data
+                   :x :x
+                   :y :y
+                   :hue :category
+                   :title "Data from Another Block")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/var-passing.svg]]
+
+* Theming and Styling
+
+** Dark Theme
+
+#+BEGIN_SRC drake :file figures/dark-theme.svg :theme dark :palette viridis
+(drake-plot-scatter :data iris
+                   :x :sepal_length
+                   :y :sepal_width
+                   :hue :species
+                   :title "Dark Theme with Viridis")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/dark-theme.svg]]
+
+** Minimal Theme
+
+#+BEGIN_SRC drake :file figures/minimal-theme.svg :theme minimal
+(drake-plot-scatter :data iris
+                   :x :petal_length
+                   :y :petal_width
+                   :hue :species
+                   :title "Minimal Theme (ggplot2-inspired)")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/minimal-theme.svg]]
+
+** Custom Palette
+
+#+BEGIN_SRC drake :file figures/custom-palette.svg :palette set1
+(drake-plot-scatter :data iris
+                   :x :sepal_length
+                   :y :petal_length
+                   :hue :species
+                   :title "Custom Palette: Set1")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/custom-palette.svg]]
+
+* Different Backends
+
+** SVG Backend (Default)
+
+Pure Elisp, works everywhere:
+
+#+BEGIN_SRC drake :file figures/svg-backend.svg :backend svg
+(drake-plot-line :data tips
+                :x :total_bill
+                :y :tip
+                :title "SVG Backend")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/svg-backend.svg]]
+
+** Rust Backend (High Performance)
+
+Best for large datasets:
+
+#+BEGIN_SRC drake :file figures/rust-backend.svg :backend rust
+(drake-plot-scatter :data iris
+                   :x :sepal_length
+                   :y :sepal_width
+                   :hue :species
+                   :title "Rust Backend (Fast!)")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/rust-backend.svg]]
+
+** Gnuplot Backend (Publication Quality)
+
+High-quality output for papers:
+
+#+BEGIN_SRC drake :file figures/gnuplot-backend.svg :backend gnuplot
+(drake-plot-line :data tips
+                :x :total_bill
+                :y :tip
+                :title "Gnuplot Backend")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/gnuplot-backend.svg]]
+
+* Advanced Plotting
+
+** Linear Regression
+
+#+BEGIN_SRC drake :file figures/regression.svg
+(drake-plot-lm :data tips
+              :x :total_bill
+              :y :tip
+              :hue :time
+              :title "Linear Regression with Confidence Intervals")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/regression.svg]]
+
+** Faceting (Small Multiples)
+
+#+BEGIN_SRC drake :file figures/facet.svg
+(drake-facet :data tips
+            :row :sex
+            :col :time
+            :plot-fn #'drake-plot-scatter
+            :args '(:x :total_bill :y :tip)
+            :title "Tips by Gender and Time of Day")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/facet.svg]]
+
+** Histogram
+
+#+BEGIN_SRC drake :file figures/histogram.svg
+(drake-plot-hist :data tips
+                :x :total_bill
+                :bins 20
+                :title "Distribution of Bill Amounts")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/histogram.svg]]
+
+* Custom Links
+
+You can reference plots by ID:
+
+#+BEGIN_SRC drake :file figures/ref-plot.svg :id fig-ref
+(drake-plot-scatter :data iris
+                   :x :sepal_length
+                   :y :sepal_width
+                   :title "Referenced Plot")
+#+END_SRC
+
+#+RESULTS:
+[[file:figures/ref-plot.svg]]
+
+As shown in [[drake:fig-ref][the referenced plot]], sepal length and width
+are correlated.
+
+You can also link directly to files: [[drake:file:figures/ref-plot.svg]]
+
+* Export Examples
+
+This document can be exported to different formats:
+
+- *HTML*: =C-c C-e h h= - Plots render as inline images
+- *LaTeX/PDF*: =C-c C-e l p= - SVG converts to PDF automatically
+- *Markdown*: =C-c C-e m m= - Plots render as markdown images
+
+* Tips & Tricks
+
+** Tip 1: Quick Templates
+
+Type =<drake= and press =TAB= to insert a Drake code block template:
+- =<drake= → Empty block
+- =<dscatter= → Scatter plot template
+- =<dline= → Line plot template
+- =<dbar= → Bar plot template
+
+** Tip 2: Update Plots
+
+Press =C-c C-v u= on a code block to re-execute and refresh the inline image.
+
+** Tip 3: Organize Output
+
+Create a figures directory to keep plots organized:
+
+#+BEGIN_SRC bash :results silent
+mkdir -p figures
+#+END_SRC
+
+Then use =:file figures/plot-name.svg= in all blocks.
+
+** Tip 4: Conditional Execution
+
+Use =:eval never-export= to prevent re-execution during export:
+
+#+BEGIN_SRC drake :file figures/manual-only.svg :eval never-export
+(drake-plot-scatter :data iris :x :sepal_length :y :sepal_width)
+#+END_SRC
+
+* Conclusion
+
+Drake's org-babel integration brings statistical plotting to your org-mode
+workflow. Key features:
+
+- ✓ Execute Drake code in org blocks
+- ✓ Inline plot display
+- ✓ Persistent sessions
+- ✓ Variable passing
+- ✓ Theme and palette control
+- ✓ Multiple backends
+- ✓ Export support
+
+See the [[file:../ORG_BABEL_GUIDE.md][Org-Babel Guide]] for complete documentation.
+
+* Appendix: Header Arguments Reference
+
+| Argument    | Description                  | Example              |
+|-------------+------------------------------+----------------------|
+| =:file=     | Output filename (required)   | =:file plot.svg=     |
+| =:session=  | Named session                | =:session analysis=  |
+| =:backend=  | Drake backend                | =:backend rust=      |
+| =:theme=    | Drake theme                  | =:theme dark=        |
+| =:palette=  | Color palette                | =:palette viridis=   |
+| =:var=      | Variable from another block  | =:var data=mydata=   |
+| =:id=       | Plot ID for links            | =:id fig1=           |
+| =:exports=  | What to export               | =:exports results=   |
+| =:eval=     | When to evaluate             | =:eval never-export= |
+
+* Setup for This Document
+
+To run this demo, ensure you have:
+
+#+BEGIN_SRC elisp :exports code :eval never
+;; Add to your init.el
+(with-eval-after-load 'org
+  (require 'ob-drake)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (drake . t)
+     (shell . t))))
+#+END_SRC
