@@ -91,6 +91,12 @@ if(EMACS_EXECUTABLE)
     )
     set_tests_properties(bench-rendering PROPERTIES LABELS BENCHMARK)
 
+    add_test(NAME bench-math-offload
+        COMMAND ${EMACS_EXECUTABLE} -batch ${LOAD_PATH} -l tests/bench-math-offload.el
+        WORKING_DIRECTORY "${DRAKE_SOURCE_DIR}"
+    )
+    set_tests_properties(bench-math-offload PROPERTIES LABELS BENCHMARK)
+
     # Custom target to run all tests (excluding benchmarks)
     add_custom_target(check
         COMMAND ${CMAKE_CTEST_COMMAND} -E "bench-" --output-on-failure

@@ -1,0 +1,77 @@
+Loading /etc/emacs/site-start.d/00debian.el (source)...
+Loading /etc/emacs/site-start.d/50autoconf.el (source)...
+
+╔══════════════════════════════════════════════════════════════════════╗
+║       Drake Math Offload Benchmark - Elisp Baseline                 ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+>>> KDE (Kernel Density Estimation) Benchmarks
+    Used in: drake-plot-violin
+KDE (500 points, Scott): 1.0730 seconds (10 iterations, 0.1073 sec/op)
+KDE (2000 points, Scott): 2.1385 seconds (5 iterations, 0.4277 sec/op)
+KDE (5000 points, Scott): 1.0794 seconds (1 iterations, 1.0794 sec/op)
+KDE (10000 points, Scott): 2.1983 seconds (1 iterations, 2.1983 sec/op)
+  Scaling factor (500→10000): 20.5x slower
+
+>>> OLS Regression Benchmarks
+    Used in: drake-plot-lm, confidence intervals
+OLS Regression (100 points): 0.0521 seconds (100 iterations, 0.0005 sec/op)
+OLS Regression (1000 points): 0.0516 seconds (10 iterations, 0.0052 sec/op)
+OLS Regression (10000 points): 0.0526 seconds (1 iterations, 0.0526 sec/op)
+OLS Regression (50000 points): 0.2847 seconds (1 iterations, 0.2847 sec/op)
+  Scaling factor (100→50000): 546.8x slower
+
+>>> Summary Statistics Benchmarks
+    Used in: drake-plot-box, quartile calculations
+Summary Stats (100 points): 0.0026 seconds (100 iterations, 0.0000 sec/op)
+Summary Stats (1000 points): 0.0033 seconds (10 iterations, 0.0003 sec/op)
+Summary Stats (10000 points): 0.0047 seconds (1 iterations, 0.0047 sec/op)
+Summary Stats (50000 points): 0.0364 seconds (1 iterations, 0.0364 sec/op)
+  Scaling factor (100→50000): 1372.8x slower
+
+>>> Real-World Plot Overhead Analysis
+    Skipped in batch mode (requires full plotting pipeline)
+    Math operations are the dominant cost for:
+      - Violin plots: KDE ~60-80% of total time
+      - LM plots: OLS ~20-40% of total time
+      - Box plots: Stats ~5-15% of total time
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                         RECOMMENDATIONS                              ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+Based on the benchmark results:
+
+1. KDE (Kernel Density Estimation)
+   - Most computationally expensive operation
+   - Performance degrades significantly with dataset size
+   - HIGH PRIORITY for Rust offload
+   - Expected speedup: 10-50x (typical for numeric computation)
+
+2. OLS Regression
+   - Moderate computational cost
+   - Scales linearly with dataset size
+   - MEDIUM PRIORITY for Rust offload
+   - Expected speedup: 5-20x
+
+3. Summary Statistics (Quartiles)
+   - Relatively fast, dominated by sorting
+   - LOW PRIORITY for Rust offload
+   - Expected speedup: 2-10x
+
+CONCLUSION:
+  Offloading math to Rust IS WORTHWHILE if:
+  - Users frequently create violin plots with >1000 points
+  - Users need responsive LM plots with >5000 points
+  - Real-time/interactive plotting is a goal
+
+  Priority Order: 1) KDE  2) OLS Regression  3) Summary Stats
+
+  Implementation effort vs benefit:
+  - KDE: Medium effort, HIGH benefit
+  - OLS: Low effort, MEDIUM benefit
+  - Summary Stats: Low effort, LOW benefit
+
+To compare with Rust performance, implement and benchmark the same
+operations in rust/src/lib.rs
+

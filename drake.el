@@ -474,7 +474,40 @@ See `drake-plot-scatter' for ARGS."
 
 (defun drake--ols-regression (points)
   "Perform Ordinary Least Squares regression on a list of (X . Y) points.
-Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx :mean-x mean-x :n n)."
+Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx :mean-x mean-x :n n).
+Uses Rust implementation if available."
+  (if (and (boundp 'drake-rust-module-loaded) drake-rust-module-loaded
+           (fboundp 'drake-rust-module/ols-regression))
+      ;; Use Rust implementation
+      (condition-case err
+          (let* ((result (drake-rust-module/ols-regression points))
+                 (m (plist-get result :slope))
+                 (b (plist-get result :intercept))
+                 (r2 (plist-get result :r-squared))
+                 (n (length points))
+                 ;; Calculate additional stats needed by Elisp code
+                 (sum-x 0.0)
+                 (sum-xx 0.0)
+                 (ss-res 0.0))
+            (dolist (p points)
+              (let* ((x (float (car p)))
+                     (y (float (cdr p)))
+                     (y-pred (+ (* m x) b)))
+                (cl-incf sum-x x)
+                (cl-incf sum-xx (* x x))
+                (cl-incf ss-res (* (- y y-pred) (- y y-pred)))))
+            (let* ((mean-x (/ sum-x n))
+                   (sxx (- sum-xx (/ (* sum-x sum-x) n)))
+                   (se (if (> n 2) (sqrt (/ ss-res (- n 2))) 0.0)))
+              (list :m m :b b :r2 r2 :se se :sxx sxx :mean-x mean-x :n n)))
+        (error
+         (message "Rust OLS failed, falling back to Elisp: %s" err)
+         (drake--ols-regression-elisp points)))
+    ;; Use Elisp implementation
+    (drake--ols-regression-elisp points)))
+
+(defun drake--ols-regression-elisp (points)
+  "Perform OLS regression in pure Elisp."
   (let* ((n (length points))
          (sum-x 0.0) (sum-y 0.0) (sum-xy 0.0) (sum-xx 0.0) (sum-yy 0.0))
     (dolist (p points)
@@ -554,6 +587,7 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
 
 (defun drake--kde-estimate-density (x data bandwidth)
   "Estimate the density at X for DATA using BANDWIDTH."
+  ;; Note: This Elisp version is kept for reference but not used when Rust is available
   (let ((n (length data))
         (sum 0.0))
     (dolist (xi data)
@@ -569,6 +603,42 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
                       (float (max 1 (1- n))))))
     (sqrt (max 0.0001 variance))))
 
+(defun drake--compute-kde (data method)
+  "Compute KDE for DATA using METHOD (scott or silverman).
+Uses Rust implementation if available, falls back to Elisp."
+  (if (and (boundp 'drake-rust-module-loaded) drake-rust-module-loaded
+           (fboundp 'drake-rust-module/kde-compute))
+      ;; Use Rust implementation
+      (condition-case err
+          (drake-rust-module/kde-compute data method 50)
+        (error
+         (message "Rust KDE failed, falling back to Elisp: %s" err)
+         (drake--compute-kde-elisp data method)))
+    ;; Use Elisp implementation
+    (drake--compute-kde-elisp data method)))
+
+(defun drake--compute-kde-elisp (data method)
+  "Compute KDE for DATA using METHOD in pure Elisp."
+  (let* ((sorted (sort (cl-remove-if-not #'numberp (append data nil)) #'<))
+         (n (length sorted)))
+    (when (> n 0)
+      (let* ((h (if (eq method 'scott)
+                    (drake--kde-scott-bandwidth sorted)
+                  (drake--kde-silverman-bandwidth sorted)))
+             (min-val (car sorted))
+             (max-val (car (last sorted)))
+             (span (- max-val min-val))
+             (kde-min (- min-val (* 0.2 span)))
+             (kde-max (+ max-val (* 0.2 span)))
+             (steps 50)
+             (kde-step (/ (- kde-max kde-min) (float steps)))
+             (kde-points nil))
+        (cl-loop for i from 0 to steps do
+                 (let* ((target-x (+ kde-min (* i kde-step)))
+                        (density (drake--kde-estimate-density target-x sorted h)))
+                   (push (cons target-x density) kde-points)))
+        (nreverse kde-points)))))
+
 (defun drake--kde-silverman-bandwidth (data)
   "Calculate the optimal bandwidth for DATA using Silverman's rule of thumb."
   (let* ((n (length data))
@@ -581,6 +651,35 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
          (sd (drake--standard-deviation data)))
     (* sd (expt n -0.2))))
 
+(defun drake--compute-quartiles-safe (data)
+  "Compute quartiles for DATA, using Rust if available."
+  (if (and (boundp 'drake-rust-module-loaded) drake-rust-module-loaded
+           (fboundp 'drake-rust-module/compute-quartiles))
+      ;; Use Rust implementation
+      (condition-case err
+          (let ((result (drake-rust-module/compute-quartiles (vconcat data))))
+            (list :min (plist-get result :min)
+                  :q1 (plist-get result :q1)
+                  :median (plist-get result :median)
+                  :q3 (plist-get result :q3)
+                  :max (plist-get result :max)))
+        (error
+         (message "Rust quartiles failed, falling back to Elisp: %s" err)
+         (drake--compute-quartiles-elisp data)))
+    ;; Use Elisp implementation
+    (drake--compute-quartiles-elisp data)))
+
+(defun drake--compute-quartiles-elisp (data)
+  "Compute quartiles for DATA in pure Elisp."
+  (let* ((sorted (sort (cl-copy-list data) #'<))
+         (n (length sorted)))
+    (when (> n 0)
+      (list :min (car sorted)
+            :q1 (drake--quantile sorted 0.25)
+            :median (drake--quantile sorted 0.5)
+            :q3 (drake--quantile sorted 0.75)
+            :max (car (last sorted))))))
+
 (defun drake--transform-stats (x-vec y-vec hue-vec)
   "Calculate summary statistics (quartiles, etc.) and KDE for each category."
   (let* ((groups (make-hash-table :test 'equal))
@@ -591,37 +690,26 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
                    (val (aref y-vec i))
                    (h (when hue-vec (aref hue-vec i))))
                (push val (gethash (cons cat h) groups))))
-    
+
     (maphash
      (lambda (key vals)
        (let* ((sorted (sort (cl-remove-if-not #'numberp vals) #'<))
               (n (length sorted)))
          (when (> n 0)
-           (let* ((min (car sorted))
-                  (max (car (last sorted)))
-                  (q1 (drake--quantile sorted 0.25))
-                  (median (drake--quantile sorted 0.5))
-                  (q3 (drake--quantile sorted 0.75))
-                  ;; KDE calculation
-                  (h (if (eq drake-kde-bandwidth-method 'scott)
-                         (drake--kde-scott-bandwidth sorted)
-                       (drake--kde-silverman-bandwidth sorted)))
-                  (kde-points nil)
-                  (steps 50)
-                  (span (- max min))
-                  ;; Extend range slightly for KDE
-                  (kde-min (- min (* 0.2 span)))
-                  (kde-max (+ max (* 0.2 span)))
-                  (kde-step (/ (- kde-max kde-min) (float steps))))
-             (cl-loop for i from 0 to steps do
-                      (let* ((target-x (+ kde-min (* i kde-step)))
-                             (density (drake--kde-estimate-density target-x sorted h)))
-                        (push (cons target-x density) kde-points)))
+           ;; Use Rust-aware functions
+           (let* ((quartiles (drake--compute-quartiles-safe sorted))
+                  (min (plist-get quartiles :min))
+                  (max (plist-get quartiles :max))
+                  (q1 (plist-get quartiles :q1))
+                  (median (plist-get quartiles :median))
+                  (q3 (plist-get quartiles :q3))
+                  ;; KDE calculation (Rust-aware)
+                  (kde-points (drake--compute-kde (vconcat sorted) drake-kde-bandwidth-method)))
              (push (car key) x-res)
              (push median y-res)
              (push (cdr key) hue-res)
-             (push (list :min min :q1 q1 :median median :q3 q3 :max max 
-                         :vals sorted :kde (nreverse kde-points)) extra-res)))))
+             (push (list :min min :q1 q1 :median median :q3 q3 :max max
+                         :vals sorted :kde kde-points) extra-res)))))
      groups)
     (list :x (vconcat (nreverse x-res))
           :y (vconcat (nreverse y-res))
@@ -637,7 +725,7 @@ Returns a plist (:m slope :b intercept :r2 r-squared :se standard-error :sxx sxx
          (fraction (- index low)))
     (if (= low high)
         (nth low sorted-vec)
-      (+ (* (1- fraction) (nth low sorted-vec))
+      (+ (* (- 1 fraction) (nth low sorted-vec))
          (* fraction (nth high sorted-vec))))))
 
 ;;; Internal Helpers

@@ -8,6 +8,12 @@
 (require 'drake-gnuplot)
 (require 'ert)
 
+;; Load Rust module if available
+(when (require 'drake-rust nil t)
+  (condition-case err
+      (drake-rust-load-module)
+    (error (message "Rust module not available: %s" err))))
+
 ;; Mock image functions for headless environments
 (unless (image-type-available-p 'svg)
   (defun image-type-available-p (type)

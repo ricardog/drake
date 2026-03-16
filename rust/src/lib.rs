@@ -525,6 +525,223 @@ pub fn render_facet(env: &Env, fplot: Value) -> Result<String> {
     Ok(buffer)
 }
 
+// ============================================================================
+// Mathematical Operations for Statistical Computing
+// ============================================================================
+
+/// Gaussian kernel function for KDE
+fn gaussian_kernel(u: f64) -> f64 {
+    use std::f64::consts::PI;
+    (-0.5 * u * u).exp() / (2.0 * PI).sqrt()
+}
+
+/// Calculate standard deviation of a dataset
+fn standard_deviation(data: &[f64]) -> f64 {
+    if data.is_empty() {
+        return 0.0;
+    }
+    let n = data.len() as f64;
+    let mean: f64 = data.iter().sum::<f64>() / n;
+    let variance: f64 = data.iter()
+        .map(|x| (x - mean).powi(2))
+        .sum::<f64>() / (n - 1.0).max(1.0);
+    variance.sqrt().max(0.0001)
+}
+
+/// Calculate bandwidth using Scott's rule
+fn kde_scott_bandwidth(data: &[f64]) -> f64 {
+    let n = data.len() as f64;
+    let sd = standard_deviation(data);
+    sd * n.powf(-0.2)
+}
+
+/// Calculate bandwidth using Silverman's rule
+fn kde_silverman_bandwidth(data: &[f64]) -> f64 {
+    let n = data.len() as f64;
+    let sd = standard_deviation(data);
+    1.06 * sd * n.powf(-0.2)
+}
+
+/// Estimate density at a point using KDE
+fn kde_estimate_density(x: f64, data: &[f64], bandwidth: f64) -> f64 {
+    let n = data.len() as f64;
+    let sum: f64 = data.iter()
+        .map(|&xi| gaussian_kernel((x - xi) / bandwidth))
+        .sum();
+    sum / (n * bandwidth)
+}
+
+#[defun]
+pub fn kde_compute<'e>(env: &'e Env, data: Value<'e>, method: Value<'e>, grid_size: Value<'e>) -> Result<Value<'e>> {
+    // Convert data vector
+    let data_vec = value_to_f64_vec(env, data)?;
+    if data_vec.is_empty() {
+        return env.list(&[]);
+    }
+
+    // Get method (scott or silverman)
+    let method_str = if method.is_not_nil() {
+        env.call("symbol-name", [method])?.into_rust::<String>()?
+    } else {
+        "scott".to_string()
+    };
+
+    // Get grid size (default 100)
+    let grid_points: usize = if grid_size.is_not_nil() {
+        grid_size.into_rust::<i64>()? as usize
+    } else {
+        100
+    };
+
+    // Calculate bandwidth
+    let bandwidth = if method_str == "silverman" {
+        kde_silverman_bandwidth(&data_vec)
+    } else {
+        kde_scott_bandwidth(&data_vec)
+    };
+
+    // Find min and max
+    let min_val = data_vec.iter().fold(f64::INFINITY, |a, &b| a.min(b));
+    let max_val = data_vec.iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+    let range = max_val - min_val;
+
+    // Generate grid points and estimate density
+    let mut result = Vec::new();
+    for i in 0..grid_points {
+        let x = min_val + (i as f64 / (grid_points - 1) as f64) * range;
+        let density = kde_estimate_density(x, &data_vec, bandwidth);
+        result.push(env.cons(x.into_lisp(env)?, density.into_lisp(env)?)?);
+    }
+
+    env.list(&result)
+}
+
+#[defun]
+pub fn ols_regression<'e>(env: &'e Env, points: Value<'e>) -> Result<Value<'e>> {
+    // Convert points list to vectors
+    let mut x_vals = Vec::new();
+    let mut y_vals = Vec::new();
+
+    let mut curr = points;
+    while curr.is_not_nil() {
+        let point = env.call("car", [curr])?;
+        let x = env.call("car", [point])?.into_rust::<f64>()?;
+        let y = env.call("cdr", [point])?.into_rust::<f64>()?;
+        x_vals.push(x);
+        y_vals.push(y);
+        curr = env.call("cdr", [curr])?;
+    }
+
+    if x_vals.is_empty() {
+        return env.list(&[
+            0.0.into_lisp(env)?,  // slope
+            0.0.into_lisp(env)?,  // intercept
+            0.0.into_lisp(env)?,  // r-squared
+        ]);
+    }
+
+    let n = x_vals.len() as f64;
+
+    // Calculate means
+    let mean_x: f64 = x_vals.iter().sum::<f64>() / n;
+    let mean_y: f64 = y_vals.iter().sum::<f64>() / n;
+
+    // Calculate slope and intercept
+    let mut numerator = 0.0;
+    let mut denominator = 0.0;
+
+    for i in 0..x_vals.len() {
+        let dx = x_vals[i] - mean_x;
+        let dy = y_vals[i] - mean_y;
+        numerator += dx * dy;
+        denominator += dx * dx;
+    }
+
+    let slope = if denominator.abs() < 1e-10 {
+        0.0
+    } else {
+        numerator / denominator
+    };
+
+    let intercept = mean_y - slope * mean_x;
+
+    // Calculate R-squared
+    let mut ss_res = 0.0;
+    let mut ss_tot = 0.0;
+
+    for i in 0..x_vals.len() {
+        let y_pred = slope * x_vals[i] + intercept;
+        ss_res += (y_vals[i] - y_pred).powi(2);
+        ss_tot += (y_vals[i] - mean_y).powi(2);
+    }
+
+    let r_squared = if ss_tot.abs() < 1e-10 {
+        0.0
+    } else {
+        1.0 - (ss_res / ss_tot)
+    };
+
+    // Return plist: (:slope m :intercept b :r-squared r2)
+    env.list(&[
+        env.intern(":slope")?,
+        slope.into_lisp(env)?,
+        env.intern(":intercept")?,
+        intercept.into_lisp(env)?,
+        env.intern(":r-squared")?,
+        r_squared.into_lisp(env)?,
+    ])
+}
+
+#[defun]
+pub fn compute_quartiles<'e>(env: &'e Env, data: Value<'e>) -> Result<Value<'e>> {
+    // Convert data vector
+    let mut data_vec = value_to_f64_vec(env, data)?;
+
+    if data_vec.is_empty() {
+        return env.list(&[
+            env.intern(":min")?, 0.0.into_lisp(env)?,
+            env.intern(":q1")?, 0.0.into_lisp(env)?,
+            env.intern(":median")?, 0.0.into_lisp(env)?,
+            env.intern(":q3")?, 0.0.into_lisp(env)?,
+            env.intern(":max")?, 0.0.into_lisp(env)?,
+        ]);
+    }
+
+    // Sort the data
+    data_vec.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let n = data_vec.len();
+    let min_val = data_vec[0];
+    let max_val = data_vec[n - 1];
+
+    // Helper function to calculate quantile
+    let quantile = |q: f64| -> f64 {
+        let pos = q * (n - 1) as f64;
+        let lower = pos.floor() as usize;
+        let upper = pos.ceil() as usize;
+        let weight = pos - lower as f64;
+
+        if lower == upper {
+            data_vec[lower]
+        } else {
+            data_vec[lower] * (1.0 - weight) + data_vec[upper] * weight
+        }
+    };
+
+    let q1 = quantile(0.25);
+    let median = quantile(0.5);
+    let q3 = quantile(0.75);
+
+    // Return plist
+    env.list(&[
+        env.intern(":min")?, min_val.into_lisp(env)?,
+        env.intern(":q1")?, q1.into_lisp(env)?,
+        env.intern(":median")?, median.into_lisp(env)?,
+        env.intern(":q3")?, q3.into_lisp(env)?,
+        env.intern(":max")?, max_val.into_lisp(env)?,
+    ])
+}
+
 #[emacs::module(name = "drake-rust-module", separator = "/")]
 fn init(env: &Env) -> Result<()> {
     env.message("Drake Rust Module Initialized")?;

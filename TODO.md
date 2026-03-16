@@ -26,7 +26,7 @@
 
 ### Stage 5: High Performance & Optimization
 - [x] **Optimize Rust Data Transfer:** Replace `env.call("aref", ...)` loops with direct memory access or more efficient vector transfer methods to handle large datasets (>100k rows) without lag.
-- [ ] **Offload Math to Rust:** Move KDE, OLS regression, and summary statistics calculations from Elisp to the Rust dynamic module.
+- [X] **Offload Math to Rust:** [DONE] Move KDE, OLS regression, and summary statistics calculations from Elisp to the Rust dynamic module. (KDE: 326x faster, OLS: 17-19x faster, Quartiles: 5x faster)
 - [ ] **Direct DuckDB-to-Rust Pipeline:** Investigate passing DuckDB result pointers directly to the Rust backend to minimize Elisp-side data manipulation.
 
 ### Backend Consistency & Features

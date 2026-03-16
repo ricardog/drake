@@ -19,6 +19,9 @@
 (defvar drake-install-buffer-name " *Install drake-rust* "
   "Name of the buffer used for compiling the drake-rust module.")
 
+(defvar drake-rust-module-loaded nil
+  "Non-nil if the Rust module is loaded and mathematical operations are available.")
+
 (defun drake-module--cmake-is-available ()
   "Return t if cmake is available."
   (executable-find "cmake"))
@@ -61,7 +64,9 @@
   "Load the Rust module, compiling it if necessary."
   (unless (featurep 'drake-rust-module)
     (condition-case nil
-        (require 'drake-rust-module)
+        (progn
+          (require 'drake-rust-module)
+          (setq drake-rust-module-loaded t))
       (error
        ;; Fallback to local file if not in load-path
        (let* ((drake-dir (file-name-directory (locate-library "drake.el" t)))
@@ -74,7 +79,9 @@
                (drake-module-compile)
              (error "Rust module drake-rust-module.so not found and could not be compiled")))
          (if (file-exists-p module-file)
-             (module-load module-file)
+             (progn
+               (module-load module-file)
+               (setq drake-rust-module-loaded t))
            (error "Rust module drake-rust-module.so not found")))))))
 
 (defun drake-rust-render (plot)
