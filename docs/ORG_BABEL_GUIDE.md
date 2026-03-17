@@ -36,6 +36,10 @@ Use Drake plotting directly in your org-mode documents! Execute Drake code in `#
 
 The plot appears inline automatically!
 
+**Example Output:**
+
+![Example Drake Plot](../examples/images/iris-scatter.svg)
+
 ## Common Workflows
 
 ### 1. Data Analysis Notebook

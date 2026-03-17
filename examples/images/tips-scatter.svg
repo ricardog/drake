@@ -1,0 +1,977 @@
+<svg width="600" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <rect width="600" height="400" x="0" y="0" fill="#ffffff"></rect> <line x1="60" x2="540" y1="340.0" y2="340.0" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="55" x2="60" y1="340.0" y2="340.0" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="end" y="344.0" x="50"> 1.0</text> <line x1="60" x2="540" y1="284.0" y2="284.0" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="55" x2="60" y1="284.0" y2="284.0" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="end" y="288.0" x="50"> 2.8</text> <line x1="60" x2="540" y1="228.0" y2="228.0" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="55" x2="60" y1="228.0" y2="228.0" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="end" y="232.0" x="50"> 4.6</text> <line x1="60" x2="540" y1="172.0" y2="172.0" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="55" x2="60" y1="172.0" y2="172.0" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="end" y="176.0" x="50"> 6.4</text> <line x1="60" x2="540" y1="116.0" y2="116.0" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="55" x2="60" y1="116.0" y2="116.0" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="end" y="120.0" x="50"> 8.2</text> <line x1="60" x2="540" y1="60.0" y2="60.0" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="55" x2="60" y1="60.0" y2="60.0" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="end" y="64.0" x="50"> 10.0</text> <line x1="60.0" x2="60.0" y1="60" y2="340" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="60.0" x2="60.0" y1="340" y2="345" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="middle" y="360" x="60.0"> 3.1</text> <line x1="156.0" x2="156.0" y1="60" y2="340" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="156.0" x2="156.0" y1="340" y2="345" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="middle" y="360" x="156.0"> 12.6</text> <line x1="252.0" x2="252.0" y1="60" y2="340" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="252.0" x2="252.0" y1="340" y2="345" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="middle" y="360" x="252.0"> 22.2</text> <line x1="348.0" x2="348.0" y1="60" y2="340" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="348.0" x2="348.0" y1="340" y2="345" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="middle" y="360" x="348.0"> 31.7</text> <line x1="444.0" x2="444.0" y1="60" y2="340" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="444.0" x2="444.0" y1="340" y2="345" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="middle" y="360" x="444.0"> 41.3</text> <line x1="540.0" x2="540.0" y1="60" y2="340" stroke-dasharray="none" stroke="#eeeeee" stroke-width="1"></line> <line x1="540.0" x2="540.0" y1="340" y2="345" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="10px" text-anchor="middle" y="360" x="540.0"> 50.8</text> <line x1="60" x2="60" y1="60" y2="340" stroke="#000000" stroke-width="1"></line> <line x1="60" x2="540" y1="340" y2="340" stroke="#000000" stroke-width="1"></line> <text fill="#000000" font-size="12px" text-anchor="middle" y="380" x="300"> :total_bill</text> <text transform="rotate(-90 10 200)" fill="#000000" font-size="12px" text-anchor="middle" y="200" x="10"> :tip</text> <circle cx="199.95810640971928" cy="339.68888888888887" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.99
+:tip: 1.01
+:time: Dinner</title> cx="199.95810640971928" cy="339.68888888888887" r="4" drake-tooltip=":total_bill: 16.99
+:tip: 1.01
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="133.09593632174278" cy="319.4666666666667" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.34
+:tip: 1.66
+:time: Dinner</title> cx="133.09593632174278" cy="319.4666666666667" r="4" drake-tooltip=":total_bill: 10.34
+:tip: 1.66
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="240.37704231252619" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 21.01
+:tip: 3.5
+:time: Dinner</title> cx="240.37704231252619" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 21.01
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="267.2224549643904" cy="268.1333333333333" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 23.68
+:tip: 3.31
+:time: Dinner</title> cx="267.2224549643904" cy="268.1333333333333" r="4" drake-tooltip=":total_bill: 23.68
+:tip: 3.31
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="276.3720150816925" cy="258.8" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 24.59
+:tip: 3.61
+:time: Dinner</title> cx="276.3720150816925" cy="258.8" r="4" drake-tooltip=":total_bill: 24.59
+:tip: 3.61
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="283.41013824884794" cy="224.57777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.29
+:tip: 4.71
+:time: Dinner</title> cx="283.41013824884794" cy="224.57777777777778" r="4" drake-tooltip=":total_bill: 25.29
+:tip: 4.71
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="117.31043150397988" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 8.77
+:tip: 2.0
+:time: Dinner</title> cx="117.31043150397988" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 8.77
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="299.3967322999581" cy="274.0444444444444" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 26.88
+:tip: 3.12
+:time: Dinner</title> cx="299.3967322999581" cy="274.0444444444444" r="4" drake-tooltip=":total_bill: 26.88
+:tip: 3.12
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="180.35190615835774" cy="310.1333333333333" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.04
+:tip: 1.96
+:time: Dinner</title> cx="180.35190615835774" cy="310.1333333333333" r="4" drake-tooltip=":total_bill: 15.04
+:tip: 1.96
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="177.7377461248429" cy="270.6222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.78
+:tip: 3.23
+:time: Dinner</title> cx="177.7377461248429" cy="270.6222222222222" r="4" drake-tooltip=":total_bill: 14.78
+:tip: 3.23
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="132.3921240050272" cy="317.9111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.27
+:tip: 1.71
+:time: Dinner</title> cx="132.3921240050272" cy="317.9111111111111" r="4" drake-tooltip=":total_bill: 10.27
+:tip: 1.71
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="383.65312107247587" cy="215.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 35.26
+:tip: 5.0
+:time: Dinner</title> cx="383.65312107247587" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 35.26
+:tip: 5.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="184.17260159195644" cy="322.26666666666665" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.42
+:tip: 1.57
+:time: Dinner</title> cx="184.17260159195644" cy="322.26666666666665" r="4" drake-tooltip=":total_bill: 15.42
+:tip: 1.57
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="214.43653121072475" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.43
+:tip: 3.0
+:time: Dinner</title> cx="214.43653121072475" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 18.43
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="178.24046920821115" cy="277.15555555555557" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.83
+:tip: 3.02
+:time: Dinner</title> cx="178.24046920821115" cy="277.15555555555557" r="4" drake-tooltip=":total_bill: 14.83
+:tip: 3.02
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="246.10808546292415" cy="249.15555555555557" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 21.58
+:tip: 3.92
+:time: Dinner</title> cx="246.10808546292415" cy="249.15555555555557" r="4" drake-tooltip=":total_bill: 21.58
+:tip: 3.92
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="132.9953917050691" cy="319.15555555555557" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.33
+:tip: 1.67
+:time: Dinner</title> cx="132.9953917050691" cy="319.15555555555557" r="4" drake-tooltip=":total_bill: 10.33
+:tip: 1.67
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="192.9199832425639" cy="255.6888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.29
+:tip: 3.71
+:time: Dinner</title> cx="192.9199832425639" cy="255.6888888888889" r="4" drake-tooltip=":total_bill: 16.29
+:tip: 3.71
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="199.757017176372" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.97
+:tip: 3.5
+:time: Dinner</title> cx="199.757017176372" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 16.97
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="236.7574361122748" cy="266.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.65
+:tip: 3.35
+:time: Dinner</title> cx="236.7574361122748" cy="266.8888888888889" r="4" drake-tooltip=":total_bill: 20.65
+:tip: 3.35
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="209.30875576036868" cy="244.17777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.92
+:tip: 4.08
+:time: Dinner</title> cx="209.30875576036868" cy="244.17777777777778" r="4" drake-tooltip=":total_bill: 17.92
+:tip: 4.08
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="233.13782991202345" cy="285.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.29
+:tip: 2.75
+:time: Dinner</title> cx="233.13782991202345" cy="285.55555555555554" r="4" drake-tooltip=":total_bill: 20.29
+:tip: 2.75
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="187.69166317553413" cy="301.73333333333335" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.77
+:tip: 2.23
+:time: Dinner</title> cx="187.69166317553413" cy="301.73333333333335" r="4" drake-tooltip=":total_bill: 15.77
+:tip: 2.23
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="425.47968160871386" cy="135.28888888888886" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 39.42
+:tip: 7.58
+:time: Dinner</title> cx="425.47968160871386" cy="135.28888888888886" r="4" drake-tooltip=":total_bill: 39.42
+:tip: 7.58
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="228.41223292836196" cy="272.1777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 19.82
+:tip: 3.18
+:time: Dinner</title> cx="228.41223292836196" cy="272.1777777777778" r="4" drake-tooltip=":total_bill: 19.82
+:tip: 3.18
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="208.2027649769585" cy="298.31111111111113" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.81
+:tip: 2.34
+:time: Dinner</title> cx="208.2027649769585" cy="298.31111111111113" r="4" drake-tooltip=":total_bill: 17.81
+:tip: 2.34
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="163.56095517385836" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.37
+:tip: 2.0
+:time: Dinner</title> cx="163.56095517385836" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.37
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="156.72392124005026" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.69
+:tip: 2.0
+:time: Dinner</title> cx="156.72392124005026" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 12.69
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="247.31462086300795" cy="237.33333333333334" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 21.7
+:tip: 4.3
+:time: Dinner</title> cx="247.31462086300795" cy="237.33333333333334" r="4" drake-tooltip=":total_bill: 21.7
+:tip: 4.3
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="226.7029744449099" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 19.65
+:tip: 3.0
+:time: Dinner</title> cx="226.7029744449099" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 19.65
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="125.15291160452452" cy="326.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 9.55
+:tip: 1.45
+:time: Dinner</title> cx="125.15291160452452" cy="326.0" r="4" drake-tooltip=":total_bill: 9.55
+:tip: 1.45
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="213.63217427733557" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.35
+:tip: 2.5
+:time: Dinner</title> cx="213.63217427733557" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 18.35
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="180.55299539170505" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.06
+:tip: 3.0
+:time: Dinner</title> cx="180.55299539170505" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 15.06
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="237.1596145789694" cy="294.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.69
+:tip: 2.45
+:time: Dinner</title> cx="237.1596145789694" cy="294.8888888888889" r="4" drake-tooltip=":total_bill: 20.69
+:tip: 2.45
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="207.90113112693757" cy="269.3777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.78
+:tip: 3.27
+:time: Dinner</title> cx="207.90113112693757" cy="269.3777777777778" r="4" drake-tooltip=":total_bill: 17.78
+:tip: 3.27
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="271.04315039798905" cy="259.1111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 24.06
+:tip: 3.6
+:time: Dinner</title> cx="271.04315039798905" cy="259.1111111111111" r="4" drake-tooltip=":total_bill: 24.06
+:tip: 3.6
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="193.12107247591118" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.31
+:tip: 2.0
+:time: Dinner</title> cx="193.12107247591118" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 16.31
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="199.3548387096774" cy="275.6" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.93
+:tip: 3.07
+:time: Dinner</title> cx="199.3548387096774" cy="275.6" r="4" drake-tooltip=":total_bill: 16.93
+:tip: 3.07
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="217.05069124423966" cy="299.2444444444444" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.69
+:tip: 2.31
+:time: Dinner</title> cx="217.05069124423966" cy="299.2444444444444" r="4" drake-tooltip=":total_bill: 18.69
+:tip: 2.31
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="343.53581901968994" cy="215.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 31.27
+:tip: 5.0
+:time: Dinner</title> cx="343.53581901968994" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 31.27
+:tip: 5.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="190.40636782572264" cy="301.4222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.04
+:tip: 2.24
+:time: Dinner</title> cx="190.40636782572264" cy="301.4222222222222" r="4" drake-tooltip=":total_bill: 16.04
+:tip: 2.24
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="204.68370339338082" cy="292.0888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.46
+:tip: 2.54
+:time: Dinner</title> cx="204.68370339338082" cy="292.0888888888889" r="4" drake-tooltip=":total_bill: 17.46
+:tip: 2.54
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="169.29199832425638" cy="275.9111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.94
+:tip: 3.06
+:time: Dinner</title> cx="169.29199832425638" cy="275.9111111111111" r="4" drake-tooltip=":total_bill: 13.94
+:tip: 3.06
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="126.45999162128194" cy="330.0444444444444" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 9.68
+:tip: 1.32
+:time: Dinner</title> cx="126.45999162128194" cy="330.0444444444444" r="4" drake-tooltip=":total_bill: 9.68
+:tip: 1.32
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="334.7884373690825" cy="196.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 30.4
+:tip: 5.6
+:time: Dinner</title> cx="334.7884373690825" cy="196.8888888888889" r="4" drake-tooltip=":total_bill: 30.4
+:tip: 5.6
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="213.02890657729364" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.29
+:tip: 3.0
+:time: Dinner</title> cx="213.02890657729364" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 18.29
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="252.64348554671136" cy="215.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 22.23
+:tip: 5.0
+:time: Dinner</title> cx="252.64348554671136" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 22.23
+:tip: 5.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="354.8973607038123" cy="184.44444444444443" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 32.4
+:tip: 6.0
+:time: Dinner</title> cx="354.8973607038123" cy="184.44444444444443" r="4" drake-tooltip=":total_bill: 32.4
+:tip: 6.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="316.1876832844575" cy="307.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 28.55
+:tip: 2.05
+:time: Dinner</title> cx="316.1876832844575" cy="307.33333333333337" r="4" drake-tooltip=":total_bill: 28.55
+:tip: 2.05
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="210.51529116045242" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.04
+:tip: 3.0
+:time: Dinner</title> cx="210.51529116045242" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 18.04
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="155.21575198994552" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.54
+:tip: 2.5
+:time: Dinner</title> cx="155.21575198994552" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 12.54
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="132.59321323837452" cy="290.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.29
+:tip: 2.6
+:time: Dinner</title> cx="132.59321323837452" cy="290.22222222222223" r="4" drake-tooltip=":total_bill: 10.29
+:tip: 2.6
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="379.1286133221617" cy="209.33333333333334" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 34.81
+:tip: 5.2
+:time: Dinner</title> cx="379.1286133221617" cy="209.33333333333334" r="4" drake-tooltip=":total_bill: 34.81
+:tip: 5.2
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="129.0741516547968" cy="322.5777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 9.94
+:tip: 1.56
+:time: Dinner</title> cx="129.0741516547968" cy="322.5777777777778" r="4" drake-tooltip=":total_bill: 9.94
+:tip: 1.56
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="286.1248428990364" cy="236.0888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.56
+:tip: 4.34
+:time: Dinner</title> cx="286.1248428990364" cy="236.0888888888889" r="4" drake-tooltip=":total_bill: 25.56
+:tip: 4.34
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="225.09426057813153" cy="261.91111111111115" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 19.49
+:tip: 3.51
+:time: Dinner</title> cx="225.09426057813153" cy="261.91111111111115" r="4" drake-tooltip=":total_bill: 19.49
+:tip: 3.51
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="411.30289065772934" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 38.01
+:tip: 3.0
+:time: Dinner</title> cx="411.30289065772934" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 38.01
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="294.6711353162966" cy="324.44444444444446" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 26.41
+:tip: 1.5
+:time: Dinner</title> cx="294.6711353162966" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 26.41
+:tip: 1.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="142.14495182237118" cy="316.35555555555555" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 11.24
+:tip: 1.76
+:time: Dinner</title> cx="142.14495182237118" cy="316.35555555555555" r="4" drake-tooltip=":total_bill: 11.24
+:tip: 1.76
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="514.4616673648932" cy="161.73333333333332" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 48.27
+:tip: 6.73
+:time: Dinner</title> cx="514.4616673648932" cy="161.73333333333332" r="4" drake-tooltip=":total_bill: 48.27
+:tip: 6.73
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="233.13782991202345" cy="271.2444444444444" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.29
+:tip: 3.21
+:time: Dinner</title> cx="233.13782991202345" cy="271.2444444444444" r="4" drake-tooltip=":total_bill: 20.29
+:tip: 3.21
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="167.98491830749896" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.81
+:tip: 2.0
+:time: Dinner</title> cx="167.98491830749896" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.81
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="139.9329702555509" cy="309.5111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 11.02
+:tip: 1.98
+:time: Dinner</title> cx="139.9329702555509" cy="309.5111111111111" r="4" drake-tooltip=":total_bill: 11.02
+:tip: 1.98
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="213.02890657729364" cy="254.13333333333333" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.29
+:tip: 3.76
+:time: Dinner</title> cx="213.02890657729364" cy="254.13333333333333" r="4" drake-tooltip=":total_bill: 18.29
+:tip: 3.76
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="205.99078341013822" cy="288.97777777777776" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.59
+:tip: 2.64
+:time: Dinner</title> cx="205.99078341013822" cy="288.97777777777776" r="4" drake-tooltip=":total_bill: 17.59
+:tip: 2.64
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="231.0263929618768" cy="273.1111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.08
+:tip: 3.15
+:time: Dinner</title> cx="231.0263929618768" cy="273.1111111111111" r="4" drake-tooltip=":total_bill: 20.08
+:tip: 3.15
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="194.52869710934226" cy="294.26666666666665" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.45
+:tip: 2.47
+:time: Dinner</title> cx="194.52869710934226" cy="294.26666666666665" r="4" drake-tooltip=":total_bill: 16.45
+:tip: 2.47
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="60.0" cy="340.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 3.07
+:tip: 1.0
+:time: Dinner</title> cx="60.0" cy="340.0" r="4" drake-tooltip=":total_bill: 3.07
+:tip: 1.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="232.53456221198155" cy="308.5777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.23
+:tip: 2.01
+:time: Dinner</title> cx="232.53456221198155" cy="308.5777777777778" r="4" drake-tooltip=":total_bill: 20.23
+:tip: 2.01
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="180.05027230833682" cy="306.0888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.01
+:tip: 2.09
+:time: Dinner</title> cx="180.05027230833682" cy="306.0888888888889" r="4" drake-tooltip=":total_bill: 15.01
+:tip: 2.09
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="149.9874319229158" cy="309.8222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.02
+:tip: 1.97
+:time: Dinner</title> cx="149.9874319229158" cy="309.8222222222222" r="4" drake-tooltip=":total_bill: 12.02
+:tip: 1.97
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="200.7624633431085" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.07
+:tip: 3.0
+:time: Dinner</title> cx="200.7624633431085" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 17.07
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="299.1956430666108" cy="273.4222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 26.86
+:tip: 3.14
+:time: Dinner</title> cx="299.1956430666108" cy="273.4222222222222" r="4" drake-tooltip=":total_bill: 26.86
+:tip: 3.14
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="283.30959363217426" cy="215.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.28
+:tip: 5.0
+:time: Dinner</title> cx="283.30959363217426" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 25.28
+:tip: 5.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="177.23502304147465" cy="302.66666666666663" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.73
+:tip: 2.2
+:time: Dinner</title> cx="177.23502304147465" cy="302.66666666666663" r="4" drake-tooltip=":total_bill: 14.73
+:tip: 2.2
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="134.8051948051948" cy="332.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.51
+:tip: 1.25
+:time: Dinner</title> cx="134.8051948051948" cy="332.22222222222223" r="4" drake-tooltip=":total_bill: 10.51
+:tip: 1.25
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="209.30875576036868" cy="275.2888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.92
+:tip: 3.08
+:time: Dinner</title> cx="209.30875576036868" cy="275.2888888888889" r="4" drake-tooltip=":total_bill: 17.92
+:tip: 3.08
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="302.61416003351485" cy="246.66666666666669" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 27.2
+:tip: 4.0
+:time: Lunch</title> cx="302.61416003351485" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 27.2
+:tip: 4.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="257.97235023041475" cy="277.77777777777777" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 22.76
+:tip: 3.0
+:time: Lunch</title> cx="257.97235023041475" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 22.76
+:tip: 3.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="202.97444490992876" cy="286.8" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 17.29
+:tip: 2.71
+:time: Lunch</title> cx="202.97444490992876" cy="286.8" r="4" drake-tooltip=":total_bill: 17.29
+:tip: 2.71
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="224.5915374947633" cy="277.77777777777777" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 19.44
+:tip: 3.0
+:time: Lunch</title> cx="224.5915374947633" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 19.44
+:tip: 3.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="196.6401340594889" cy="265.3333333333333" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.66
+:tip: 3.4
+:time: Lunch</title> cx="196.6401340594889" cy="265.3333333333333" r="4" drake-tooltip=":total_bill: 16.66
+:tip: 3.4
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="130.38123167155425" cy="314.1777777777778" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 10.07
+:tip: 1.83
+:time: Lunch</title> cx="130.38123167155425" cy="314.1777777777778" r="4" drake-tooltip=":total_bill: 10.07
+:tip: 1.83
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="357.71260997067446" cy="215.55555555555554" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 32.68
+:tip: 5.0
+:time: Lunch</title> cx="357.71260997067446" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 32.68
+:tip: 5.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="189.80310012568077" cy="307.9555555555556" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 15.98
+:tip: 2.03
+:time: Lunch</title> cx="189.80310012568077" cy="307.9555555555556" r="4" drake-tooltip=":total_bill: 15.98
+:tip: 2.03
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="379.32970255550896" cy="210.26666666666668" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 34.83
+:tip: 5.17
+:time: Lunch</title> cx="379.32970255550896" cy="210.26666666666668" r="4" drake-tooltip=":total_bill: 34.83
+:tip: 5.17
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="160.14243820695432" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.03
+:tip: 2.0
+:time: Lunch</title> cx="160.14243820695432" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.03
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="212.92836196062004" cy="246.66666666666669" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 18.28
+:tip: 4.0
+:time: Lunch</title> cx="212.92836196062004" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 18.28
+:tip: 4.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="277.57855048177623" cy="189.11111111111111" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 24.71
+:tip: 5.85
+:time: Lunch</title> cx="277.57855048177623" cy="189.11111111111111" r="4" drake-tooltip=":total_bill: 24.71
+:tip: 5.85
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="241.88521156263093" cy="277.77777777777777" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 21.16
+:tip: 3.0
+:time: Lunch</title> cx="241.88521156263093" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 21.16
+:tip: 3.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="320.4105571847507" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 28.97
+:tip: 3.0
+:time: Dinner</title> cx="320.4105571847507" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 28.97
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="255.25764558022618" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 22.49
+:tip: 3.5
+:time: Dinner</title> cx="255.25764558022618" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 22.49
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="86.94595726853791" cy="340.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 5.75
+:tip: 1.0
+:time: Dinner</title> cx="86.94595726853791" cy="340.0" r="4" drake-tooltip=":total_bill: 5.75
+:tip: 1.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="193.22161709258484" cy="237.33333333333334" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.32
+:tip: 4.3
+:time: Dinner</title> cx="193.22161709258484" cy="237.33333333333334" r="4" drake-tooltip=":total_bill: 16.32
+:tip: 4.3
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="257.87180561374106" cy="270.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 22.75
+:tip: 3.25
+:time: Dinner</title> cx="257.87180561374106" cy="270.0" r="4" drake-tooltip=":total_bill: 22.75
+:tip: 3.25
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="433.0205278592375" cy="223.95555555555552" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 40.17
+:tip: 4.73
+:time: Dinner</title> cx="433.0205278592375" cy="223.95555555555552" r="4" drake-tooltip=":total_bill: 40.17
+:tip: 4.73
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="303.41851696690406" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 27.28
+:tip: 4.0
+:time: Dinner</title> cx="303.41851696690406" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 27.28
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="150.08797653958942" cy="324.44444444444446" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.03
+:tip: 1.5
+:time: Dinner</title> cx="150.08797653958942" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 12.03
+:tip: 1.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="240.37704231252619" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 21.01
+:tip: 3.0
+:time: Dinner</title> cx="240.37704231252619" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 21.01
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="154.41139505655633" cy="324.44444444444446" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.46
+:tip: 1.5
+:time: Dinner</title> cx="154.41139505655633" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 12.46
+:tip: 1.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="143.2509426057813" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 11.35
+:tip: 2.5
+:time: Dinner</title> cx="143.2509426057813" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 11.35
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="183.77042312526186" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.38
+:tip: 3.0
+:time: Dinner</title> cx="183.77042312526186" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 15.38
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="474.5454545454545" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 44.3
+:tip: 2.5
+:time: Dinner</title> cx="474.5454545454545" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 44.3
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="254.5538332635107" cy="262.84444444444443" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 22.42
+:tip: 3.48
+:time: Dinner</title> cx="254.5538332635107" cy="262.84444444444443" r="4" drake-tooltip=":total_bill: 22.42
+:tip: 3.48
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="239.47214076246334" cy="244.17777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.92
+:tip: 4.08
+:time: Dinner</title> cx="239.47214076246334" cy="244.17777777777778" r="4" drake-tooltip=":total_bill: 20.92
+:tip: 4.08
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="183.56933389191454" cy="320.0888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.36
+:tip: 1.64
+:time: Dinner</title> cx="183.56933389191454" cy="320.0888888888889" r="4" drake-tooltip=":total_bill: 15.36
+:tip: 1.64
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="235.14872224549643" cy="244.8" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.49
+:tip: 4.06
+:time: Dinner</title> cx="235.14872224549643" cy="244.8" r="4" drake-tooltip=":total_bill: 20.49
+:tip: 4.06
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="282.6057813154587" cy="237.64444444444445" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.21
+:tip: 4.29
+:time: Dinner</title> cx="282.6057813154587" cy="237.64444444444445" r="4" drake-tooltip=":total_bill: 25.21
+:tip: 4.29
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="212.52618349392543" cy="254.13333333333333" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.24
+:tip: 3.76
+:time: Dinner</title> cx="212.52618349392543" cy="254.13333333333333" r="4" drake-tooltip=":total_bill: 18.24
+:tip: 3.76
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="173.0121491411814" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.31
+:tip: 4.0
+:time: Dinner</title> cx="173.0121491411814" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 14.31
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="169.89526602429828" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.0
+:tip: 3.0
+:time: Dinner</title> cx="169.89526602429828" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 14.0
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="102.02764976958525" cy="340.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 7.25
+:tip: 1.0
+:time: Dinner</title> cx="102.02764976958525" cy="340.0" r="4" drake-tooltip=":total_bill: 7.25
+:tip: 1.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="411.9061583577713" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 38.07
+:tip: 4.0
+:time: Dinner</title> cx="411.9061583577713" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 38.07
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="269.93715961457895" cy="291.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 23.95
+:tip: 2.55
+:time: Dinner</title> cx="269.93715961457895" cy="291.77777777777777" r="4" drake-tooltip=":total_bill: 23.95
+:tip: 2.55
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="287.63301214914117" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.71
+:tip: 4.0
+:time: Dinner</title> cx="287.63301214914117" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 25.71
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="203.17553414327605" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.31
+:tip: 3.5
+:time: Dinner</title> cx="203.17553414327605" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 17.31
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="330.062840385421" cy="213.37777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 29.93
+:tip: 5.07
+:time: Dinner</title> cx="330.062840385421" cy="213.37777777777777" r="4" drake-tooltip=":total_bill: 29.93
+:tip: 5.07
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="136.2128194386259" cy="324.44444444444446" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 10.65
+:tip: 1.5
+:time: Lunch</title> cx="136.2128194386259" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 10.65
+:tip: 1.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="154.10976120653538" cy="315.1111111111111" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 12.43
+:tip: 1.8
+:time: Lunch</title> cx="154.10976120653538" cy="315.1111111111111" r="4" drake-tooltip=":total_bill: 12.43
+:tip: 1.8
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="271.24423963133637" cy="280.26666666666665" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 24.08
+:tip: 2.92
+:time: Lunch</title> cx="271.24423963133637" cy="280.26666666666665" r="4" drake-tooltip=":total_bill: 24.08
+:tip: 2.92
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="146.66945957268535" cy="299.2444444444444" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 11.69
+:tip: 2.31
+:time: Lunch</title> cx="146.66945957268535" cy="299.2444444444444" r="4" drake-tooltip=":total_bill: 11.69
+:tip: 2.31
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="164.06367825722663" cy="318.84444444444443" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.42
+:tip: 1.68
+:time: Lunch</title> cx="164.06367825722663" cy="318.84444444444443" r="4" drake-tooltip=":total_bill: 13.42
+:tip: 1.68
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="172.50942605781313" cy="293.33333333333337" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 14.26
+:tip: 2.5
+:time: Lunch</title> cx="172.50942605781313" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 14.26
+:tip: 2.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="189.50146627565982" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 15.95
+:tip: 2.0
+:time: Lunch</title> cx="189.50146627565982" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 15.95
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="154.61248428990365" cy="292.7111111111111" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 12.48
+:tip: 2.52
+:time: Lunch</title> cx="154.61248428990365" cy="292.7111111111111" r="4" drake-tooltip=":total_bill: 12.48
+:tip: 2.52
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="328.7557603686636" cy="240.44444444444446" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 29.8
+:tip: 4.2
+:time: Lunch</title> cx="328.7557603686636" cy="240.44444444444446" r="4" drake-tooltip=":total_bill: 29.8
+:tip: 4.2
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="114.79681608713867" cy="325.06666666666666" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 8.52
+:tip: 1.48
+:time: Lunch</title> cx="114.79681608713867" cy="325.06666666666666" r="4" drake-tooltip=":total_bill: 8.52
+:tip: 1.48
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="175.123586091328" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 14.52
+:tip: 2.0
+:time: Lunch</title> cx="175.123586091328" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 14.52
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="143.55257645580227" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 11.38
+:tip: 2.0
+:time: Lunch</title> cx="143.55257645580227" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 11.38
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="258.57561793045664" cy="303.2888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 22.82
+:tip: 2.18
+:time: Lunch</title> cx="258.57561793045664" cy="303.2888888888889" r="4" drake-tooltip=":total_bill: 22.82
+:tip: 2.18
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="220.97193129451193" cy="324.44444444444446" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 19.08
+:tip: 1.5
+:time: Lunch</title> cx="220.97193129451193" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 19.08
+:tip: 1.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="232.93674067867616" cy="283.06666666666666" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 20.27
+:tip: 2.83
+:time: Lunch</title> cx="232.93674067867616" cy="283.06666666666666" r="4" drake-tooltip=":total_bill: 20.27
+:tip: 2.83
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="141.44113950565563" cy="324.44444444444446" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 11.17
+:tip: 1.5
+:time: Lunch</title> cx="141.44113950565563" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 11.17
+:tip: 1.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="152.40050272308338" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 12.26
+:tip: 2.0
+:time: Lunch</title> cx="152.40050272308338" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 12.26
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="212.72727272727272" cy="270.0" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 18.26
+:tip: 3.25
+:time: Lunch</title> cx="212.72727272727272" cy="270.0" r="4" drake-tooltip=":total_bill: 18.26
+:tip: 3.25
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="114.696271470465" cy="332.22222222222223" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 8.51
+:tip: 1.25
+:time: Lunch</title> cx="114.696271470465" cy="332.22222222222223" r="4" drake-tooltip=":total_bill: 8.51
+:tip: 1.25
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="132.9953917050691" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 10.33
+:tip: 2.0
+:time: Lunch</title> cx="132.9953917050691" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 10.33
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="171.40343527440302" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 14.15
+:tip: 2.0
+:time: Lunch</title> cx="171.40343527440302" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 14.15
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="190.00418935902806" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.0
+:tip: 2.0
+:time: Lunch</title> cx="190.00418935902806" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 16.0
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="161.44951822371178" cy="285.55555555555554" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.16
+:tip: 2.75
+:time: Lunch</title> cx="161.44951822371178" cy="285.55555555555554" r="4" drake-tooltip=":total_bill: 13.16
+:tip: 2.75
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="204.78424801005443" cy="262.22222222222223" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 17.47
+:tip: 3.5
+:time: Lunch</title> cx="204.78424801005443" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 17.47
+:tip: 3.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="374.0008378718056" cy="162.66666666666669" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 34.3
+:tip: 6.7
+:time: Lunch</title> cx="374.0008378718056" cy="162.66666666666669" r="4" drake-tooltip=":total_bill: 34.3
+:tip: 6.7
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="443.27607875994966" cy="215.55555555555554" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 41.19
+:tip: 5.0
+:time: Lunch</title> cx="443.27607875994966" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 41.19
+:tip: 5.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="301.1059907834101" cy="215.55555555555554" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 27.05
+:tip: 5.0
+:time: Lunch</title> cx="301.1059907834101" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 27.05
+:tip: 5.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="194.32760787599497" cy="299.55555555555554" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.43
+:tip: 2.3
+:time: Lunch</title> cx="194.32760787599497" cy="299.55555555555554" r="4" drake-tooltip=":total_bill: 16.43
+:tip: 2.3
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="113.08755760368663" cy="324.44444444444446" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 8.35
+:tip: 1.5
+:time: Lunch</title> cx="113.08755760368663" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 8.35
+:tip: 1.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="216.5479681608714" cy="328.8" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 18.64
+:tip: 1.36
+:time: Lunch</title> cx="216.5479681608714" cy="328.8" r="4" drake-tooltip=":total_bill: 18.64
+:tip: 1.36
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="148.47926267281105" cy="320.4" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 11.87
+:tip: 1.63
+:time: Lunch</title> cx="148.47926267281105" cy="320.4" r="4" drake-tooltip=":total_bill: 11.87
+:tip: 1.63
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="127.46543778801842" cy="317.2888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 9.78
+:tip: 1.73
+:time: Lunch</title> cx="127.46543778801842" cy="317.2888888888889" r="4" drake-tooltip=":total_bill: 9.78
+:tip: 1.73
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="104.64180980310012" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 7.51
+:tip: 2.0
+:time: Lunch</title> cx="104.64180980310012" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 7.51
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="170.5990783410138" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.07
+:tip: 2.5
+:time: Dinner</title> cx="170.5990783410138" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 14.07
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="161.14788437369083" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.13
+:tip: 2.0
+:time: Dinner</title> cx="161.14788437369083" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.13
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="202.67281105990781" cy="285.8666666666667" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.26
+:tip: 2.74
+:time: Dinner</title> cx="202.67281105990781" cy="285.8666666666667" r="4" drake-tooltip=":total_bill: 17.26
+:tip: 2.74
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="275.9698366149979" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 24.55
+:tip: 2.0
+:time: Dinner</title> cx="275.9698366149979" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 24.55
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="227.9095098449937" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 19.77
+:tip: 2.0
+:time: Dinner</title> cx="227.9095098449937" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 19.77
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="329.25848345203184" cy="211.20000000000002" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 29.85
+:tip: 5.14
+:time: Dinner</title> cx="329.25848345203184" cy="211.20000000000002" r="4" drake-tooltip=":total_bill: 29.85
+:tip: 5.14
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="513.4562211981568" cy="215.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 48.17
+:tip: 5.0
+:time: Dinner</title> cx="513.4562211981568" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 48.17
+:tip: 5.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="280.4943443653121" cy="254.44444444444446" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.0
+:tip: 3.75
+:time: Dinner</title> cx="280.4943443653121" cy="254.44444444444446" r="4" drake-tooltip=":total_bill: 25.0
+:tip: 3.75
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="163.7620444072057" cy="289.9111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.39
+:tip: 2.61
+:time: Dinner</title> cx="163.7620444072057" cy="289.9111111111111" r="4" drake-tooltip=":total_bill: 13.39
+:tip: 2.61
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="194.93087557603684" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.49
+:tip: 2.0
+:time: Dinner</title> cx="194.93087557603684" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 16.49
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="245.30372852953496" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 21.5
+:tip: 3.5
+:time: Dinner</title> cx="245.30372852953496" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 21.5
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="156.42228739002934" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.66
+:tip: 2.5
+:time: Dinner</title> cx="156.42228739002934" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 12.66
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="192.1156263091747" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.21
+:tip: 2.0
+:time: Dinner</title> cx="192.1156263091747" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 16.21
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="167.98491830749896" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.81
+:tip: 2.0
+:time: Dinner</title> cx="167.98491830749896" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.81
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="205.18642647674906" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.51
+:tip: 3.0
+:time: Dinner</title> cx="205.18642647674906" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 17.51
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="275.66820276497697" cy="262.84444444444443" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 24.52
+:tip: 3.48
+:time: Dinner</title> cx="275.66820276497697" cy="262.84444444444443" r="4" drake-tooltip=":total_bill: 24.52
+:tip: 3.48
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="237.86342689568497" cy="301.4222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.76
+:tip: 2.24
+:time: Dinner</title> cx="237.86342689568497" cy="301.4222222222222" r="4" drake-tooltip=":total_bill: 20.76
+:tip: 2.24
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="347.95978215333054" cy="231.11111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 31.71
+:tip: 4.5
+:time: Dinner</title> cx="347.95978215333054" cy="231.11111111111111" r="4" drake-tooltip=":total_bill: 31.71
+:tip: 4.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="135.609551738584" cy="321.02222222222224" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.59
+:tip: 1.61
+:time: Dinner</title> cx="135.609551738584" cy="321.02222222222224" r="4" drake-tooltip=":total_bill: 10.59
+:tip: 1.61
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="136.01173020527858" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.63
+:tip: 2.0
+:time: Dinner</title> cx="136.01173020527858" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 10.63
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="540.0" cy="60.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 50.81
+:tip: 10.0
+:time: Dinner</title> cx="540.0" cy="60.0" r="4" drake-tooltip=":total_bill: 50.81
+:tip: 10.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="188.09384164222874" cy="272.8" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.81
+:tip: 3.16
+:time: Dinner</title> cx="188.09384164222874" cy="272.8" r="4" drake-tooltip=":total_bill: 15.81
+:tip: 3.16
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="102.02764976958525" cy="210.88888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 7.25
+:tip: 5.15
+:time: Dinner</title> cx="102.02764976958525" cy="210.88888888888889" r="4" drake-tooltip=":total_bill: 7.25
+:tip: 5.15
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="349.36740678676165" cy="272.1777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 31.85
+:tip: 3.18
+:time: Dinner</title> cx="349.36740678676165" cy="272.1777777777778" r="4" drake-tooltip=":total_bill: 31.85
+:tip: 3.18
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="198.24884792626727" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 16.82
+:tip: 4.0
+:time: Dinner</title> cx="198.24884792626727" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 16.82
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="359.92459153749473" cy="274.35555555555555" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 32.9
+:tip: 3.11
+:time: Dinner</title> cx="359.92459153749473" cy="274.35555555555555" r="4" drake-tooltip=":total_bill: 32.9
+:tip: 3.11
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="209.0071219103477" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.89
+:tip: 2.0
+:time: Dinner</title> cx="209.0071219103477" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 17.89
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="174.72140762463343" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 14.48
+:tip: 2.0
+:time: Dinner</title> cx="174.72140762463343" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 14.48
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="125.65563468789274" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 9.6
+:tip: 4.0
+:time: Dinner</title> cx="125.65563468789274" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 9.6
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="377.318810222036" cy="260.6666666666667" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 34.63
+:tip: 3.55
+:time: Dinner</title> cx="377.318810222036" cy="260.6666666666667" r="4" drake-tooltip=":total_bill: 34.63
+:tip: 3.55
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="377.5198994553833" cy="256.6222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 34.65
+:tip: 3.68
+:time: Dinner</title> cx="377.5198994553833" cy="256.6222222222222" r="4" drake-tooltip=":total_bill: 34.65
+:tip: 3.68
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="263.7033933808127" cy="195.33333333333331" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 23.33
+:tip: 5.65
+:time: Dinner</title> cx="263.7033933808127" cy="195.33333333333331" r="4" drake-tooltip=":total_bill: 23.33
+:tip: 5.65
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="485.1026392961877" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 45.35
+:tip: 3.5
+:time: Dinner</title> cx="485.1026392961877" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 45.35
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="262.09467951403434" cy="168.88888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 23.17
+:tip: 6.5
+:time: Dinner</title> cx="262.09467951403434" cy="168.88888888888889" r="4" drake-tooltip=":total_bill: 23.17
+:tip: 6.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="436.84122329283616" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 40.55
+:tip: 3.0
+:time: Dinner</title> cx="436.84122329283616" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 40.55
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="237.1596145789694" cy="215.55555555555554" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.69
+:tip: 5.0
+:time: Dinner</title> cx="237.1596145789694" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 20.69
+:tip: 5.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="239.271051529116" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.9
+:tip: 3.5
+:time: Dinner</title> cx="239.271051529116" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 20.9
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="335.39170506912444" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 30.46
+:tip: 2.0
+:time: Dinner</title> cx="335.39170506912444" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 30.46
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="211.62128194386256" cy="262.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.15
+:tip: 3.5
+:time: Dinner</title> cx="211.62128194386256" cy="262.22222222222223" r="4" drake-tooltip=":total_bill: 18.15
+:tip: 3.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="261.3908671973188" cy="246.66666666666669" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 23.1
+:tip: 4.0
+:time: Dinner</title> cx="261.3908671973188" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 23.1
+:tip: 4.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="186.88730624214492" cy="324.44444444444446" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.69
+:tip: 1.5
+:time: Dinner</title> cx="186.88730624214492" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 15.69
+:tip: 1.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="228.3116883116883" cy="240.75555555555553" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 19.81
+:tip: 4.19
+:time: Lunch</title> cx="228.3116883116883" cy="240.75555555555553" r="4" drake-tooltip=":total_bill: 19.81
+:tip: 4.19
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="315.08169250104737" cy="291.4666666666667" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 28.44
+:tip: 2.56
+:time: Lunch</title> cx="315.08169250104737" cy="291.4666666666667" r="4" drake-tooltip=":total_bill: 28.44
+:tip: 2.56
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="184.77586929199833" cy="308.26666666666665" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 15.48
+:tip: 2.02
+:time: Lunch</title> cx="184.77586929199833" cy="308.26666666666665" r="4" drake-tooltip=":total_bill: 15.48
+:tip: 2.02
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="195.83577712609969" cy="246.66666666666669" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.58
+:tip: 4.0
+:time: Lunch</title> cx="195.83577712609969" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 16.58
+:tip: 4.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="105.14453288646837" cy="326.31111111111113" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 7.56
+:tip: 1.44
+:time: Lunch</title> cx="105.14453288646837" cy="326.31111111111113" r="4" drake-tooltip=":total_bill: 7.56
+:tip: 1.44
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="133.09593632174278" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 10.34
+:tip: 2.0
+:time: Lunch</title> cx="133.09593632174278" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 10.34
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="462.5806451612903" cy="215.55555555555554" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 43.11
+:tip: 5.0
+:time: Lunch</title> cx="462.5806451612903" cy="215.55555555555554" r="4" drake-tooltip=":total_bill: 43.11
+:tip: 5.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="159.8408043569334" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.0
+:tip: 2.0
+:time: Lunch</title> cx="159.8408043569334" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.0
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="164.96857980728947" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.51
+:tip: 2.0
+:time: Lunch</title> cx="164.96857980728947" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.51
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="217.25178047758692" cy="246.66666666666669" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 18.71
+:tip: 4.0
+:time: Lunch</title> cx="217.25178047758692" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 18.71
+:tip: 4.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="157.2266443234185" cy="308.5777777777778" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 12.74
+:tip: 2.01
+:time: Lunch</title> cx="157.2266443234185" cy="308.5777777777778" r="4" drake-tooltip=":total_bill: 12.74
+:tip: 2.01
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="159.8408043569334" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.0
+:tip: 2.0
+:time: Lunch</title> cx="159.8408043569334" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 13.0
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="194.025974025974" cy="293.33333333333337" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.4
+:tip: 2.5
+:time: Lunch</title> cx="194.025974025974" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 16.4
+:tip: 2.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="235.55090071219104" cy="246.66666666666669" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 20.53
+:tip: 4.0
+:time: Lunch</title> cx="235.55090071219104" cy="246.66666666666669" r="4" drake-tooltip=":total_bill: 20.53
+:tip: 4.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="194.72978634268955" cy="270.6222222222222" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.47
+:tip: 3.23
+:time: Lunch</title> cx="194.72978634268955" cy="270.6222222222222" r="4" drake-tooltip=":total_bill: 16.47
+:tip: 3.23
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="296.4809384164223" cy="265.02222222222224" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 26.59
+:tip: 3.41
+:time: Dinner</title> cx="296.4809384164223" cy="265.02222222222224" r="4" drake-tooltip=":total_bill: 26.59
+:tip: 3.41
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="418.542103058232" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 38.73
+:tip: 3.0
+:time: Dinner</title> cx="418.542103058232" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 38.73
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="273.1545873481357" cy="307.9555555555556" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 24.27
+:tip: 2.03
+:time: Dinner</title> cx="273.1545873481357" cy="307.9555555555556" r="4" drake-tooltip=":total_bill: 24.27
+:tip: 2.03
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="157.42773355676582" cy="301.73333333333335" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.76
+:tip: 2.23
+:time: Dinner</title> cx="157.42773355676582" cy="301.73333333333335" r="4" drake-tooltip=":total_bill: 12.76
+:tip: 2.23
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="331.3699204021785" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 30.06
+:tip: 2.0
+:time: Dinner</title> cx="331.3699204021785" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 30.06
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="289.44281524926686" cy="210.57777777777775" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 25.89
+:tip: 5.16
+:time: Dinner</title> cx="289.44281524926686" cy="210.57777777777775" r="4" drake-tooltip=":total_bill: 25.89
+:tip: 5.16
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="515.0649350649351" cy="91.11111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 48.33
+:tip: 9.0
+:time: Dinner</title> cx="515.0649350649351" cy="91.11111111111111" r="4" drake-tooltip=":total_bill: 48.33
+:tip: 9.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="162.55550900712188" cy="293.33333333333337" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.27
+:tip: 2.5
+:time: Dinner</title> cx="162.55550900712188" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 13.27
+:tip: 2.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="312.36698785085883" cy="168.88888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 28.17
+:tip: 6.5
+:time: Dinner</title> cx="312.36698785085883" cy="168.88888888888889" r="4" drake-tooltip=":total_bill: 28.17
+:tip: 6.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="158.8353581901969" cy="336.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.9
+:tip: 1.1
+:time: Dinner</title> cx="158.8353581901969" cy="336.8888888888889" r="4" drake-tooltip=":total_bill: 12.9
+:tip: 1.1
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="312.1658986175115" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 28.15
+:tip: 3.0
+:time: Dinner</title> cx="312.1658986175115" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 28.15
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="145.66401340594888" cy="324.44444444444446" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 11.59
+:tip: 1.5
+:time: Dinner</title> cx="145.66401340594888" cy="324.44444444444446" r="4" drake-tooltip=":total_bill: 11.59
+:tip: 1.5
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="106.95433598659406" cy="326.31111111111113" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 7.74
+:tip: 1.44
+:time: Dinner</title> cx="106.95433598659406" cy="326.31111111111113" r="4" drake-tooltip=":total_bill: 7.74
+:tip: 1.44
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="332.17427733556764" cy="274.97777777777776" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 30.14
+:tip: 3.09
+:time: Dinner</title> cx="332.17427733556764" cy="274.97777777777776" r="4" drake-tooltip=":total_bill: 30.14
+:tip: 3.09
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="151.39505655634687" cy="302.66666666666663" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 12.16
+:tip: 2.2
+:time: Lunch</title> cx="151.39505655634687" cy="302.66666666666663" r="4" drake-tooltip=":total_bill: 12.16
+:tip: 2.2
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="164.06367825722663" cy="262.84444444444443" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.42
+:tip: 3.48
+:time: Lunch</title> cx="164.06367825722663" cy="262.84444444444443" r="4" drake-tooltip=":total_bill: 13.42
+:tip: 3.48
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="115.40008378718056" cy="311.3777777777778" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 8.58
+:tip: 1.92
+:time: Lunch</title> cx="115.40008378718056" cy="311.3777777777778" r="4" drake-tooltip=":total_bill: 8.58
+:tip: 1.92
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="189.80310012568077" cy="277.77777777777777" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 15.98
+:tip: 3.0
+:time: Lunch</title> cx="189.80310012568077" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 15.98
+:tip: 3.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="164.06367825722663" cy="321.9555555555556" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 13.42
+:tip: 1.58
+:time: Lunch</title> cx="164.06367825722663" cy="321.9555555555556" r="4" drake-tooltip=":total_bill: 13.42
+:tip: 1.58
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="192.71889400921657" cy="293.33333333333337" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 16.27
+:tip: 2.5
+:time: Lunch</title> cx="192.71889400921657" cy="293.33333333333337" r="4" drake-tooltip=":total_bill: 16.27
+:tip: 2.5
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="130.58232090490154" cy="308.8888888888889" r="4" stroke="#55a868" fill-opacity="0.7" fill="#55a868"><title>:total_bill: 10.09
+:tip: 2.0
+:time: Lunch</title> cx="130.58232090490154" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 10.09
+:tip: 2.0
+:time: Lunch" stroke="#55a868" fill-opacity="0.7" fill="#55a868"></circle> <circle cx="234.74654377880182" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 20.45
+:tip: 3.0
+:time: Dinner</title> cx="234.74654377880182" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 20.45
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="162.65605362379554" cy="286.4888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 13.28
+:tip: 2.72
+:time: Dinner</title> cx="162.65605362379554" cy="286.4888888888889" r="4" drake-tooltip=":total_bill: 13.28
+:tip: 2.72
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="251.53749476330123" cy="281.5111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 22.12
+:tip: 2.88
+:time: Dinner</title> cx="251.53749476330123" cy="281.5111111111111" r="4" drake-tooltip=":total_bill: 22.12
+:tip: 2.88
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="270.54042731462084" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 24.01
+:tip: 2.0
+:time: Dinner</title> cx="270.54042731462084" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 24.01
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="186.88730624214492" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.69
+:tip: 3.0
+:time: Dinner</title> cx="186.88730624214492" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 15.69
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="145.8651026392962" cy="265.64444444444445" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 11.61
+:tip: 3.39
+:time: Dinner</title> cx="145.8651026392962" cy="265.64444444444445" r="4" drake-tooltip=":total_bill: 11.61
+:tip: 3.39
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="137.41935483870967" cy="325.3777777777778" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.77
+:tip: 1.47
+:time: Dinner</title> cx="137.41935483870967" cy="325.3777777777778" r="4" drake-tooltip=":total_bill: 10.77
+:tip: 1.47
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="185.27859237536657" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 15.53
+:tip: 3.0
+:time: Dinner</title> cx="185.27859237536657" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 15.53
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="130.38123167155425" cy="332.22222222222223" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 10.07
+:tip: 1.25
+:time: Dinner</title> cx="130.38123167155425" cy="332.22222222222223" r="4" drake-tooltip=":total_bill: 10.07
+:tip: 1.25
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="155.8190196899874" cy="340.0" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 12.6
+:tip: 1.0
+:time: Dinner</title> cx="155.8190196899874" cy="340.0" r="4" drake-tooltip=":total_bill: 12.6
+:tip: 1.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="359.2207792207792" cy="334.7111111111111" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 32.83
+:tip: 1.17
+:time: Dinner</title> cx="359.2207792207792" cy="334.7111111111111" r="4" drake-tooltip=":total_bill: 32.83
+:tip: 1.17
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="389.3841642228739" cy="225.82222222222222" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 35.83
+:tip: 4.67
+:time: Dinner</title> cx="389.3841642228739" cy="225.82222222222222" r="4" drake-tooltip=":total_bill: 35.83
+:tip: 4.67
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="321.0138248847926" cy="186.93333333333334" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 29.03
+:tip: 5.92
+:time: Dinner</title> cx="321.0138248847926" cy="186.93333333333334" r="4" drake-tooltip=":total_bill: 29.03
+:tip: 5.92
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="302.4130708001676" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 27.18
+:tip: 2.0
+:time: Dinner</title> cx="302.4130708001676" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 27.18
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="257.06744868035196" cy="308.8888888888889" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 22.67
+:tip: 2.0
+:time: Dinner</title> cx="257.06744868035196" cy="308.8888888888889" r="4" drake-tooltip=":total_bill: 22.67
+:tip: 2.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="208.30330959363215" cy="316.6666666666667" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 17.82
+:tip: 1.75
+:time: Dinner</title> cx="208.30330959363215" cy="316.6666666666667" r="4" drake-tooltip=":total_bill: 17.82
+:tip: 1.75
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <circle cx="217.95559279430248" cy="277.77777777777777" r="4" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"><title>:total_bill: 18.78
+:tip: 3.0
+:time: Dinner</title> cx="217.95559279430248" cy="277.77777777777777" r="4" drake-tooltip=":total_bill: 18.78
+:tip: 3.0
+:time: Dinner" stroke="#4c72b0" fill-opacity="0.7" fill="#4c72b0"></circle> <rect width="100" height="40" x="70" y="70" stroke="#cccccc" fill-opacity="0.9" fill="#ffffff"></rect> <circle cx="80" cy="80" r="5" fill="#4c72b0"></circle> <text fill="#000000" font-size="10px" y="85" x="90"> Dinner</text> <circle cx="80" cy="100" r="5" fill="#55a868"></circle> <text fill="#000000" font-size="10px" y="105" x="90"> Lunch</text> <text font-weight="bold" fill="#000000" font-size="16px" text-anchor="middle" y="30" x="300"> Restaurant Tips</text></svg>

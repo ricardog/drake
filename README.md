@@ -3,7 +3,34 @@ A high performance statistics plotting library for Emacs.
 
 `drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
 
-**Quick Links:** [Theming Guide](docs/THEMING.md) | [Palette Browser](docs/PALETTE_BROWSER_QUICKSTART.md) | [Examples](examples/) | [Documentation](#documentation)
+**Quick Links:** [Gallery](docs/GALLERY.md) | [Theming Guide](docs/THEMING.md) | [Palette Browser](docs/PALETTE_BROWSER_QUICKSTART.md) | [Examples](examples/) | [Documentation](#documentation)
+
+## Visual Showcase
+
+<table>
+<tr>
+<td width="50%">
+<img src="examples/images/iris-scatter.svg" alt="Scatter Plot">
+<p align="center"><em>Scatter plot with color grouping</em></p>
+</td>
+<td width="50%">
+<img src="examples/images/tips-regression.svg" alt="Linear Regression">
+<p align="center"><em>Linear regression with confidence intervals</em></p>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<img src="examples/images/tips-violin.svg" alt="Violin Plot">
+<p align="center"><em>Violin plot with multiple categories</em></p>
+</td>
+<td width="50%">
+<img src="examples/images/iris-dark-theme.svg" alt="Dark Theme">
+<p align="center"><em>Dark theme support</em></p>
+</td>
+</tr>
+</table>
+
+**[View Full Gallery →](docs/GALLERY.md)**
 
 ## Status: Stage 5 (High Performance & Advanced Features)
 - **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
@@ -159,20 +186,20 @@ Palettes can be applied in three ways:
 - ✓ Colorblind-friendly: viridis, magma, plasma, inferno, set2
 - ✗ Avoid: Red-green combinations, rainbow palettes
 
-**Examples:**
-```elisp
-;; Sequential for temperature data
-(drake-plot-scatter :data climate :x :date :y :temp
-                   :hue :temp :palette 'viridis)
+**Palette Comparison:**
 
-;; Categorical for regions
-(drake-plot-bar :data sales :x :quarter :y :revenue
-               :hue :region :palette 'set1)
-
-;; Diverging for changes
-(drake-plot-bar :data changes :x :category :y :change-pct
-               :palette 'rdbu)
-```
+<table>
+<tr>
+<td width="50%">
+<img src="examples/images/iris-palette-viridis.svg" alt="Viridis Palette">
+<p align="center"><em>Viridis (colorblind-friendly)</em></p>
+</td>
+<td width="50%">
+<img src="examples/images/iris-palette-set1.svg" alt="Set1 Palette">
+<p align="center"><em>Set1 (high contrast)</em></p>
+</td>
+</tr>
+</table>
 
 **Learn More:**
 - [Palette Browser Quick Start](docs/PALETTE_BROWSER_QUICKSTART.md) - Get started in 60 seconds
@@ -208,6 +235,19 @@ Drake includes a comprehensive theming system that automatically adapts to your 
 - `seaborn` - Inspired by Python's Seaborn
 - `high-contrast` - Maximum contrast for accessibility
 - `solarized-light` / `solarized-dark` - Solarized color schemes
+
+<table>
+<tr>
+<td width="50%">
+<img src="examples/images/iris-dark-theme.svg" alt="Dark Theme">
+<p align="center"><em>Dark theme</em></p>
+</td>
+<td width="50%">
+<img src="examples/images/iris-minimal-theme.svg" alt="Minimal Theme">
+<p align="center"><em>Minimal theme</em></p>
+</td>
+</tr>
+</table>
 
 **Custom Themes:**
 ```elisp
@@ -420,6 +460,7 @@ The `examples/` directory contains ready-to-run demonstrations:
 
 **Core Documentation:**
 - [README.md](README.md) - This file (getting started, features, API)
+- [Gallery](docs/GALLERY.md) - Visual showcase of all plot types with examples
 - [drake-spec.md](docs/drake-spec.md) - Original specification and design
 - [TODO.md](TODO.md) - Roadmap and future features
 
