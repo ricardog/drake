@@ -10,6 +10,9 @@ drake-rust-module.so
 .eldev/
 .keg/
 
+# Org integration files
+examples/figures/
+
 # Built distribution
 dist/
 

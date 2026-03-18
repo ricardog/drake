@@ -32,6 +32,8 @@ drake/
 
 ## 3. Coding Conventions
 
+Do not use emoji in any files.
+
 ### 3.1 C (Module) Conventions
 
 * **Naming:** Prefix all internal C functions with `drake_` and Lisp-exposed functions with `Fdrake_`.

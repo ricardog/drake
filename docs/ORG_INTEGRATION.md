@@ -397,64 +397,6 @@ Reference other code blocks:
 
 ---
 
-## Implementation Plan
-
-### Phase 1: Minimal Viable Integration (1-2 days)
-
-**Goal:** Basic code execution and file output
-
-1. Create `ob-drake.el` with:
-   - `org-babel-execute:drake`
-   - `:file` and `:results file graphics` support
-   - Basic error handling
-
-2. Register with org-babel:
-   ```elisp
-   (with-eval-after-load 'org
-     (require 'ob-drake))
-   ```
-
-3. Test basic workflow:
-   ```org
-   #+BEGIN_SRC drake :file test.svg
-   (drake-plot-scatter :data iris :x :sepal_length :y :sepal_width)
-   #+END_SRC
-   ```
-
-**Deliverable:** Working code blocks with file output
-
----
-
-### Phase 2: Enhanced Features (2-3 days)
-
-**Goal:** Session support and variable passing
-
-1. Implement `org-babel-drake-initiate-session`
-2. Add `:var` variable passing
-3. Support `:width`, `:height`, `:backend`, `:theme` headers
-4. Add inline display hook
-5. Create org-tempo templates
-
-**Deliverable:** Multi-block workflows with persistent data
-
----
-
-### Phase 3: Export & Polish (2-3 days)
-
-**Goal:** Professional export and convenience features
-
-1. HTML export with inline SVG
-2. LaTeX export with PDF conversion
-3. Markdown export
-4. Custom link type (`drake:`)
-5. Cache support
-6. Interactive update command
-7. Comprehensive documentation
-
-**Deliverable:** Production-ready org integration
-
----
-
 ## Example Workflows
 
 ### Research Notebook
@@ -661,21 +603,6 @@ Drake brings statistical plotting to Emacs.
 
 ---
 
-## Success Criteria
-
-Integration is complete when users can:
-
-1. ✅ Execute drake code in org-babel blocks
-2. ✅ See plots inline in org buffer
-3. ✅ Export documents with plots (HTML, LaTeX, Markdown)
-4. ✅ Use sessions for persistent data across blocks
-5. ✅ Pass variables between blocks
-6. ✅ Customize plots via header arguments
-7. ✅ Update plots interactively
-8. ✅ Cache results for unchanged blocks
-
----
-
 ## Comparison with Other Languages
 
 ### Python (ob-python)
@@ -734,11 +661,3 @@ plot(iris$Sepal.Length, iris$Sepal.Width)
 ## Conclusion
 
 Org-mode integration is essential for Drake adoption. The implementation is straightforward—about 400-500 lines in `ob-drake.el`—and follows established patterns from `ob-python.el` and `ob-R.el`.
-
-**Recommended Timeline:**
-- Phase 1 (Minimal): 1-2 days
-- Phase 2 (Enhanced): 2-3 days
-- Phase 3 (Polish): 2-3 days
-- **Total: 5-8 days for complete integration**
-
-**Impact:** Unlocks Drake for 90% of Emacs data analysis workflows. Enables notebooks, reports, presentations, and literate programming—the core use cases for statistical plotting in Emacs.
