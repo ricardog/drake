@@ -121,9 +121,12 @@
                             :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size font-size :fill text-color)))
       ;; Categorical Y
       (let* ((n (length y-range))
+             (padding 0.1)  ;; 10% padding on each side
              (i 0))
         (dolist (val y-range)
-          (let* ((ratio (if (> n 1) (/ (float i) (1- n)) 0.5))
+          (let* ((ratio (if (> n 1)
+                            (+ padding (* (/ (float i) (1- n)) (- 1.0 (* 2 padding))))
+                          0.5))
                  (py (+ y (- height (* ratio height)))))
             (svg-line svg x py (+ x width) py :stroke grid-color :stroke-width grid-width :stroke-dasharray grid-dasharray)
             (svg-text svg (format "%s" val) :x (- x 10) :y (+ py 4) :text-anchor "end" :font-size font-size :fill text-color)
@@ -146,9 +149,12 @@
                             :x px :y (+ y height 20) :text-anchor "middle" :font-size font-size :fill text-color)))
       ;; Categorical X
       (let* ((n (length x-range))
+             (padding 0.1)  ;; 10% padding on each side
              (i 0))
         (dolist (val x-range)
-          (let* ((ratio (if (> n 1) (/ (float i) (1- n)) 0.5))
+          (let* ((ratio (if (> n 1)
+                            (+ padding (* (/ (float i) (1- n)) (- 1.0 (* 2 padding))))
+                          0.5))
                  (px (+ x (* ratio width))))
             (svg-line svg px y px (+ y height) :stroke grid-color :stroke-width grid-width :stroke-dasharray grid-dasharray)
             (svg-text svg (format "%s" val) :x px :y (+ y height 20) :text-anchor "middle" :font-size font-size :fill text-color)

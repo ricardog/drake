@@ -1259,9 +1259,14 @@ Each element should be a plist with :min and :max keys, and optionally :kde."
    (t ;; categorical
     (let* ((n (length scale))
            (map (make-hash-table :test 'equal))
+           (padding 0.1)  ;; 10% padding on each side
            (i 0))
       (dolist (val scale)
-        (puthash val (if (> n 1) (/ (float i) (1- n)) 0.5) map)
+        (puthash val
+                 (if (> n 1)
+                     (+ padding (* (/ (float i) (1- n)) (- 1.0 (* 2 padding))))
+                   0.5)
+                 map)
         (setq i (1+ i)))
       (vconcat (mapcar (lambda (val) (gethash val map 0.0)) vec))))))
 
