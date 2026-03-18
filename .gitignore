@@ -22,3 +22,6 @@ build/
 # Undo-tree save-files
 *.~undo-tree
 /.agent-shell/
+
+# Agent configuration
+.claude
