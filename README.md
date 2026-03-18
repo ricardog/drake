@@ -50,7 +50,7 @@ DuckDB and SQLite data directly in Emacs.
 
 ### Requirements
 
-Drake requires Emacs 28 or newer. By default it uses the build-in
+Drake requires Emacs 28 or newer. By default it uses the built-in
 `svg.el` to generate the output and no additional packages are required.
 
 #### Optional
@@ -59,9 +59,58 @@ Drake requires Emacs 28 or newer. By default it uses the build-in
 - **gnuplot**: Faster (and better looking) charts.
 - **Rust**: Use the Rust backend for higher performance.
 
-You can install drake from GitHub:
+### Installation Methods
 
-<Add installation instructions using use-package from github>.
+Drake can be installed using various Emacs package managers:
+
+#### straight.el
+
+```elisp
+(use-package drake
+  :straight (drake :type git :host github :repo "ricardog/drake")
+  :custom
+  (drake-default-backend 'svg))
+```
+
+#### Quelpa
+
+```elisp
+(use-package drake
+  :quelpa (drake :fetcher github :repo "ricardog/drake")
+  :custom
+  (drake-default-backend 'svg))
+```
+
+#### elpaca
+
+```elisp
+(use-package drake
+  :elpaca (drake :host github :repo "ricardog/drake")
+  :custom
+  (drake-default-backend 'svg))
+```
+
+#### Manual Installation
+
+Clone the repository and add it to your `load-path`:
+
+```bash
+git clone https://github.com/ricardog/drake.git ~/.emacs.d/drake
+```
+
+```elisp
+(add-to-list 'load-path "~/.emacs.d/drake")
+(require 'drake)
+(require 'drake-svg)  ; Load default backend
+
+;; Optional: Load additional backends
+(require 'drake-gnuplot)
+(require 'drake-rust)
+
+;; Optional: Enable org-babel integration
+(with-eval-after-load 'org
+  (require 'ob-drake))
+```
 
 ---
 
