@@ -101,7 +101,7 @@ M-x drake-palette-browser
 (drake-palette-preview 'viridis)
 
 ;; Fetch additional palettes
-M-x drake-fetch-palettes-improved
+M-x drake-fetch-palettes
 ```
 
 ### Built-in Palettes
@@ -134,7 +134,7 @@ Drake includes 13 built-in palettes organized by type:
 Download 100+ additional professional palettes from ColorBrewer:
 
 ```elisp
-M-x drake-fetch-palettes-improved
+M-x drake-fetch-palettes
 ```
 
 Includes sequential (Blues, Greens, Oranges, etc.), diverging (BrBG, PiYG, RdYlGn, etc.), and qualitative (Accent, Pastel1, Set3, etc.) palettes. All palettes are cached locally at `~/.emacs.d/drake/palettes-cache.el` for offline use.

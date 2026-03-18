@@ -21,7 +21,8 @@
 (autoload 'drake-palette-browser "drake-palette-browser" "Open palette browser" t)
 (autoload 'drake-palette-preview "drake-palette-browser" "Preview a palette" t)
 (autoload 'drake-palette-browser-quick-select "drake-palette-browser" "Quick palette selection" t)
-(autoload 'drake-fetch-palettes-improved "drake-palette-browser" "Fetch palettes with better error handling" t)
+;;;###autoload
+(autoload 'drake-fetch-palettes "drake-palette-browser" "Fetch and cache additional palettes from ColorBrewer" t)
 
 ;; Optional org-babel support (loaded on demand)
 (autoload 'org-babel-execute:drake "ob-drake" "Execute Drake code in org-babel" nil)
@@ -87,49 +88,6 @@ Valid options are 'scott and 'silverman."
   "Register a new palette NAME with COLORS (list of hex strings)."
   (push (cons name colors) drake--user-palettes))
 
-(defun drake-fetch-palettes ()
-  "Fetch and cache additional palettes from `drake-palette-url`.
-This is a simple synchronous version. For better error handling and
-async fetching, use `drake-fetch-palettes-improved' instead."
-  (interactive)
-  (if (fboundp 'drake-fetch-palettes-improved)
-      (drake-fetch-palettes-improved)
-    (condition-case err
-        (progn
-          (message "Fetching additional palettes from %s..." drake-palette-url)
-          (let ((url-request-method "GET"))
-            (with-current-buffer (url-retrieve-synchronously drake-palette-url t nil 30)
-              (goto-char (point-min))
-              (unless (re-search-forward "^$" nil t)
-                (error "Invalid response from server"))
-              (let* ((json-object-type 'alist)
-                     (raw-data (json-read))
-                     (processed nil))
-                (dolist (entry raw-data)
-                  (let* ((name (symbol-name (car entry)))
-                         (data (cdr entry))
-                         ;; Get the largest available class count (k)
-                         (max-k (apply #'max (mapcar (lambda (k-entry)
-                                                       (if (string-match "^[0-9]+$" (symbol-name (car k-entry)))
-                                                           (string-to-number (symbol-name (car k-entry)))
-                                                         0))
-                                                     data)))
-                         (colors (cdr (assoc (intern (number-to-string max-k)) data))))
-                    (when (vectorp colors)
-                      (push (cons (intern (downcase name)) (append colors nil)) processed))))
-                (setq drake--palette-cache processed)
-                ;; Simple persistence in ~/.emacs.d/drake/
-                (let ((cache-dir (expand-file-name "drake" user-emacs-directory)))
-                  (unless (file-exists-p cache-dir) (make-directory cache-dir t))
-                  (with-temp-file (expand-file-name "palettes-cache.el" cache-dir)
-                    (insert ";;; Generated drake palettes cache\n")
-                    (insert (format "(setq drake--palette-cache '%S)" processed))))
-                (message "Successfully loaded %d additional palettes." (length processed))))))
-      (error
-       (message "Failed to fetch palettes: %s" (error-message-string err))
-       (message "Try: M-x drake-fetch-palettes-improved for better error handling")
-       nil))))
-
 (defun drake--load-cache-if-needed ()
   "Load palettes from disk cache if not already loaded."
   (unless drake--palette-cache
@@ -137,27 +95,49 @@ async fetching, use `drake-fetch-palettes-improved' instead."
       (when (file-exists-p cache-file)
         (load cache-file t t)))))
 
+(defun drake--normalize-color (color)
+  "Convert COLOR from rgb(r,g,b) format to hex #rrggbb format.
+If COLOR is already in hex format, return it unchanged."
+  (if (and (stringp color)
+           (string-match "^rgb(\\([0-9]+\\),\\([0-9]+\\),\\([0-9]+\\))" color))
+      (let ((r (string-to-number (match-string 1 color)))
+            (g (string-to-number (match-string 2 color)))
+            (b (string-to-number (match-string 3 color))))
+        (format "#%02x%02x%02x" r g b))
+    ;; Already hex or other format, return as is
+    color))
+
+(defun drake--normalize-colors (colors)
+  "Normalize COLORS list, converting RGB format to hex."
+  (mapcar #'drake--normalize-color colors))
+
 (defun drake--get-palette (name)
   "Return color list for palette NAME.
-If NAME is nil, uses the palette specified by the current theme."
-  (cond
-   ((and name (listp name)) name) ;; Direct list of colors
-   ((symbolp name)
-    (drake--load-cache-if-needed)
-    (or (and name (cdr (assoc name drake--user-palettes)))
-        (and name (cdr (assoc name drake--bundled-palettes)))
-        (and name (cdr (assoc name drake--palette-cache)))
-        ;; Fall back to theme palette
-        (let ((theme-palette (drake-theme-get :palette)))
-          (if theme-palette
-              (drake--get-palette theme-palette)
-            (cdr (assoc 'default drake--bundled-palettes))))))
-   (t
-    ;; No name provided, use theme palette or default
-    (let ((theme-palette (drake-theme-get :palette)))
-      (if theme-palette
-          (drake--get-palette theme-palette)
-        (cdr (assoc 'default drake--bundled-palettes)))))))
+If NAME is nil, uses the palette specified by the current theme.
+All colors are normalized to hex format."
+  (let ((colors
+         (cond
+          ((and name (listp name)) name) ;; Direct list of colors
+          ((symbolp name)
+           (drake--load-cache-if-needed)
+           (or (and name (cdr (assoc name drake--user-palettes)))
+               (and name (cdr (assoc name drake--bundled-palettes)))
+               (and name (cdr (assoc name drake--palette-cache)))
+               ;; Fall back to theme palette
+               (let ((theme-palette (drake-theme-get :palette)))
+                 (if theme-palette
+                     (drake--get-palette theme-palette)
+                   (cdr (assoc 'default drake--bundled-palettes))))))
+          (t
+           ;; No name provided, use theme palette or default
+           (let ((theme-palette (drake-theme-get :palette)))
+             (if theme-palette
+                 (drake--get-palette theme-palette)
+               (cdr (assoc 'default drake--bundled-palettes))))))))
+    ;; Normalize all colors to hex format
+    (if (listp colors)
+        (drake--normalize-colors colors)
+      colors)))
 
 (defun drake--color-manager (unique-values palette-name)
   "Return an alist mapping values to colors based on PALETTE-NAME."

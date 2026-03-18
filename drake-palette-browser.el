@@ -53,9 +53,11 @@ CALLBACK is called with (success-p num-palettes error-message)."
            (error
             (funcall callback nil 0 (format "Parse error: %s" (error-message-string err))))))))))
 
-(defun drake-fetch-palettes-improved ()
-  "Fetch and cache additional palettes with improved error handling.
-This function provides better feedback and handles errors gracefully."
+;;;###autoload
+(defun drake-fetch-palettes ()
+  "Fetch and cache additional palettes from ColorBrewer.
+Downloads palette definitions asynchronously and provides feedback on success or failure.
+Cached palettes are saved to ~/.emacs.d/drake/ for future use."
   (interactive)
   (if (not (require 'url nil t))
       (message "Error: url library not available")
@@ -74,6 +76,31 @@ This function provides better feedback and handles errors gracefully."
              (message "Cache directory: %s" cache-dir)
              (when (y-or-n-p "Open cache directory? ")
                (dired cache-dir)))))))))
+
+;;; Color Conversion Utilities
+
+(defun drake-palette-browser--rgb-to-hex (color)
+  "Convert COLOR from rgb(r,g,b) format to hex #rrggbb format.
+If COLOR is already in hex format, return it unchanged."
+  (if (string-match "^rgb(\\([0-9]+\\),\\([0-9]+\\),\\([0-9]+\\))" color)
+      (let ((r (string-to-number (match-string 1 color)))
+            (g (string-to-number (match-string 2 color)))
+            (b (string-to-number (match-string 3 color))))
+        (format "#%02x%02x%02x" r g b))
+    ;; Already hex or other format, return as is
+    color))
+
+(defun drake-palette-browser--normalize-colors (colors)
+  "Normalize COLORS list, converting RGB format to hex."
+  (mapcar #'drake-palette-browser--rgb-to-hex colors))
+
+(defun drake-palette-browser--render-swatch (color)
+  "Render a color swatch for COLOR that works across platforms.
+Returns a propertized string with visible width."
+  (let ((hex-color (drake-palette-browser--rgb-to-hex color)))
+    ;; Use actual space characters with background color
+    ;; This works more reliably than display properties
+    (propertize "    " 'face `(:background ,hex-color))))
 
 ;;; Palette Browser UI
 
@@ -159,17 +186,14 @@ This function provides better feedback and handles errors gracefully."
                       (lambda (a b) (string< (symbol-name (car a))
                                             (symbol-name (car b))))))
     (let ((name (car entry))
-          (colors (cdr entry)))
+          (colors (drake-palette-browser--normalize-colors (cdr entry))))
       (insert (propertize (format "  %-20s " (symbol-name name))
                          'drake-palette-name name
                          'face '(:weight bold)))
 
-      ;; Display color swatches
+      ;; Display color swatches using consistent rendering
       (dolist (color colors)
-        (insert (propertize "  "
-                           'face `(:background ,color)
-                           'display '(space :width (3))))
-        (insert (propertize " " 'face 'default)))
+        (insert (drake-palette-browser--render-swatch color)))
 
       ;; Add color count
       (insert (propertize (format " (%d colors)" (length colors))
@@ -201,7 +225,7 @@ This function provides better feedback and handles errors gracefully."
 (defun drake-palette-browser-fetch ()
   "Fetch additional palettes from the web."
   (interactive)
-  (drake-fetch-palettes-improved))
+  (drake-fetch-palettes))
 
 (defun drake-palette-browser-search ()
   "Search for palettes by name."
@@ -309,13 +333,13 @@ Examples:
                            'face '(:height 1.3 :weight bold)))
         (insert (make-string 60 ?=) "\n\n")
 
-        ;; Large color swatches
+        ;; Large color swatches with better cross-platform rendering
         (insert (propertize "Color Swatches:\n" 'face 'bold))
         (dotimes (i n-colors)
           (let ((color (nth i colors)))
-            (insert (propertize (format " %d " (1+ i))
-                               'face `(:background ,color :foreground ,(drake-palette-preview--contrast-color color))
-                               'display '(space :width (6) :height (3))))
+            ;; Use actual characters instead of display property for better compatibility
+            (insert (propertize (format "  %d  " (1+ i))
+                               'face `(:background ,color :foreground ,(drake-palette-preview--contrast-color color))))
             (insert " ")))
         (insert "\n\n")
 

@@ -56,7 +56,7 @@ Select with completion, see instant preview, apply in one click.
 ### Fetch ColorBrewer
 
 ```elisp
-M-x drake-fetch-palettes-improved
+M-x drake-fetch-palettes
 ```
 
 Downloads 100+ professional palettes. Cached locally for offline use.
@@ -128,7 +128,7 @@ Downloads 100+ professional palettes. Cached locally for offline use.
 
 ### Workflow 4: Download and Browse ColorBrewer
 
-1. `M-x drake-fetch-palettes-improved`
+1. `M-x drake-fetch-palettes`
 2. Wait for download (30 seconds)
 3. `M-x drake-palette-browser`
 4. See 100+ new palettes under "Cached"

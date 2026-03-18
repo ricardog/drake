@@ -201,7 +201,7 @@
   (message "and are optimized for data visualization.\n")
 
   (when (y-or-n-p "Fetch ColorBrewer palettes now? (requires internet) ")
-    (drake-fetch-palettes-improved)
+    (drake-fetch-palettes)
     (message "\nOnce fetched, palettes are cached locally.")
     (message "Use M-x drake-palette-browser to explore them!")))
 
@@ -243,7 +243,7 @@
   (message "  M-x drake-palette-browser          - Browse all palettes")
   (message "  M-x drake-palette-preview          - Preview a palette")
   (message "  M-x drake-palette-browser-quick-select  - Quick selection")
-  (message "  M-x drake-fetch-palettes-improved  - Download ColorBrewer"))
+  (message "  M-x drake-fetch-palettes  - Download ColorBrewer"))
 
 ;;; Interactive Tutorial
 
@@ -309,7 +309,7 @@
 
     (insert "** Fetch ColorBrewer\n")
     (insert "#+BEGIN_SRC elisp\n")
-    (insert "(drake-fetch-palettes-improved)\n")
+    (insert "(drake-fetch-palettes)\n")
     (insert "#+END_SRC\n\n")
 
     (insert "* Tips\n\n")

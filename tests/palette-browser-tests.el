@@ -156,5 +156,72 @@
     (dolist (entry color-map)
       (should (string-match "^#[0-9a-fA-F]\\{6\\}$" (cdr entry))))))
 
+;; Issue #1: Test that cached palettes are displayed
+(ert-deftest drake-palette-cached-palettes-display-test ()
+  "Test that cached palettes are visible in the browser."
+  ;; Set up a mock cache with RGB format colors (like ColorBrewer)
+  (let ((drake--palette-cache '((testrgb . ("rgb(255,0,0)" "rgb(0,255,0)" "rgb(0,0,255)")))))
+    (drake-palette-browser)
+    (should (get-buffer "*Drake Palette Browser*"))
+    (with-current-buffer "*Drake Palette Browser*"
+      ;; Should display cached section when cache exists
+      (should (string-match "Cached Palettes" (buffer-string)))
+      ;; Should show the palette name
+      (should (string-match "testrgb" (buffer-string))))
+    (kill-buffer "*Drake Palette Browser*")))
+
+(ert-deftest drake-palette-rgb-to-hex-conversion-test ()
+  "Test that RGB colors are properly converted to hex for display."
+  (should (equal (drake-palette-browser--rgb-to-hex "rgb(255,0,0)") "#ff0000"))
+  (should (equal (drake-palette-browser--rgb-to-hex "rgb(0,255,0)") "#00ff00"))
+  (should (equal (drake-palette-browser--rgb-to-hex "rgb(0,0,255)") "#0000ff"))
+  (should (equal (drake-palette-browser--rgb-to-hex "rgb(128,128,128)") "#808080"))
+  (should (equal (drake-palette-browser--rgb-to-hex "rgb(255,255,255)") "#ffffff"))
+  (should (equal (drake-palette-browser--rgb-to-hex "rgb(0,0,0)") "#000000"))
+  ;; Hex colors should pass through unchanged
+  (should (equal (drake-palette-browser--rgb-to-hex "#abcdef") "#abcdef")))
+
+(ert-deftest drake-palette-fetched-colors-are-hex-test ()
+  "Test that fetched palette colors are normalized to hex format."
+  ;; Set up cache with RGB format
+  (let ((drake--palette-cache '((blues . ("rgb(247,251,255)" "rgb(222,235,247)"))
+                                 (reds . ("#ff0000" "#ee0000")))))
+    (drake--load-cache-if-needed)
+    ;; Get palette - should convert RGB to hex
+    (let ((blues-colors (drake--get-palette 'blues))
+          (reds-colors (drake--get-palette 'reds)))
+      ;; All colors should be valid hex
+      (dolist (color blues-colors)
+        (should (string-match "^#[0-9a-fA-F]\\{6\\}$" color)))
+      (dolist (color reds-colors)
+        (should (string-match "^#[0-9a-fA-F]\\{6\\}$" color))))))
+
+;; Issue #2: Test that color swatches have visible width
+(ert-deftest drake-palette-swatch-width-test ()
+  "Test that color swatches are rendered with visible width."
+  (drake-palette-browser)
+  (with-current-buffer "*Drake Palette Browser*"
+    ;; Look for color swatch display
+    (goto-char (point-min))
+    ;; Search for palette name line
+    (should (search-forward "viridis" nil t))
+    ;; Check that swatches use visible characters (not just display property)
+    ;; The implementation should use multiple characters like "█" or "  " per swatch
+    (let ((line-start (line-beginning-position))
+          (line-end (line-end-position)))
+      (goto-char line-start)
+      ;; Should find swatch characters on the palette line
+      (should (re-search-forward "[█▓▒░]\\|  " line-end t))))
+  (kill-buffer "*Drake Palette Browser*"))
+
+(ert-deftest drake-palette-swatch-rendering-consistency-test ()
+  "Test that swatch rendering works across platforms."
+  ;; Test the swatch rendering function directly
+  (let ((swatch (drake-palette-browser--render-swatch "#ff0000")))
+    (should (stringp swatch))
+    (should (> (length swatch) 0))
+    ;; Swatch should have a background color face property
+    (should (get-text-property 0 'face swatch))))
+
 (provide 'palette-browser-tests)
 ;;; palette-browser-tests.el ends here
