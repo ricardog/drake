@@ -370,8 +370,11 @@ ARGS is a plist containing:
          (x-type (drake--detect-type x-final))
          (y-type (drake--detect-type y-final))
          ;; 4. Calculate scales
+         ;; For box/violin plots, y-scale should cover full data range, not just medians
          (x-scale (drake--make-scale x-final x-type))
-         (y-scale (drake--make-scale y-final y-type))
+         (y-scale (if (or (eq type 'box) (eq type 'violin))
+                      (drake--make-scale-from-stats extra-data)
+                    (drake--make-scale y-final y-type)))
          ;; 5. Scale data to 0.0-1.0
          (x-scaled (drake--apply-scale x-final x-scale (plist-get args :logx)))
          (y-scaled (drake--apply-scale y-final y-scale (plist-get args :logy)))
@@ -765,6 +768,21 @@ Uses Rust implementation if available, falls back to Elisp."
    ((and (listp val) (>= (length val) 2)) (float-time val))
    ((stringp val) (float-time (date-to-time val)))
    (t 0.0)))
+
+(defun drake--make-scale-from-stats (extra-vec)
+  "Create y-scale from box/violin plot statistics in EXTRA-VEC.
+Each element should be a plist with :min and :max keys."
+  (let ((all-mins nil)
+        (all-maxs nil))
+    (cl-loop for i from 0 below (length extra-vec) do
+             (let ((stats (aref extra-vec i)))
+               (when (plist-get stats :min)
+                 (push (plist-get stats :min) all-mins))
+               (when (plist-get stats :max)
+                 (push (plist-get stats :max) all-maxs))))
+    (if (and all-mins all-maxs)
+        (cons (apply #'min all-mins) (apply #'max all-maxs))
+      (cons 0 1)))) ;; Fallback
 
 (defun drake--make-scale (vec type)
   "Create scale for VEC based on TYPE."
