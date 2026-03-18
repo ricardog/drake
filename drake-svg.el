@@ -323,7 +323,9 @@ Handles self-closing tags by converting them to open/close tags with the title i
 
 (defun drake-svg--draw-bar (svg x y width height x-scaled y-scaled hue-colors tooltips)
   (let* ((n (length x-scaled))
-         (bar-width (/ (* 0.8 width) n)))
+         ;; Account for 10% padding on each side (0.8 effective width) when calculating bar width
+         ;; Cap bar width at 2 * padding * width to ensure bars don't extend past axes
+         (bar-width (min (/ (* 0.64 width) n) (* 0.2 width))))
     (cl-loop for i from 0 below n do
              (let* ((px (+ x (* (aref x-scaled i) width) (- (/ bar-width 2))))
                     (h (* (aref y-scaled i) height))
@@ -420,8 +422,12 @@ Handles self-closing tags by converting them to open/close tags with the title i
   (let* ((spec (drake-plot-spec plot))
          (legend-pos (plist-get spec :legend))
          (data (drake-plot-data-internal plot))
+         (scales (drake-plot-scales plot))
          (x-scaled (plist-get data :x))
          (y-scaled (plist-get data :y))
+         (x-type (plist-get scales :x-type))
+         (y-type (plist-get scales :y-type))
+         (plot-type (plist-get spec :type))
          (n-items (length hue-map))
          (l-width 100)
          (l-height (* n-items 20))
@@ -436,7 +442,14 @@ Handles self-closing tags by converting them to open/close tags with the title i
                                      ((and (> xv 0.5) (> yv 0.5)) (cl-incf tr))
                                      ((and (<= xv 0.5) (> yv 0.5)) (cl-incf tl))
                                      ((and (> xv 0.5) (<= yv 0.5)) (cl-incf br))
-                                     (t (cl-incf bl)))))
+                                     (t (cl-incf bl)))
+                                    ;; For bar charts with categorical X, bars extend from bottom upward
+                                    ;; Penalize bottom corners based on bar height to avoid overlap
+                                    (when (and (eq x-type 'categorical) (eq y-type 'numeric)
+                                               (memq plot-type '(bar)))
+                                      (if (<= xv 0.5)
+                                          (cl-incf bl (* yv 2))  ; Tall bars on left side penalize bottom-left
+                                        (cl-incf br (* yv 2))))))
                          (let ((counts (list (cons 'top-right tr) (cons 'top-left tl)
                                              (cons 'bottom-right br) (cons 'bottom-left bl))))
                            (car (car (sort counts (lambda (a b) (< (cdr a) (cdr b))))))))))
