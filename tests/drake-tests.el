@@ -2,6 +2,24 @@
 
 (require 'test-helper)
 
+(ert-deftest drake-default-backend-loaded-test ()
+  "Test that requiring drake loads the default backend.
+The backend loaded depends on the value of drake-default-backend."
+  ;; After requiring drake, the default backend should be loaded
+  (pcase drake-default-backend
+    ('svg
+     (should (featurep 'drake-svg))
+     (should (fboundp 'drake-svg-render)))
+    ('gnuplot
+     (should (featurep 'drake-gnuplot))
+     (should (fboundp 'drake-gnuplot-render)))
+    ('rust
+     (should (featurep 'drake-rust))
+     (should (fboundp 'drake-rust-render)))
+    (_
+     ;; Unknown backend should fall back to svg
+     (should (featurep 'drake-svg)))))
+
 (ert-deftest drake--ensure-vector-test ()
   (should (equal (drake--ensure-vector [1 2 3]) [1 2 3]))
   (should (equal (drake--ensure-vector '(1 2 3)) [1 2 3]))

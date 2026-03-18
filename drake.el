@@ -998,4 +998,13 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
         (display-buffer buf)))))
 
 (provide 'drake)
+
+;; Load default backend after providing drake to avoid circular dependency
+;; Respects user's drake-default-backend setting (e.g., via use-package :custom)
+(pcase drake-default-backend
+  ('svg (require 'drake-svg))
+  ('gnuplot (require 'drake-gnuplot))
+  ('rust (require 'drake-rust))
+  (_ (require 'drake-svg))) ;; Fallback to svg if unknown backend
+
 ;;; drake.el ends here
