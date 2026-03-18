@@ -59,7 +59,7 @@ Select with completion, see instant preview, apply in one click.
 M-x drake-fetch-palettes
 ```
 
-Downloads 100+ professional palettes. Cached locally for offline use.
+Downloads 35 professional palettes from ColorBrewer. Cached locally for offline use.
 
 ## Usage Examples
 
@@ -131,7 +131,7 @@ Downloads 100+ professional palettes. Cached locally for offline use.
 1. `M-x drake-fetch-palettes`
 2. Wait for download (30 seconds)
 3. `M-x drake-palette-browser`
-4. See 100+ new palettes under "Cached"
+4. See 35 new palettes under "Cached"
 5. Explore sequential, diverging, and qualitative palettes
 
 ## Palette Types Cheat Sheet

@@ -299,7 +299,7 @@ Palette Types:
   User        Custom palettes registered via drake-register-palette
 
 Tips:
-  - Use 'f' to download 100+ additional ColorBrewer palettes
+  - Use 'f' to download 35 additional ColorBrewer palettes
   - Palettes are cached locally in ~/.emacs.d/drake/
   - Apply a palette to set it as default for current theme
   - Use :palette argument in plots to override theme default

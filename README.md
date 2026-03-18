@@ -106,7 +106,7 @@ M-x drake-fetch-palettes
 
 ### Built-in Palettes
 
-Drake includes 13 built-in palettes organized by type:
+Drake includes 12 built-in palettes organized by type:
 
 **Sequential** (for ordered data - low to high values):
 - `viridis` - Perceptually uniform, colorblind-friendly (default)
@@ -131,7 +131,7 @@ Drake includes 13 built-in palettes organized by type:
 
 ### ColorBrewer Integration
 
-Download 100+ additional professional palettes from ColorBrewer:
+Download 35 additional professional palettes from ColorBrewer:
 
 ```elisp
 M-x drake-fetch-palettes

@@ -192,7 +192,7 @@
   "Demonstrate fetching ColorBrewer palettes."
   (interactive)
   (message "\n=== ColorBrewer Palette Demo ===\n")
-  (message "Drake can fetch 100+ additional palettes from ColorBrewer.")
+  (message "Drake can fetch 35 additional palettes from ColorBrewer.")
   (message "These include:")
   (message "  - Sequential: Blues, Greens, Oranges, etc.")
   (message "  - Diverging: RdBu, RdYlGn, PuOr, etc.")
@@ -256,9 +256,9 @@
     (insert "#+TITLE: Drake Palette System Tutorial\n\n")
     (insert "* Overview\n\n")
     (insert "Drake includes a comprehensive palette management system with:\n")
-    (insert "- 13 built-in palettes\n")
+    (insert "- 12 built-in palettes\n")
     (insert "- Interactive browser with visual previews\n")
-    (insert "- ColorBrewer integration (100+ additional palettes)\n")
+    (insert "- ColorBrewer integration (35 additional palettes)\n")
     (insert "- Custom palette creation and sharing\n\n")
 
     (insert "* Quick Start\n\n")
