@@ -234,8 +234,17 @@ Handles self-closing tags by converting them to open/close tags with the title i
                           (py-down (+ y (- height (* (/ (- (- yv ci-width) y-min) y-span) height)))))
                      (push (list px py-up) ci-upper)
                      (push (list px py-down) ci-lower)))
-          (let ((points (append (nreverse ci-upper) ci-lower)))
-            (svg-polyline svg points :fill color :fill-opacity 0.15 :stroke "none")))
+          (let* ((points (append (nreverse ci-upper) ci-lower))
+                 ;; Format points as "x1,y1 x2,y2 x3,y3 ..." for SVG
+                 (points-str (mapconcat (lambda (p) (format "%s,%s" (car p) (cadr p)))
+                                        points " ")))
+            (svg--append
+             svg
+             (dom-node 'polyline
+                       `((points . ,points-str)
+                         (fill . ,color)
+                         (fill-opacity . "0.15")
+                         (stroke . "none"))))))
 
         ;; 2. Draw Regression Line
         (let* ((y-at-min (+ (* m x-min) b))
@@ -379,9 +388,20 @@ Handles self-closing tags by converting them to open/close tags with the title i
                         (w (if (> max-density 0) (* (/ violin-width 2.0) (/ density max-density)) 0)))
                    (push (list (- px w) py) points-left)
                    (push (list (+ px w) py) points-right)))
-               (let ((all-points (append (nreverse points-left) points-right)))
-                 (svg-polyline svg all-points
-                               :fill color :fill-opacity 0.4 :stroke color :stroke-width 1 :drake-tooltip tooltip))))))
+               (let* ((all-points (append (nreverse points-left) points-right))
+                      ;; Format points as "x1,y1 x2,y2 x3,y3 ..." for SVG
+                      (points-str (mapconcat (lambda (p) (format "%s,%s" (car p) (cadr p)))
+                                             all-points " ")))
+                 ;; Manually append polyline node to SVG
+                 (svg--append
+                  svg
+                  (dom-node 'polyline
+                            `((points . ,points-str)
+                              (stroke . ,color)
+                              (fill . ,color)
+                              (fill-opacity . "0.4")
+                              (stroke-width . "1")
+                              (drake-tooltip . ,tooltip)))))))))
 
 (defun drake-svg--draw-legend (svg width height margin hue-map plot)
   "Draw legend for HUE-MAP on SVG. PLOT is used for smart placement."
