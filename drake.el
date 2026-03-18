@@ -371,7 +371,9 @@ ARGS is a plist containing:
          (y-type (drake--detect-type y-final))
          ;; 4. Calculate scales
          ;; For box/violin plots, y-scale should cover full data range, not just medians
-         (x-scale (drake--make-scale x-final x-type))
+         (x-scale (if (and (eq x-type 'categorical) (plist-get args :order))
+                      (plist-get args :order)
+                    (drake--make-scale x-final x-type)))
          (y-scale (if (or (eq type 'box) (eq type 'violin))
                       (drake--make-scale-from-stats extra-data)
                     (drake--make-scale y-final y-type)))
@@ -379,7 +381,7 @@ ARGS is a plist containing:
          (x-scaled (drake--apply-scale x-final x-scale (plist-get args :logx)))
          (y-scaled (drake--apply-scale y-final y-scale (plist-get args :logy)))
          ;; 6. Handle Hue
-         (hue-info (when hue-final (drake--process-hue hue-final (plist-get args :palette))))
+         (hue-info (when hue-final (drake--process-hue hue-final (plist-get args :palette) (plist-get args :hue-order))))
 
          ;; 7. Prepare Tooltips
          (final-tooltips (or tooltip-vec
@@ -425,9 +427,9 @@ See `drake-plot-scatter' for ARGS."
    ((eq type 'hist)
     (drake--transform-hist x-vec hue-vec (or (plist-get args :bins) 10)))
    ((eq type 'box)
-    (drake--transform-stats x-vec y-vec hue-vec))
+    (drake--transform-stats x-vec y-vec hue-vec (plist-get args :order) (plist-get args :hue-order)))
    ((eq type 'violin)
-    (drake--transform-stats x-vec y-vec hue-vec))
+    (drake--transform-stats x-vec y-vec hue-vec (plist-get args :order) (plist-get args :hue-order)))
    ((eq type 'lm)
     (drake--transform-lm x-vec y-vec hue-vec))
    ((eq type 'smooth)
@@ -696,37 +698,47 @@ Uses Rust implementation if available, falls back to Elisp."
             :q3 (drake--quantile sorted 0.75)
             :max (car (last sorted))))))
 
-(defun drake--transform-stats (x-vec y-vec hue-vec)
-  "Calculate summary statistics (quartiles, etc.) and KDE for each category."
+(defun drake--transform-stats (x-vec y-vec hue-vec &optional order hue-order)
+  "Calculate summary statistics (quartiles, etc.) and KDE for each category.
+Optional ORDER specifies the order of categories on the x-axis.
+Optional HUE-ORDER specifies the order of hue values."
   (let* ((groups (make-hash-table :test 'equal))
-         (categories (drake--get-unique-values x-vec))
+         (categories (or order (drake--get-unique-values x-vec)))
          (x-res nil) (y-res nil) (hue-res nil) (extra-res nil))
+    ;; Collect data into groups
     (cl-loop for i from 0 below (length x-vec) do
              (let ((cat (aref x-vec i))
                    (val (aref y-vec i))
                    (h (when hue-vec (aref hue-vec i))))
                (push val (gethash (cons cat h) groups))))
 
-    (maphash
-     (lambda (key vals)
-       (let* ((sorted (sort (cl-remove-if-not #'numberp vals) #'<))
-              (n (length sorted)))
-         (when (> n 0)
-           ;; Use Rust-aware functions
-           (let* ((quartiles (drake--compute-quartiles-safe sorted))
-                  (min (plist-get quartiles :min))
-                  (max (plist-get quartiles :max))
-                  (q1 (plist-get quartiles :q1))
-                  (median (plist-get quartiles :median))
-                  (q3 (plist-get quartiles :q3))
-                  ;; KDE calculation (Rust-aware)
-                  (kde-points (drake--compute-kde (vconcat sorted) drake-kde-bandwidth-method)))
-             (push (car key) x-res)
-             (push median y-res)
-             (push (cdr key) hue-res)
-             (push (list :min min :q1 q1 :median median :q3 q3 :max max
-                         :vals sorted :kde kde-points) extra-res)))))
-     groups)
+    ;; Process categories in the specified order
+    (dolist (cat categories)
+      ;; For each category, process all hue values in specified order
+      (let ((hue-values (if hue-vec
+                            (or hue-order (drake--get-unique-values hue-vec))
+                          '(nil))))
+        (dolist (h hue-values)
+          (let ((key (cons cat h)))
+            (when-let ((vals (gethash key groups)))
+              (let* ((sorted (sort (cl-remove-if-not #'numberp vals) #'<))
+                     (n (length sorted)))
+                (when (> n 0)
+                  ;; Use Rust-aware functions
+                  (let* ((quartiles (drake--compute-quartiles-safe sorted))
+                         (min (plist-get quartiles :min))
+                         (max (plist-get quartiles :max))
+                         (q1 (plist-get quartiles :q1))
+                         (median (plist-get quartiles :median))
+                         (q3 (plist-get quartiles :q3))
+                         ;; KDE calculation (Rust-aware)
+                         (kde-points (drake--compute-kde (vconcat sorted) drake-kde-bandwidth-method)))
+                    (push cat x-res)
+                    (push median y-res)
+                    (push h hue-res)
+                    (push (list :min min :q1 q1 :median median :q3 q3 :max max
+                                :vals sorted :kde kde-points) extra-res)))))))))
+
     (list :x (vconcat (nreverse x-res))
           :y (vconcat (nreverse y-res))
           :hue (if hue-vec (vconcat (nreverse hue-res)) nil)
@@ -771,15 +783,22 @@ Uses Rust implementation if available, falls back to Elisp."
 
 (defun drake--make-scale-from-stats (extra-vec)
   "Create y-scale from box/violin plot statistics in EXTRA-VEC.
-Each element should be a plist with :min and :max keys."
+Each element should be a plist with :min and :max keys, and optionally :kde."
   (let ((all-mins nil)
         (all-maxs nil))
     (cl-loop for i from 0 below (length extra-vec) do
              (let ((stats (aref extra-vec i)))
+               ;; Collect data min/max
                (when (plist-get stats :min)
                  (push (plist-get stats :min) all-mins))
                (when (plist-get stats :max)
-                 (push (plist-get stats :max) all-maxs))))
+                 (push (plist-get stats :max) all-maxs))
+               ;; Also collect KDE range if present (for violin plots)
+               (when-let ((kde (plist-get stats :kde)))
+                 (dolist (point kde)
+                   (let ((y-val (car point)))
+                     (push y-val all-mins)
+                     (push y-val all-maxs))))))
     (if (and all-mins all-maxs)
         (cons (apply #'min all-mins) (apply #'max all-maxs))
       (cons 0 1)))) ;; Fallback
@@ -942,9 +961,10 @@ Handles columnar plists, row-based lists, and lists of alists/plists."
                  (aset result i 0.0))))
     result))
 
-(defun drake--process-hue (hue-vec palette)
-  "Process HUE-VEC and return a plist with mapped colors."
-  (let* ((unique-vals (drake--get-unique-values hue-vec))
+(defun drake--process-hue (hue-vec palette &optional hue-order)
+  "Process HUE-VEC and return a plist with mapped colors.
+Optional HUE-ORDER specifies the order of hue values for color assignment."
+  (let* ((unique-vals (or hue-order (drake--get-unique-values hue-vec)))
          (color-map (drake--color-manager unique-vals palette))
          (mapped-values (make-vector (length hue-vec) nil)))
     (cl-loop for i from 0 below (length hue-vec) do

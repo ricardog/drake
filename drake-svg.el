@@ -401,7 +401,13 @@ Handles self-closing tags by converting them to open/close tags with the title i
                               (fill . ,color)
                               (fill-opacity . "0.4")
                               (stroke-width . "1")
-                              (drake-tooltip . ,tooltip)))))))))
+                              (drake-tooltip . ,tooltip))))
+                 ;; Draw median line
+                 (let ((median (plist-get stats :median)))
+                   (when median
+                     (let ((py-med (funcall scale-y median)))
+                       (svg-line svg (- px (/ violin-width 2)) py-med (+ px (/ violin-width 2)) py-med
+                                :stroke "black" :stroke-width 2)))))))))
 
 (defun drake-svg--draw-legend (svg width height margin hue-map plot)
   "Draw legend for HUE-MAP on SVG. PLOT is used for smart placement."

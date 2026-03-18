@@ -9,6 +9,26 @@
 This document demonstrates Drake's org-babel integration. Execute any
 code block with =C-c C-c= to generate plots inline.
 
+** Setup: Loading CSV Data
+
+Drake doesn't include CSV parsing. We recommend =duckdb-el= for loading data:
+
+#+BEGIN_SRC emacs-lisp :results silent
+;; Helper function for loading CSV files
+(defun load-csv-for-drake (file columns)
+  "Load CSV FILE with specified COLUMNS using duckdb-el.
+COLUMNS should be a string like \"col1, col2, col3\"."
+  (require 'duckdb)
+  (let* ((db (duckdb-open ":memory:"))
+         (conn (duckdb-connect db)))
+    (duckdb-execute conn (format "CREATE TABLE data AS SELECT * FROM read_csv_auto('%s')"
+                                 (expand-file-name file)))
+    (let ((result (duckdb-select-columns conn (format "SELECT %s FROM data" columns))))
+      (duckdb-disconnect conn)
+      (duckdb-close db)
+      result)))
+#+END_SRC
+
 * Basic Plotting
 
 ** Simple Scatter Plot
@@ -27,10 +47,11 @@ The simplest Drake plot in org-mode:
 
 ** Using Built-in Datasets
 
-Drake includes sample datasets. Let's load the iris dataset:
+Drake includes sample datasets. Let's load the iris dataset using the helper function:
 
 #+BEGIN_SRC emacs-lisp :results silent
-(setq iris (drake-load-csv "../datasets/iris.csv.gz"))
+(setq iris (load-csv-for-drake "../datasets/iris.csv.gz"
+                               "sepal_length, sepal_width, petal_length, petal_width, species"))
 #+END_SRC
 
 Now plot it:
@@ -53,7 +74,8 @@ Sessions maintain data across multiple blocks. Perfect for exploratory analysis!
 ** Load Data in Session
 
 #+BEGIN_SRC drake :session analysis
-(setq tips (drake-load-csv "../datasets/tips.csv.gz"))
+(setq tips (load-csv-for-drake "../datasets/tips.csv.gz"
+                               "total_bill, tip, sex, smoker, day, time, size"))
 (message "Loaded %d rows" (length (plist-get tips :total_bill)))
 #+END_SRC
 
@@ -349,6 +371,8 @@ See the [[file:../docs/ORG_BABEL_GUIDE.md][Org-Babel Guide]] for complete docume
 
 To run this demo, ensure you have:
 
+1. Drake org-babel integration loaded:
+
 #+BEGIN_SRC elisp :exports code :eval never
 ;; Add to your init.el
 (with-eval-after-load 'org
@@ -359,3 +383,14 @@ To run this demo, ensure you have:
      (drake . t)
      (shell . t))))
 #+END_SRC
+
+2. CSV loading library (choose one):
+
+- **duckdb-el** (recommended): =M-x package-install RET duckdb RET=
+  - Handles gzipped files automatically
+  - Fast for large datasets
+  - Source: https://github.com/unhammer/duckdb.el
+
+- **csv.el** (built-in): Already included with Emacs
+  - No support for .gz files
+  - Fine for small datasets

@@ -111,6 +111,7 @@
  (drake-plot-box :data drake-tips-data
                 :x :day
                 :y :total_bill
+                :order '("Thur" "Fri" "Sat" "Sun")
                 :title "Bill Amount by Day of Week"
                 :backend 'svg)
  "tips-boxplot.svg")
@@ -122,6 +123,8 @@
                    :x :day
                    :y :tip
                    :hue :time
+                   :order '("Thur" "Fri" "Sat" "Sun")
+                   :hue-order '("Lunch" "Dinner")
                    :title "Tip Distribution by Day and Time"
                    :backend 'svg)
  "tips-violin.svg")

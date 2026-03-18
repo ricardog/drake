@@ -316,8 +316,18 @@ Press `C-c C-c` to execute. The plot appears inline automatically!
 #+TITLE: Iris Analysis
 
 * Data Loading
-#+BEGIN_SRC drake :session analysis
-(setq iris-data (drake-load-csv "datasets/iris.csv.gz"))
+
+Load CSV data using duckdb-el (recommended) or csv.el:
+
+#+BEGIN_SRC emacs-lisp :results silent
+;; Using duckdb-el (handles .gz files, large datasets)
+(require 'duckdb)
+(let* ((db (duckdb-open ":memory:"))
+       (conn (duckdb-connect db)))
+  (duckdb-execute conn "CREATE TABLE iris AS SELECT * FROM read_csv_auto('datasets/iris.csv.gz')")
+  (setq iris-data (duckdb-select-columns conn "SELECT * FROM iris"))
+  (duckdb-disconnect conn)
+  (duckdb-close db))
 #+END_SRC
 
 * Visualization

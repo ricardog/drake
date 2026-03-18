@@ -79,7 +79,14 @@ Allow persistent Drake environment across code blocks:
 
 ```org
 #+BEGIN_SRC drake :session *drake-analysis*
-(setq iris-data (drake-load-csv "datasets/iris.csv.gz"))
+;; Load CSV with duckdb-el or csv.el
+(require 'duckdb)
+(let* ((db (duckdb-open ":memory:"))
+       (conn (duckdb-connect db)))
+  (duckdb-execute conn "CREATE TABLE iris AS SELECT * FROM read_csv_auto('datasets/iris.csv.gz')")
+  (setq iris-data (duckdb-select-columns conn "SELECT * FROM iris"))
+  (duckdb-disconnect conn)
+  (duckdb-close db))
 #+END_SRC
 
 #+BEGIN_SRC drake :session *drake-analysis*
@@ -386,7 +393,7 @@ Reference other code blocks:
 ```org
 #+NAME: load-data
 #+BEGIN_SRC emacs-lisp
-(drake-load-csv "datasets/iris.csv.gz")
+;; Use duckdb-el or csv.el to load CSV data
 #+END_SRC
 
 #+BEGIN_SRC drake :file plot.svg :noweb yes
@@ -409,7 +416,7 @@ Reference other code blocks:
 * Data Loading
 
 #+BEGIN_SRC drake :session analysis :results output
-(setq iris (drake-load-csv "datasets/iris.csv.gz"))
+(setq iris ;; Use duckdb-el or csv.el to load CSV data)
 (message "Loaded %d rows" (length (plist-get iris :sepal_length)))
 #+END_SRC
 

@@ -51,8 +51,21 @@ The plot appears inline automatically!
 
 * Load Data
 
-#+BEGIN_SRC drake :session analysis
-(setq iris-data (drake-load-csv "datasets/iris.csv.gz"))
+Use duckdb-el or csv.el to load CSV files:
+
+#+BEGIN_SRC emacs-lisp :results silent :session analysis
+;; Option 1: duckdb-el (recommended - handles .gz, large data)
+(require 'duckdb)
+(let* ((db (duckdb-open ":memory:"))
+       (conn (duckdb-connect db)))
+  (duckdb-execute conn "CREATE TABLE iris AS SELECT * FROM read_csv_auto('datasets/iris.csv.gz')")
+  (setq iris-data (duckdb-select-columns conn "SELECT * FROM iris"))
+  (duckdb-disconnect conn)
+  (duckdb-close db))
+
+;; Option 2: csv.el (built-in, but no .gz support)
+;; (require 'csv)
+;; (setq iris-data (csv-parse-buffer ...))
 #+END_SRC
 
 * Scatter Plot
@@ -138,7 +151,8 @@ Use sessions to maintain state across multiple blocks:
 
 ```org
 #+BEGIN_SRC drake :session my-analysis
-(setq my-data (drake-load-csv "data.csv"))
+;; Load data with duckdb-el or csv.el (see examples above)
+(setq my-data ...)
 (setq filtered (drake-filter my-data :species "setosa"))
 #+END_SRC
 
