@@ -1,7 +1,9 @@
 # drake
-A high performance statistics plotting library for Emacs.
+A statistics plotting library for Emacs.
 
-`drake` is a declarative plotting library for Emacs, inspired by Seaborn. It aims to provide high-quality statistical visualizations from DuckDB and SQLite data directly in Emacs.
+`drake` is a declarative plotting library for Emacs, inspired by
+Seaborn. It aims to provide high-quality statistical visualizations from
+DuckDB and SQLite data directly in Emacs.
 
 **Quick Links:** [Gallery](docs/GALLERY.md) | [Theming Guide](docs/THEMING.md) | [Palette Browser](docs/PALETTE_BROWSER_QUICKSTART.md) | [Examples](examples/) | [Documentation](#documentation)
 
@@ -32,13 +34,36 @@ A high performance statistics plotting library for Emacs.
 
 **[View Full Gallery →](docs/GALLERY.md)**
 
-## Status: Stage 5 (High Performance & Advanced Features)
+---
+
+## Status
 - **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
 - **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats), interactive tooltips, **native faceting**, **logarithmic scales**, and **date/time axes**.
 - **Backends:**
   - **Native SVG (`svg`)**: Pure Elisp, zero dependencies.
   - **Gnuplot (`gnuplot`)**: High-quality SVG rendering via external `gnuplot`.
   - **Rust (`rust`)**: High-performance rendering for large datasets (10-13x faster than SVG).
+
+---
+
+## Install
+
+### Requirements
+
+Drake requires Emacs 28 or newer. By default it uses the build-in
+`svg.el` to generate the output and no additional packages are required.
+
+#### Optional
+
+- **duckdb-el**: For fast SQL queries of many data formats.
+- **gnuplot**: Faster (and better looking) charts.
+- **Rust**: Use the Rust backend for higher performance.
+
+You can install drake from GitHub:
+
+<Add installation instructions using use-package from github>.
+
+---
 
 ## Backends
 
@@ -70,6 +95,8 @@ To use the Rust backend, you must compile the dynamic module:
 (require 'drake-rust)
 (drake-module-compile) ;; Requires CMake and Cargo/Rust
 ```
+
+---
 
 ## Color Palettes
 
@@ -174,18 +201,6 @@ Palettes can be applied in three ways:
 (drake-set-theme 'dark)  ; Uses viridis by default
 ```
 
-### Best Practices
-
-**Choosing Palettes:**
-- Match data type to palette type (sequential for ordered, categorical for groups)
-- Use colorblind-friendly palettes (viridis, magma, plasma, inferno)
-- Test in grayscale for print publications
-- Use high-contrast palettes for presentations (set1, high-contrast theme)
-
-**Accessibility:**
-- ✓ Colorblind-friendly: viridis, magma, plasma, inferno, set2
-- ✗ Avoid: Red-green combinations, rainbow palettes
-
 **Palette Comparison:**
 
 <table>
@@ -204,6 +219,8 @@ Palettes can be applied in three ways:
 **Learn More:**
 - [Palette Browser Quick Start](docs/PALETTE_BROWSER_QUICKSTART.md) - Get started in 60 seconds
 - [Palette Demo](examples/palette-demo.el) - Interactive demonstrations
+
+---
 
 ## Theming
 
@@ -268,6 +285,8 @@ Themes control colors, fonts, grid styles, and default palettes across all plot 
 **Learn More:**
 - [Theming Documentation](docs/THEMING.md) - Comprehensive theming guide
 - [Theme Demo](examples/theme-demo.el) - Interactive demonstrations
+
+---
 
 ## Org-Mode Integration
 
@@ -345,7 +364,8 @@ Load CSV data using duckdb-el (recommended) or csv.el:
 
 **Learn More:**
 - [Org-Babel Guide](docs/ORG_BABEL_GUIDE.md) - Complete usage guide with examples
-- [Org Integration Design](docs/ORG_INTEGRATION.md) - Technical implementation details
+
+---
 
 ## Advanced Features
 
@@ -374,7 +394,7 @@ Create grids of plots based on categorical variables using `drake-facet`. All ba
             :backend 'gnuplot)
 ```
 
-### Logarithmic Scales
+### Log Scales
 Apply logarithmic scaling to either or both axes using `:logx` and `:logy`:
 
 ```elisp
@@ -429,6 +449,8 @@ You can save any generated plot to an SVG file using `drake-save-plot`:
 
 For plots displayed in a buffer, you can also use the interactive command **`M-x drake-save`** from that buffer to save it to a file. This works because `drake` stores the plot object in a buffer-local variable `drake-current-plot`.
 
+---
+
 ## Data Formats
 
 `drake` is optimized for **DuckDB** but supports any common Emacs data shape:
@@ -436,10 +458,13 @@ For plots displayed in a buffer, you can also use the interactive command **`M-x
 - **List of Lists (Row-based):** `((1 10) (2 20) (3 30))` (Use positional indices for `:x` and `:y`).
 - **List of Alists/Plists:** `((:x 1 :y 10) (:x 2 :y 20))` (Keyword-based access).
 
+
 ## Sample Datasets
 
 `drake` includes several well-known sample datasets in the `datasets/` directory (compressed as `.gz`):
 - `iris.csv.gz`, `tips.csv.gz`, `gapminder.csv.gz`, `stocks.csv.gz`, etc.
+
+---
 
 ## Usage
 
@@ -479,16 +504,12 @@ The `examples/` directory contains ready-to-run demonstrations:
 - [PALETTE_BROWSER_QUICKSTART.md](docs/PALETTE_BROWSER_QUICKSTART.md) - Palette browser quick start
 - [ORG_BABEL_GUIDE.md](docs/ORG_BABEL_GUIDE.md) - Org-mode integration and usage guide
 
-**Design Documents:**
-- [ORG_INTEGRATION.md](docs/ORG_INTEGRATION.md) - Org-babel integration design
-- [AGGREGATION_DESIGN.md](docs/AGGREGATION_DESIGN.md) - Aggregation strategy and design philosophy
-- [GAP_ANALYSIS.md](docs/GAP_ANALYSIS.md) - Feature gap analysis and future roadmap
-- [RUST_EXPLORATION.md](docs/RUST_EXPLORATION.md) - Rust backend exploration and analysis
-
 **Implementation Details:**
 - [MATH_OFFLOAD_IMPLEMENTATION.md](docs/MATH_OFFLOAD_IMPLEMENTATION.md) - Rust math offload implementation
 - [MATH_OFFLOAD_ANALYSIS.md](docs/MATH_OFFLOAD_ANALYSIS.md) - Performance analysis of math offloading
 - [IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md) - Stage 5 implementation summary
+
+---
 
 ## Development
 
