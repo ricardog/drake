@@ -238,6 +238,50 @@
                    :backend 'svg)
  "tips-smooth.svg")
 
+;;; Example 15: Count plot
+(message "Generating: tips-count.svg")
+(drake-save-example
+ (drake-plot-count :data drake-tips-data
+                  :x :day
+                  :hue :time
+                  :palette 'set2
+                  :title "Lunch vs Dinner by Day"
+                  :backend 'svg)
+ "tips-count.svg")
+
+;;; Example 16: Count plot ordered by frequency
+(message "Generating: tips-count-ordered.svg")
+(drake-save-example
+ (drake-plot-count :data drake-tips-data
+                  :x :day
+                  :order 'value-desc
+                  :palette 'dark2
+                  :title "Most Popular Days"
+                  :backend 'svg)
+ "tips-count-ordered.svg")
+
+;;; Example 17: Pair plot
+(message "Generating: iris-pair.svg")
+(drake-save-example
+ (drake-plot-pair :data drake-iris-data
+                 :vars '(:sepal_length :sepal_width :petal_length)
+                 :hue :species
+                 :palette 'set1
+                 :title "Iris Pair Plot"
+                 :backend 'svg)
+ "iris-pair.svg")
+
+;;; Example 18: Pair plot corner mode
+(message "Generating: iris-pair-corner.svg")
+(drake-save-example
+ (drake-plot-pair :data drake-iris-data
+                 :vars '(:sepal_length :sepal_width :petal_length)
+                 :hue :species
+                 :corner t
+                 :title "Iris Correlation (Corner)"
+                 :backend 'svg)
+ "iris-pair-corner.svg")
+
 (message "")
 (message "====================================")
 (message "All example images generated!")

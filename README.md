@@ -37,8 +37,8 @@ DuckDB and SQLite data directly in Emacs.
 ---
 
 ## Status
-- **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, and Linear Models (`drake-plot-lm`).
-- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats), interactive tooltips, **native faceting**, **logarithmic scales**, and **date/time axes**.
+- **Plot types:** Scatter, Line, Bar, Histogram, Box, Violin, Linear Models (`drake-plot-lm`), Count, and Pair Plot.
+- **Features:** Grouping by color (`:hue`), automatic legends, categorical axes, statistical transformations (binning, OLS regression, summary stats, automatic counting), interactive tooltips, **native faceting**, **logarithmic scales**, **date/time axes**, and **multivariate exploration** (pair plots).
 - **Backends:**
   - **Native SVG (`svg`)**: Pure Elisp, zero dependencies.
   - **Gnuplot (`gnuplot`)**: High-quality SVG rendering via external `gnuplot`.

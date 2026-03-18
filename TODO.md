@@ -20,6 +20,10 @@
 - [x] **Confidence Intervals:** 95% CI shaded areas for regression lines.
 - [x] **Gaussian Smoothing:** `drake-plot-smooth` for trend visualization.
 
+### Stage 6: Additional Plot Types & Exploration Tools
+- [x] **Count Plot:** Automatic frequency counting for categorical data with `drake-plot-count`. Supports hue grouping, multiple ordering options (appearance, alphabetical, by value), and statistical transformations (count, proportion, percent).
+- [x] **Pair Plot:** Multivariate exploration with `drake-plot-pair`. Creates grids of pairwise scatter plots with diagonal histograms, supports hue coloring, corner mode, regression lines, and rectangular grids.
+
 ---
 
 ## Current & Future Tasks

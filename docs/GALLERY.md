@@ -123,6 +123,60 @@ Gaussian smoothing for trend visualization.
 
 ![Tips Smooth](../examples/images/tips-smooth.svg)
 
+### Count Plot
+
+Automatic frequency counting for categorical data.
+
+```elisp
+(drake-plot-count :data tips
+                 :x :day
+                 :hue :time
+                 :palette 'set2
+                 :title "Lunch vs Dinner by Day")
+```
+
+![Count Plot](../examples/images/tips-count.svg)
+
+#### Ordered by Frequency
+
+```elisp
+(drake-plot-count :data tips
+                 :x :day
+                 :order 'value-desc
+                 :palette 'dark2
+                 :title "Most Popular Days")
+```
+
+![Count Plot Ordered](../examples/images/tips-count-ordered.svg)
+
+### Pair Plot
+
+Grid of pairwise variable relationships for exploratory data analysis.
+
+```elisp
+(drake-plot-pair :data iris
+                :vars '(:sepal_length :sepal_width :petal_length)
+                :hue :species
+                :palette 'set1
+                :title "Iris Pair Plot")
+```
+
+![Pair Plot](../examples/images/iris-pair.svg)
+
+#### Corner Mode
+
+Show only lower triangle to reduce redundancy.
+
+```elisp
+(drake-plot-pair :data iris
+                :vars '(:sepal_length :sepal_width :petal_length)
+                :hue :species
+                :corner t
+                :title "Iris Correlation (Corner)")
+```
+
+![Pair Plot Corner](../examples/images/iris-pair-corner.svg)
+
 ---
 
 ## Themes

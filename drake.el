@@ -233,6 +233,250 @@ See `drake-plot-scatter' for ARGS."
 See `drake-plot-scatter' for ARGS."
   (drake--create-plot 'violin args))
 
+(defun drake-plot-count (&rest args)
+  "Create a count plot (bar chart of categorical frequencies).
+
+Automatically counts occurrences of categorical values and displays
+them as a bar chart. This is a convenience wrapper around `drake-plot-bar'
+with implicit aggregation.
+
+ARGS is a plist:
+:data    - Data source (required)
+:x       - Categorical column for X-axis (vertical bars) - mutually exclusive with :y
+:y       - Categorical column for Y-axis (horizontal bars) - mutually exclusive with :x
+:hue     - Optional color grouping column
+:order   - Category ordering: 'appearance (default), 'alpha, 'value-desc, 'value-asc,
+           or explicit list
+:hue-order - Order of hue categories (list)
+:stat    - Statistical transformation: 'count (default), 'proportion, or 'percent
+:palette - Color palette
+:title   - Plot title
+:xlabel  - X-axis label
+:ylabel  - Y-axis label
+:width   - Plot width
+:height  - Plot height
+:backend - Rendering backend
+:buffer  - Target buffer name
+
+Examples:
+  ;; Simple count plot
+  (drake-plot-count :data tips :x :day)
+
+  ;; With hue grouping
+  (drake-plot-count :data tips :x :day :hue :time)
+
+  ;; Ordered by frequency (most common first)
+  (drake-plot-count :data tips :x :day :order 'value-desc)
+
+  ;; Show as percentages
+  (drake-plot-count :data tips :x :day :stat 'percent)"
+  ;; Validate parameters
+  (unless (or (plist-get args :x) (plist-get args :y))
+    (error "Either :x or :y must be specified"))
+  (when (and (plist-get args :x) (plist-get args :y))
+    (error "Cannot specify both :x and :y"))
+
+  (let* ((data (plist-get args :data))
+         (x-key (plist-get args :x))
+         (y-key (plist-get args :y))
+         (hue-key (plist-get args :hue))
+         (stat (or (plist-get args :stat) 'count))
+         (order-method (or (plist-get args :order) 'appearance))
+
+         ;; Determine orientation
+         (cat-key (or x-key y-key))
+         (orientation (if x-key 'vertical 'horizontal))
+
+         ;; Extract columns
+         (cat-vec (drake--extract-column data cat-key))
+         (hue-vec (when hue-key (drake--extract-column data hue-key)))
+
+         ;; Count occurrences
+         (counts (drake--count-by-group cat-vec hue-vec cat-key hue-key))
+
+         ;; Apply ordering
+         (counts-ordered (drake--order-counts counts cat-key order-method))
+
+         ;; Apply statistical transformation
+         (counts-transformed (drake--transform-counts counts-ordered stat)))
+
+    ;; Build bar plot arguments
+    (let ((bar-args (list :data counts-transformed
+                         :x (if (eq orientation 'vertical) cat-key :count)
+                         :y (if (eq orientation 'vertical) :count cat-key))))
+      ;; Add optional parameters
+      (when hue-key
+        (setq bar-args (plist-put bar-args :hue hue-key)))
+      (when (plist-get args :hue-order)
+        (setq bar-args (plist-put bar-args :hue-order (plist-get args :hue-order))))
+      (when (plist-get args :palette)
+        (setq bar-args (plist-put bar-args :palette (plist-get args :palette))))
+      (when (plist-get args :title)
+        (setq bar-args (plist-put bar-args :title (plist-get args :title))))
+      (when (plist-get args :xlabel)
+        (setq bar-args (plist-put bar-args :xlabel (plist-get args :xlabel))))
+      (when (plist-get args :ylabel)
+        (setq bar-args (plist-put bar-args :ylabel (plist-get args :ylabel))))
+      (when (plist-get args :width)
+        (setq bar-args (plist-put bar-args :width (plist-get args :width))))
+      (when (plist-get args :height)
+        (setq bar-args (plist-put bar-args :height (plist-get args :height))))
+      (when (plist-get args :backend)
+        (setq bar-args (plist-put bar-args :backend (plist-get args :backend))))
+      (when (plist-get args :buffer)
+        (setq bar-args (plist-put bar-args :buffer (plist-get args :buffer))))
+
+      ;; Plot as bar chart
+      (apply #'drake-plot-bar bar-args))))
+
+(defun drake--count-by-group (cat-vec hue-vec cat-key hue-key)
+  "Count occurrences of categories in CAT-VEC, optionally grouped by HUE-VEC.
+Returns columnar plist with CAT-KEY, optional HUE-KEY, and :count columns."
+  (let ((counts (make-hash-table :test 'equal))
+        (order nil))
+    ;; Count each (category, hue) combination
+    (cl-loop for i from 0 below (length cat-vec) do
+             (let* ((cat (aref cat-vec i))
+                    (hue (when hue-vec (aref hue-vec i)))
+                    (key (if hue (cons cat hue) cat)))
+               (unless (gethash key counts)
+                 (push key order))  ; Track order of first appearance
+               (puthash key (1+ (gethash key counts 0)) counts)))
+
+    (setq order (nreverse order))
+
+    ;; Convert hash to columnar plist
+    (if hue-vec
+        ;; With hue: need cat, hue, count columns
+        (let ((cat-list nil)
+              (hue-list nil)
+              (count-list nil))
+          (dolist (key order)
+            (push (car key) cat-list)
+            (push (cdr key) hue-list)
+            (push (gethash key counts) count-list))
+          (list cat-key (vconcat (nreverse cat-list))
+                hue-key (vconcat (nreverse hue-list))
+                :count (vconcat (nreverse count-list))))
+      ;; No hue: just cat and count columns
+      (let ((cat-list nil)
+            (count-list nil))
+        (dolist (key order)
+          (push key cat-list)
+          (push (gethash key counts) count-list))
+        (list cat-key (vconcat (nreverse cat-list))
+              :count (vconcat (nreverse count-list)))))))
+
+(defun drake--order-counts (counts cat-key order-method)
+  "Order COUNTS data according to ORDER-METHOD.
+Methods: 'appearance (default), 'alpha, 'value-desc, 'value-asc, or explicit list."
+  (cond
+   ((eq order-method 'appearance)
+    counts)  ; Already in order of first appearance
+
+   ((eq order-method 'alpha)
+    (drake--sort-counts-by-category counts cat-key #'string<))
+
+   ((eq order-method 'value-desc)
+    (drake--sort-counts-by-count counts #'>))
+
+   ((eq order-method 'value-asc)
+    (drake--sort-counts-by-count counts #'<))
+
+   ((listp order-method)
+    (drake--reorder-counts counts cat-key order-method))
+
+   (t counts)))
+
+(defun drake--sort-counts-by-category (counts cat-key predicate)
+  "Sort COUNTS by category using PREDICATE."
+  (let* ((cat-vec (plist-get counts cat-key))
+         (count-vec (plist-get counts :count))
+         (hue-key (cl-loop for (k v) on counts by #'cddr
+                          when (and (not (eq k cat-key)) (not (eq k :count)))
+                          return k))
+         (hue-vec (when hue-key (plist-get counts hue-key)))
+         (indices (cl-loop for i from 0 below (length cat-vec) collect i))
+         (sorted-indices (sort indices (lambda (a b)
+                                        (funcall predicate
+                                                (format "%s" (aref cat-vec a))
+                                                (format "%s" (aref cat-vec b)))))))
+    (if hue-key
+        (list cat-key (vconcat (mapcar (lambda (i) (aref cat-vec i)) sorted-indices))
+              hue-key (vconcat (mapcar (lambda (i) (aref hue-vec i)) sorted-indices))
+              :count (vconcat (mapcar (lambda (i) (aref count-vec i)) sorted-indices)))
+      (list cat-key (vconcat (mapcar (lambda (i) (aref cat-vec i)) sorted-indices))
+            :count (vconcat (mapcar (lambda (i) (aref count-vec i)) sorted-indices))))))
+
+(defun drake--sort-counts-by-count (counts predicate)
+  "Sort COUNTS by count value using PREDICATE."
+  (let* ((cat-key (cl-loop for (k v) on counts by #'cddr
+                          when (not (eq k :count))
+                          return k))
+         (cat-vec (plist-get counts cat-key))
+         (count-vec (plist-get counts :count))
+         (hue-key (cl-loop for (k v) on counts by #'cddr
+                          when (and (not (eq k cat-key)) (not (eq k :count)))
+                          return k))
+         (hue-vec (when hue-key (plist-get counts hue-key)))
+         (indices (cl-loop for i from 0 below (length count-vec) collect i))
+         (sorted-indices (sort indices (lambda (a b)
+                                        (funcall predicate
+                                                (aref count-vec a)
+                                                (aref count-vec b))))))
+    (if hue-key
+        (list cat-key (vconcat (mapcar (lambda (i) (aref cat-vec i)) sorted-indices))
+              hue-key (vconcat (mapcar (lambda (i) (aref hue-vec i)) sorted-indices))
+              :count (vconcat (mapcar (lambda (i) (aref count-vec i)) sorted-indices)))
+      (list cat-key (vconcat (mapcar (lambda (i) (aref cat-vec i)) sorted-indices))
+            :count (vconcat (mapcar (lambda (i) (aref count-vec i)) sorted-indices))))))
+
+(defun drake--reorder-counts (counts cat-key explicit-order)
+  "Reorder COUNTS according to EXPLICIT-ORDER list."
+  (let* ((cat-vec (plist-get counts cat-key))
+         (count-vec (plist-get counts :count))
+         (hue-key (cl-loop for (k v) on counts by #'cddr
+                          when (and (not (eq k cat-key)) (not (eq k :count)))
+                          return k))
+         (hue-vec (when hue-key (plist-get counts hue-key)))
+         (new-cat nil)
+         (new-hue nil)
+         (new-count nil))
+    ;; Build new vectors in the order specified
+    (dolist (cat explicit-order)
+      (cl-loop for i from 0 below (length cat-vec)
+               when (equal (aref cat-vec i) cat)
+               do (push (aref cat-vec i) new-cat)
+                  (when hue-vec (push (aref hue-vec i) new-hue))
+                  (push (aref count-vec i) new-count)))
+    (if hue-key
+        (list cat-key (vconcat (nreverse new-cat))
+              hue-key (vconcat (nreverse new-hue))
+              :count (vconcat (nreverse new-count)))
+      (list cat-key (vconcat (nreverse new-cat))
+            :count (vconcat (nreverse new-count))))))
+
+(defun drake--transform-counts (counts stat)
+  "Transform counts according to STAT ('count, 'proportion, or 'percent)."
+  (cond
+   ((eq stat 'count)
+    counts)  ; Already counts
+
+   ((eq stat 'proportion)
+    (let* ((count-vec (plist-get counts :count))
+           (total (apply #'+ (append count-vec nil)))
+           (prop-vec (vconcat (mapcar (lambda (c) (/ (float c) total))
+                                     (append count-vec nil)))))
+      (plist-put (copy-sequence counts) :count prop-vec)))
+
+   ((eq stat 'percent)
+    (let* ((counts-prop (drake--transform-counts counts 'proportion))
+           (prop-vec (plist-get counts-prop :count))
+           (pct-vec (vconcat (mapcar (lambda (p) (* p 100.0)) (append prop-vec nil)))))
+      (plist-put counts-prop :count pct-vec)))
+
+   (t counts)))
+
 (cl-defstruct drake-facet-plot
   grid           ;; 2D list of drake-plot objects
   title          ;; Overall title
@@ -285,36 +529,216 @@ ARGS is a plist containing:
       (drake--display-in-buffer fplot (or (plist-get args :buffer) "*drake-facet*"))
       fplot)))
 
+(defun drake-plot-pair (&rest args)
+  "Create a pair plot (scatter matrix) showing pairwise relationships.
+
+Displays a grid of plots where each cell shows the relationship between
+two variables. Diagonal cells show the distribution of individual variables
+(histograms or KDE), while off-diagonal cells show scatter plots or
+regression lines.
+
+ARGS is a plist:
+:data      - Data source (required)
+:vars      - List of variable keywords '(:var1 :var2 ...) (required unless x-vars/y-vars)
+:x-vars    - Alternative: list of variables for columns (overrides :vars)
+:y-vars    - Alternative: list of variables for rows (overrides :vars)
+:hue       - Optional color grouping column
+:palette   - Color palette
+:kind      - 'scatter (default) or 'reg (regression lines)
+:diag-kind - 'hist (default), 'kde, or 'none
+:diag-bins - Number of bins for diagonal histograms (default 20)
+:corner    - If t, only show lower triangle (default nil)
+:alpha     - Point transparency (default 0.7)
+:title     - Overall title
+:width     - Width of each subplot
+:height    - Height of each subplot
+:backend   - Rendering backend
+:buffer    - Target buffer name
+
+Examples:
+  ;; Basic pair plot
+  (drake-plot-pair :data iris
+                  :vars '(:sepal_length :sepal_width :petal_length))
+
+  ;; With species coloring
+  (drake-plot-pair :data iris
+                  :vars '(:sepal_length :sepal_width :petal_length)
+                  :hue :species)
+
+  ;; Corner mode (lower triangle only)
+  (drake-plot-pair :data iris
+                  :vars '(:sepal_length :sepal_width :petal_length)
+                  :corner t)
+
+  ;; With regression lines
+  (drake-plot-pair :data iris
+                  :vars '(:sepal_length :petal_length)
+                  :kind 'reg)"
+  (let* ((data (drake--normalize-data-all (plist-get args :data)))
+         (vars (plist-get args :vars))
+         (x-vars (or (plist-get args :x-vars) vars))
+         (y-vars (or (plist-get args :y-vars) vars)))
+
+    ;; Validate parameters
+    (unless (and x-vars y-vars)
+      (error "Must specify either :vars or both :x-vars and :y-vars"))
+    (when (null x-vars)
+      (error "No variables specified"))
+
+    ;; Validate variables exist in data
+    (cl-loop for var in x-vars
+             unless (plist-member data var)
+             do (error "Variable %s not found in data" var))
+    (cl-loop for var in y-vars
+             unless (plist-member data var)
+             do (error "Variable %s not found in data" var))
+
+    (let* ((hue-key (plist-get args :hue))
+           (kind (or (plist-get args :kind) 'scatter))
+           (diag-kind (or (plist-get args :diag-kind) 'hist))
+           (corner (plist-get args :corner))
+           (backend-sym (or (plist-get args :backend) drake-default-backend))
+
+           ;; Determine grid dimensions
+           (n-rows (length y-vars))
+           (n-cols (length x-vars))
+
+           ;; Create grid of plots
+           (grid (drake--create-pair-grid data x-vars y-vars hue-key kind diag-kind
+                                         corner backend-sym args)))
+
+      ;; Package as facet plot
+      (let ((fplot (make-drake-facet-plot
+                    :grid grid
+                    :title (plist-get args :title)
+                    :rows n-rows
+                    :cols n-cols
+                    :spec args)))
+
+        ;; Render
+        (let ((backend (gethash backend-sym drake--backends)))
+          (if (and backend (drake-backend-render-facet-fn backend))
+              (setf (drake-facet-plot-image fplot)
+                    (funcall (drake-backend-render-facet-fn backend) fplot))
+            (setf (drake-facet-plot-image fplot) (drake--render-facet fplot))))
+
+        ;; Display
+        (drake--display-in-buffer fplot (or (plist-get args :buffer) "*drake-pair*"))
+        fplot))))
+
+(defun drake--create-pair-grid (data x-vars y-vars hue-key kind diag-kind corner backend args)
+  "Create grid of plots for pair plot."
+  (let ((grid nil))
+    (cl-loop for row-idx from 0 below (length y-vars) do
+      (let ((y-var (nth row-idx y-vars))
+            (row-plots nil))
+        (cl-loop for col-idx from 0 below (length x-vars) do
+          (let ((x-var (nth col-idx x-vars)))
+            (cond
+             ;; Skip upper triangle if corner mode
+             ((and corner (> col-idx row-idx))
+              (push nil row-plots))
+
+             ;; Diagonal: histogram or KDE
+             ((equal x-var y-var)
+              (push (drake--create-diagonal-plot data x-var hue-key diag-kind backend args)
+                    row-plots))
+
+             ;; Off-diagonal: scatter or regression
+             (t
+              (push (drake--create-offdiag-plot data x-var y-var hue-key kind backend args)
+                    row-plots)))))
+        (push (nreverse row-plots) grid)))
+    (nreverse grid)))
+
+(defun drake--create-diagonal-plot (data var hue-key diag-kind backend args)
+  "Create diagonal plot (histogram or KDE)."
+  (cond
+   ((eq diag-kind 'hist)
+    (drake-plot-hist :data data :x var :hue hue-key
+                    :backend backend :buffer nil
+                    :bins (or (plist-get args :diag-bins) 20)
+                    :palette (plist-get args :palette)
+                    :width (plist-get args :width)
+                    :height (plist-get args :height)))
+
+   ((eq diag-kind 'kde)
+    ;; KDE plot not implemented yet, fall back to histogram
+    (drake-plot-hist :data data :x var :hue hue-key
+                    :backend backend :buffer nil
+                    :bins (or (plist-get args :diag-bins) 20)
+                    :palette (plist-get args :palette)
+                    :width (plist-get args :width)
+                    :height (plist-get args :height)))
+
+   ((eq diag-kind 'none)
+    nil)  ; Empty subplot
+
+   (t
+    (drake-plot-hist :data data :x var :hue hue-key
+                    :backend backend :buffer nil
+                    :bins (or (plist-get args :diag-bins) 20)
+                    :palette (plist-get args :palette)
+                    :width (plist-get args :width)
+                    :height (plist-get args :height)))))
+
+(defun drake--create-offdiag-plot (data x-var y-var hue-key kind backend args)
+  "Create off-diagonal plot (scatter or regression)."
+  (cond
+   ((eq kind 'scatter)
+    (drake-plot-scatter :data data :x x-var :y y-var :hue hue-key
+                       :backend backend :buffer nil
+                       :palette (plist-get args :palette)
+                       :width (plist-get args :width)
+                       :height (plist-get args :height)))
+
+   ((eq kind 'reg)
+    (drake-plot-lm :data data :x x-var :y y-var :hue hue-key
+                  :backend backend :buffer nil
+                  :palette (plist-get args :palette)
+                  :width (plist-get args :width)
+                  :height (plist-get args :height)))
+
+   (t
+    (drake-plot-scatter :data data :x x-var :y y-var :hue hue-key
+                       :backend backend :buffer nil
+                       :palette (plist-get args :palette)
+                       :width (plist-get args :width)
+                       :height (plist-get args :height)))))
+
 (defun drake--render-facet (fplot)
   "Render a drake-facet-plot FPLOT into a single composite SVG image."
   (let* ((grid (drake-facet-plot-grid fplot))
          (n-rows (drake-facet-plot-rows fplot))
          (n-cols (drake-facet-plot-cols fplot))
-         (first-plot (caar grid))
-         (p-spec (drake-plot-spec first-plot))
-         (p-width (or (plist-get p-spec :width) drake-default-width))
-         (p-height (or (plist-get p-spec :height) drake-default-height))
+         ;; Find first non-nil plot to get dimensions
+         (first-plot (cl-loop for row in grid
+                             thereis (cl-loop for p in row
+                                             when p return p)))
+         (p-spec (when first-plot (drake-plot-spec first-plot)))
+         (p-width (or (and p-spec (plist-get p-spec :width)) drake-default-width))
+         (p-height (or (and p-spec (plist-get p-spec :height)) drake-default-height))
          (padding 10)
          (title-height (if (drake-facet-plot-title fplot) 40 0))
          (total-width (+ (* n-cols p-width) (* (1+ n-cols) padding)))
          (total-height (+ title-height (* n-rows p-height) (* (1+ n-rows) padding)))
          (svg (svg-create total-width total-height)))
-    
+
     (svg-rectangle svg 0 0 total-width total-height :fill "white")
-    
+
     (when (drake-facet-plot-title fplot)
-      (svg-text svg (drake-facet-plot-title fplot) 
-                :x (/ total-width 2) :y 25 :text-anchor "middle" 
+      (svg-text svg (drake-facet-plot-title fplot)
+                :x (/ total-width 2) :y 25 :text-anchor "middle"
                 :font-size "20px" :fill "black" :font-weight "bold"))
-    
+
     (cl-loop for r from 0 below n-rows do
              (cl-loop for c from 0 below n-cols do
                       (let* ((p (nth c (nth r grid)))
-                             (xml (drake-plot-svg-xml p))
+                             (xml (when p (drake-plot-svg-xml p)))
                              (px (+ padding (* c (+ p-width padding))))
                              (py (+ title-height padding (* r (+ p-height padding)))))
                         (if xml
-                            (svg-embed svg xml "image/svg+xml" t 
+                            (svg-embed svg xml "image/svg+xml" t
                                        :x px :y py :width p-width :height p-height)
                           (svg-rectangle svg px py p-width p-height :fill "none" :stroke "#ccc")
                           (svg-text svg (format "Plot (%d,%d)" r c) :x (+ px (/ p-width 2)) :y (+ py (/ p-height 2))
@@ -323,7 +747,10 @@ ARGS is a plist containing:
                  (svg-print svg)
                  (buffer-string))))
       (setf (drake-facet-plot-svg-xml fplot) xml)
-      (svg-image svg))))
+      ;; In batch mode or if SVG support is unavailable, return a placeholder
+      (condition-case nil
+          (svg-image svg)
+        (error (list 'image :type 'svg :data xml))))))
 
 (defun drake--filter-data (data filters)
   "Filter DATA based on FILTERS (alist of key . value)."
