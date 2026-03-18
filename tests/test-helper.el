@@ -1,7 +1,10 @@
 ;;; test-helper.el --- Helper for drake tests -*- lexical-binding: t; -*-
 
 (add-to-list 'load-path (expand-file-name ".." (file-name-directory (or load-file-name (buffer-file-name)))))
-(add-to-list 'load-path "/root/src/duckdb-el")
+
+;; Try to add duckdb-el to load-path if it exists
+(when (file-directory-p "/root/src/duckdb-el")
+  (add-to-list 'load-path "/root/src/duckdb-el"))
 
 (require 'drake)
 (require 'drake-svg)
@@ -44,5 +47,10 @@
   "Skip the current ERT test unless gnuplot backend is available."
   `(unless (gethash 'gnuplot drake--backends)
      (ert-skip "Gnuplot backend not available")))
+
+(defmacro drake-skip-unless-duckdb ()
+  "Skip the current ERT test unless duckdb is available."
+  `(unless (featurep 'duckdb)
+     (ert-skip "duckdb-el not available")))
 
 (provide 'test-helper)

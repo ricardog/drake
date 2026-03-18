@@ -80,10 +80,10 @@
         (session-buf nil))
     (unwind-protect
         (progn
-          ;; First block: set variable
+          ;; First block: set variable (no graphics output)
           (with-temp-buffer
             (org-mode)
-            (insert (format "#+BEGIN_SRC drake :session %s\n" session-name))
+            (insert (format "#+BEGIN_SRC drake :session %s :results silent\n" session-name))
             (insert "(setq test-data drake-test-iris-data)\n")
             (insert "#+END_SRC\n")
             (goto-char (point-min))
@@ -132,7 +132,7 @@
          (expanded (org-babel-expand-body:drake body params)))
     (should (string-match-p "(setq x 10)" expanded))
     (should (string-match-p "(setq y 20)" expanded))
-    (should (string-match-p "(+ x y)" expanded))))
+    (should (string-match-p (regexp-quote "(+ x y)") expanded))))
 
 ;;; Plot ID Registry Tests
 
@@ -198,9 +198,8 @@
     (insert "#+END_SRC\n")
     (goto-char (point-min))
     (forward-line)
-    (let ((result (org-babel-execute-src-block)))
-      (should (stringp result))
-      (should (string-match-p "error" (downcase result))))))
+    ;; Execution should fail with an error
+    (should-error (org-babel-execute-src-block) :type 'error)))
 
 ;;; Template Tests
 

@@ -84,8 +84,12 @@ object for value results."
          (plot-id (cdr (assq :id params))))
 
     ;; Validate required parameters for graphics output
+    ;; Skip validation if :results silent or other non-graphics result type
     (when (and (or (member "file" result-params)
                    (member "graphics" result-params))
+               (not (member "silent" result-params))
+               (not (member "value" result-params))
+               (not (member "none" result-params))
                (not output-file))
       (error "Drake graphics output requires :file parameter"))
 
