@@ -578,6 +578,14 @@ Or run a specific test file using Emacs directly:
 emacs -batch -L . -L tests -l tests/drake-tests.el -f ert-run-tests-batch-and-exit
 ```
 
+### Running Locally
+
+There's also a convenient script to set up your local environment:
+
+```sh
+./github/scripts/test-local.sh
+```
+
 ### Running Benchmarks
 
 Benchmarks are used to track performance regressions in data normalization, filtering, and rendering backends.

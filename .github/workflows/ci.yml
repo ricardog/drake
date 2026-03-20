@@ -1,0 +1,58 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Emacs
+      uses: emacs-eask/setup-emacs@v3
+      with:
+        version: '28.2'
+
+    - name: Setup Eask
+      uses: emacs-eask/setup-eask@v3
+
+    - name: Install system dependencies
+      run: |
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libx11-dev libxpm-dev libjpeg-dev libpng-dev libgif-dev libtiff-dev libncurses-dev libxft-dev libxaw7-dev libxext-dev libxt-dev pkg-config libgccjit-dev curl clang cmake gnuplot
+        else
+          brew install libgccjit cmake gnuplot
+        fi
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Build and Test with CMake
+      run: |
+        # Build the Rust module first
+        cd rust
+        cargo build --release
+        cp target/release/libdrake_rust_module.so ../drake-rust-module.so
+        cd ..
+
+        # Set up and run full CMake test suite
+        mkdir -p build
+        cd build
+        cmake ..
+        make
+        make check
+        cd ..
+
+    - name: Run Core ERT Tests
+      run: |
+        # Run specific test files via Emacs directly as documented
+        emacs -batch -L . -L tests -l tests/test-helper.el -l tests/drake-tests.el -f ert-run-tests-batch-and-exit
+        emacs -batch -L . -L tests -l tests/test-helper.el -l tests/drake-svg-tests.el -f ert-run-tests-batch-and-exit
