@@ -30,16 +30,16 @@
 
 ### Stage 5: High Performance & Optimization
 - [x] **Optimize Rust Data Transfer:** Replace `env.call("aref", ...)` loops with direct memory access or more efficient vector transfer methods to handle large datasets (>100k rows) without lag.
-- [X] **Offload Math to Rust:** [DONE] Move KDE, OLS regression, and summary statistics calculations from Elisp to the Rust dynamic module. (KDE: 326x faster, OLS: 17-19x faster, Quartiles: 5x faster)
+- [X] **Offload Math to Rust:** Move KDE, OLS regression, and summary statistics calculations from Elisp to the Rust dynamic module. (KDE: 326x faster, OLS: 17-19x faster, Quartiles: 5x faster)
 - [ ] **Direct DuckDB-to-Rust Pipeline:** Investigate passing DuckDB result pointers directly to the Rust backend to minimize Elisp-side data manipulation.
 
 ### Backend Consistency & Features
 - [ ] **Gnuplot Interactivity:** Implement tooltip support for the Gnuplot backend, possibly via SVG post-processing.
-- [X] **Native Faceting:** Implement native `multiplot` (Gnuplot) and grid rendering (Rust) for `drake-facet` to improve performance and layout precision. [DONE] **COMPLETE** (All backends support native faceting)
-- [X] **Advanced Axis Support:** [DONE] **95% COMPLETE**
-    - [X] Date/Time axis scaling and formatting. [DONE] (SVG & Rust backends; Gnuplot has known limitation)
-    - [X] Logarithmic scales. [DONE] (All backends)
-    - [X] Customizable number formatting (SI prefixes, decimal precision). [DONE] (Rust backend)
+- [X] **Native Faceting:** Implement native `multiplot` (Gnuplot) and grid rendering (Rust) for `drake-facet` to improve performance and layout precision.
+- [X] **Advanced Axis Support:**
+    - [X] Date/Time axis scaling and formatting.
+    - [X] Logarithmic scales.
+    - [X] Customizable number formatting (SI prefixes, decimal precision).
 
 ### Code Quality & Robustness
 - [X] **Hardened Rust Module:** Replace `unwrap()` calls in `rust/src/lib.rs` with proper `Result` handling to prevent Emacs crashes on malformed data.
@@ -47,10 +47,10 @@
 - [X] **Enhanced KDE:** Implement automatic bandwidth selection methods beyond Silverman's rule (e.g., Scott's Rule, Cross-validation).
 
 ### API & Ergonomics
-- [X] **Thematic Styling:** [DONE] Add `drake-set-theme` to globally manage fonts, grid styles, and color schemes. Includes 8 built-in themes and automatic Emacs theme detection with `drake-auto-theme`.
+- [X] **Thematic Styling:** Add `drake-set-theme` to globally manage fonts, grid styles, and color schemes. Includes 8 built-in themes and automatic Emacs theme detection with `drake-auto-theme`.
 - [ ] **Coordinate Flipping:** Add a `:flip` argument to easily swap X and Y axes (e.g., for horizontal bar charts).
-- [X] **Palette Browser:** [DONE] Interactive palette browser with visual previews, search, export/import, and improved ColorBrewer fetching with async support and error handling.
-- [X] **Org-Mode Integration:** [DONE] Full org-babel support with `ob-drake.el`. Execute Drake code in org blocks with file output, sessions, variable passing, custom links, and export support for HTML/LaTeX/Markdown.
+- [X] **Palette Browser:** Interactive palette browser with visual previews, search, export/import, and improved ColorBrewer fetching with async support and error handling.
+- [X] **Org-Mode Integration:** Full org-babel support with `ob-drake.el`. Execute Drake code in org blocks with file output, sessions, variable passing, custom links, and export support for HTML/LaTeX/Markdown.
 
 ### Documentation & Testing
 - [ ] **Visual Regression Suite:** Implement tests that verify visual consistency across `svg`, `gnuplot`, and `rust` backends.
