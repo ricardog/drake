@@ -416,6 +416,34 @@ Load CSV data using duckdb-el (recommended) or csv.el:
 
 ---
 
+## DuckDB Integration
+
+Drake features a deep integration with `duckdb-el`, allowing you to create charts directly from your SQL query results using an interactive Transient UI.
+
+### Usage
+
+1. Open a DuckDB database and run a query using `M-x duckdb-browse-query`.
+2. In the `*DuckDB Query Results*` buffer, press `P` (or your preferred binding) to open the Drake Transient.
+3. Select your chart type, axes, hue, theme, and palette.
+4. Choose the **Data Source**:
+   - **buffer**: Use only the rows currently displayed in the results buffer (respects `LIMIT` and `OFFSET`).
+   - **full**: Re-run the query without any `LIMIT` or `OFFSET` to plot the entire result set.
+5. Press `g` to generate the chart.
+
+### Configuration
+
+Add the following to your Emacs configuration:
+
+```elisp
+(with-eval-after-load 'duckdb
+  (require 'drake-duckdb)
+  (define-key duckdb-query-results-mode-map (kbd "P") #'drake-duckdb-transient))
+```
+
+The Transient UI provides a seamless way to explore your data visually as you query it, with support for all Drake plot types including Scatter, Line, Bar, Histogram, and more.
+
+---
+
 ## Advanced Features
 
 ### Native Faceting (Small Multiples)
