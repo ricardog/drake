@@ -10,9 +10,13 @@
 ;;; Code:
 
 (require 'drake)
-(require 'duckdb)
-(require 'transient)
 (require 'cl-lib)
+
+(unless (require 'duckdb nil t)
+  (warn "drake-duckdb: duckdb.el not found. DuckDB integration will be unavailable."))
+
+(unless (require 'transient nil t)
+  (warn "drake-duckdb: transient.el not found. DuckDB integration will be unavailable."))
 
 (defvar drake-duckdb-chart-type "scatter")
 (defvar drake-duckdb-x-axis nil)
