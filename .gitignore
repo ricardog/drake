@@ -28,3 +28,6 @@ build/
 
 # Agent configuration
 .claude
+
+# MacOS system files
+.DS_Store
