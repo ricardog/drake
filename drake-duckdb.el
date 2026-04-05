@@ -11,6 +11,7 @@
 
 (require 'drake)
 (require 'cl-lib)
+(require 'transient)
 
 (unless (require 'duckdb nil t)
   (warn "drake-duckdb: duckdb.el not found. DuckDB integration will be unavailable."))
