@@ -42,7 +42,7 @@
          (t nil)))
     (error "Not in duckdb-query-results-mode")))
 
-(transient-define-infix drake-duckdb--chart-type ()
+(transient-define-infix drake-duckdb-chart-type ()
   :description "Chart Type"
   :class 'transient-lisp-variable
   :variable 'drake-duckdb-chart-type
