@@ -67,7 +67,8 @@ Drake can be installed using various Emacs package managers:
 
 ```elisp
 (use-package drake
-  :straight (drake :type git :host github :repo "ricardog/drake")
+  :straight (drake :type git :host github :repo "ricardog/drake"
+		    :files (:defaults "CMakeLists.txt" ("rust" . "rust")))
   :custom
   (drake-default-backend 'svg))
 ```
